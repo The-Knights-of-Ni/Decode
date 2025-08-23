@@ -1,4 +1,4 @@
-org.firstinspires.ftc.teamcode.test.TeamCode-androidTest-0 /Users/admin/ftc/IntoTheDeep2024_25/TeamCode/build/generated/res/resValues/androidTest/debug
-org.firstinspires.ftc.teamcode.test.TeamCode-mergeDebugAndroidTestResources-1 /Users/admin/ftc/IntoTheDeep2024_25/TeamCode/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/merged.dir
-org.firstinspires.ftc.teamcode.test.TeamCode-mergeDebugAndroidTestResources-2 /Users/admin/ftc/IntoTheDeep2024_25/TeamCode/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/stripped.dir
-org.firstinspires.ftc.teamcode.test.TeamCode-debugAndroidTest-3 /Users/admin/ftc/IntoTheDeep2024_25/TeamCode/build/intermediates/merged_res/debugAndroidTest/mergeDebugAndroidTestResources
+org.firstinspires.ftc.teamcode.test.TeamCode-androidTest-0 /Users/admin/ftc/Decode/TeamCode/build/generated/res/resValues/androidTest/debug
+org.firstinspires.ftc.teamcode.test.TeamCode-mergeDebugAndroidTestResources-1 /Users/admin/ftc/Decode/TeamCode/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/merged.dir
+org.firstinspires.ftc.teamcode.test.TeamCode-mergeDebugAndroidTestResources-2 /Users/admin/ftc/Decode/TeamCode/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/stripped.dir
+org.firstinspires.ftc.teamcode.test.TeamCode-debugAndroidTest-3 /Users/admin/ftc/Decode/TeamCode/build/intermediates/merged_res/debugAndroidTest/mergeDebugAndroidTestResources
