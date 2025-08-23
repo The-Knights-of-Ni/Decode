@@ -1,0 +1,43 @@
+//
+// build.gradle in TeamCode
+//
+// Most of the definitions for building your module reside in a common, shared
+// file 'build.common.gradle'. Being factored in this way makes it easier to
+// integrate updates to the FTC into your code. If you really need to customize
+// the build definitions, you can place those customizations in this file, but
+// please think carefully as to whether such customizations are really necessary
+// before doing so.
+
+
+// Custom definitions may go here
+
+// Include common definitions from above.
+apply from: '../build.common.gradle'
+apply from: '../build.dependencies.gradle'
+
+android {
+    namespace = 'org.firstinspires.ftc.teamcode'
+
+    packagingOptions {
+        jniLibs.useLegacyPackaging true
+    }
+}
+
+dependencies {
+    implementation project(':FtcRobotController')
+    implementation(group: 'org.openftc', name: 'easyopencv', version: '1.7.3')
+    testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.2')
+    testImplementation 'org.mockito:mockito-core:5.5.0'
+    testRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.8.2')
+    implementation(group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1')
+    implementation(group: 'org.apache.commons', name: 'commons-geometry-euclidean', version: '1.0')
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+    testLogging {
+        exceptionFormat "full"
+        events "started", "skipped", "passed", "failed"
+        showStandardStreams true
+    }
+}
