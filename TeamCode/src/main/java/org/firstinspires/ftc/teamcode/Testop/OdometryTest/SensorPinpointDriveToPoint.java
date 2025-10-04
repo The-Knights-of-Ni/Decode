@@ -31,14 +31,13 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
         DRIVE_TO_TARGET_2,
         DRIVE_TO_TARGET_3,
         DRIVE_TO_TARGET_4,
-        DRIVE_TO_TARGET_5
-    }
+        DRIVE_TO_TARGET_5$ProjectFileDir$    }
 
-    static final Pose2D TARGET_1 = new Pose2D(DistanceUnit.MM,10,0, AngleUnit.DEGREES,0);
-    static final Pose2D TARGET_2 = new Pose2D(DistanceUnit.MM, 2600, -20, AngleUnit.DEGREES, -90);
-    static final Pose2D TARGET_3 = new Pose2D(DistanceUnit.MM,2600,-2600, AngleUnit.DEGREES,-90);
-    static final Pose2D TARGET_4 = new Pose2D(DistanceUnit.MM, 100, -2600, AngleUnit.DEGREES, 90);
-    static final Pose2D TARGET_5 = new Pose2D(DistanceUnit.MM, 100, 0, AngleUnit.DEGREES, 0);
+    static final Pose2D TARGET_1 = new Pose2D(DistanceUnit.MM,300,0, AngleUnit.DEGREES,0);
+    static final Pose2D TARGET_2 = new Pose2D(DistanceUnit.MM, 0, 150, AngleUnit.DEGREES, -90);
+    static final Pose2D TARGET_3 = new Pose2D(DistanceUnit.MM, 300,150, AngleUnit.DEGREES,0);
+//    static final Pose2D TARGET_4 = new Pose2D(DistanceUnit.MM, 100, , AngleUnit.DEGREES, 90);
+//    static final Pose2D TARGET_5 = new Pose2D(DistanceUnit.MM, 100, 0, AngleUnit.DEGREES, 0);
 
 
     @Override
@@ -62,10 +61,10 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
 
         odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
 //        odo.setOffsets(-142.0, 120.0); //these are tuned for 3110-0002-0001 Product Insight #1
-        odo.setOffsets(-60.0, -168.0);
+        odo.setOffsets(-67.0, -168.0); // change later ?
 
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
         odo.recalibrateIMU();
 
@@ -103,24 +102,29 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
                     the robot has reached the target, and has been there for (holdTime) seconds.
                     Once driveTo returns true, it prints a telemetry line and moves the state machine forward.
                      */
+                    telemetry.addData("Reached target", nav.driveTo(odo.getPosition(), TARGET_1, 0.7, 0));
                     if (nav.driveTo(odo.getPosition(), TARGET_1, 0.7, 0)){
                         telemetry.addLine("at position #1!");
                         stateMachine = StateMachine.DRIVE_TO_TARGET_2;
+//                        break;
+                    }
+                    else{
+                        telemetry.addLine("going to position #1");
                     }
                     break;
-//                case DRIVE_TO_TARGET_2:
-//                    //drive to the second target
-//                    if (nav.driveTo(odo.getPosition(), TARGET_2, 0.7, 1)){
-//                        telemetry.addLine("at position #2!");
-//                        stateMachine = StateMachine.DRIVE_TO_TARGET_3;
-//                    }
-//                    break;
-//                case DRIVE_TO_TARGET_3:
-//                    if(nav.driveTo(odo.getPosition(), TARGET_3, 0.7, 3)){
-//                        telemetry.addLine("at position #3");
-//                        stateMachine = StateMachine.DRIVE_TO_TARGET_4;
-//                    }
-//                    break;
+                case DRIVE_TO_TARGET_2:
+                    //drive to the second target
+                    if (nav.driveTo(odo.getPosition(), TARGET_2, 0.7, 1)){
+                        telemetry.addLine("at position #2!");
+                        stateMachine = StateMachine.DRIVE_TO_TARGET_3;
+                    }
+                    break;
+                case DRIVE_TO_TARGET_3:
+                    if(nav.driveTo(odo.getPosition(), TARGET_3, 0.7, 3)){
+                        telemetry.addLine("at position #3");
+                        stateMachine = StateMachine.DRIVE_TO_TARGET_4;
+                    }
+                    break;
 //                case DRIVE_TO_TARGET_4:
 //                    if(nav.driveTo(odo.getPosition(),TARGET_4,0.7,1)){
 //                        telemetry.addLine("at position #4");
@@ -137,12 +141,17 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
 
 
             //nav calculates the power to set to each motor in a mecanum or tank drive. Use nav.getMotorPower to find that value.
-            leftFrontDrive.setPower(nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_FRONT));
-            rightFrontDrive.setPower(nav.getMotorPower(DriveToPoint.DriveMotor.RIGHT_FRONT));
-            leftBackDrive.setPower(nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_BACK));
-            rightBackDrive.setPower(nav.getMotorPower(DriveToPoint.DriveMotor.RIGHT_BACK));
+            leftFrontDrive.setPower(0.7*nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_FRONT));
+            rightFrontDrive.setPower(0.7*nav.getMotorPower(DriveToPoint.DriveMotor.RIGHT_FRONT));
+            leftBackDrive.setPower(0.7*nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_BACK));
+            rightBackDrive.setPower(0.7*nav.getMotorPower(DriveToPoint.DriveMotor.RIGHT_BACK));
 
             telemetry.addData("current state:",stateMachine);
+            telemetry.addData("LF motor power:",nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_FRONT));
+            telemetry.addData("RF motor power:",nav.getMotorPower(DriveToPoint.DriveMotor.RIGHT_FRONT));
+            telemetry.addData("LB motor power:",nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_BACK));
+            telemetry.addData("RB motor power:",nav.getMotorPower(DriveToPoint.DriveMotor.RIGHT_BACK));
+
 
             Pose2D pos = odo.getPosition();
             String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
