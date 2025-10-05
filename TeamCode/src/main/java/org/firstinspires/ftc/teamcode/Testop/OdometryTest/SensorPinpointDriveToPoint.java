@@ -33,9 +33,11 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
         DRIVE_TO_TARGET_4,
         DRIVE_TO_TARGET_5$ProjectFileDir$    }
 
-    static final Pose2D TARGET_1 = new Pose2D(DistanceUnit.MM,300,0, AngleUnit.DEGREES,0);
-    static final Pose2D TARGET_2 = new Pose2D(DistanceUnit.MM, 0, 150, AngleUnit.DEGREES, -90);
-    static final Pose2D TARGET_3 = new Pose2D(DistanceUnit.MM, 300,150, AngleUnit.DEGREES,0);
+
+    // Note: will overshoot the x-coordinate by the tolerance, but not the y-coordinate
+    static final Pose2D TARGET_1 = new Pose2D(DistanceUnit.MM,280,280, AngleUnit.DEGREES,0);
+//    static final Pose2D TARGET_2 = new Pose2D(DistanceUnit.MM, 280, 0, AngleUnit.DEGREES, 0);
+//    static final Pose2D TARGET_3 = new Pose2D(DistanceUnit.MM, 300,150, AngleUnit.DEGREES,0);
 //    static final Pose2D TARGET_4 = new Pose2D(DistanceUnit.MM, 100, , AngleUnit.DEGREES, 90);
 //    static final Pose2D TARGET_5 = new Pose2D(DistanceUnit.MM, 100, 0, AngleUnit.DEGREES, 0);
 
@@ -103,8 +105,11 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
                     Once driveTo returns true, it prints a telemetry line and moves the state machine forward.
                      */
                     telemetry.addData("Reached target", nav.driveTo(odo.getPosition(), TARGET_1, 0.7, 0));
-                    if (nav.driveTo(odo.getPosition(), TARGET_1, 0.7, 0)){
+                    if (nav.driveTo(odo.getPosition(), TARGET_1, 0.7, 1)){
                         telemetry.addLine("at position #1!");
+                        odo.resetPosAndIMU();
+                        sleep(300);
+
                         stateMachine = StateMachine.DRIVE_TO_TARGET_2;
 //                        break;
                     }
@@ -112,19 +117,19 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
                         telemetry.addLine("going to position #1");
                     }
                     break;
-                case DRIVE_TO_TARGET_2:
-                    //drive to the second target
-                    if (nav.driveTo(odo.getPosition(), TARGET_2, 0.7, 1)){
-                        telemetry.addLine("at position #2!");
-                        stateMachine = StateMachine.DRIVE_TO_TARGET_3;
-                    }
-                    break;
-                case DRIVE_TO_TARGET_3:
-                    if(nav.driveTo(odo.getPosition(), TARGET_3, 0.7, 3)){
-                        telemetry.addLine("at position #3");
-                        stateMachine = StateMachine.DRIVE_TO_TARGET_4;
-                    }
-                    break;
+//                case DRIVE_TO_TARGET_2:
+//                    //drive to the second target
+//                    if (nav.driveTo(odo.getPosition(), TARGET_2, 0.7, 1)){
+//                        telemetry.addLine("at position #2!");
+//                        stateMachine = StateMachine.DRIVE_TO_TARGET_3;
+//                    }
+//                    break;
+//                case DRIVE_TO_TARGET_3:
+//                    if(nav.driveTo(odo.getPosition(), TARGET_3, 0.7, 3)){
+//                        telemetry.addLine("at position #3");
+//                        stateMachine = StateMachine.DRIVE_TO_TARGET_4;
+//                    }
+//                    break;
 //                case DRIVE_TO_TARGET_4:
 //                    if(nav.driveTo(odo.getPosition(),TARGET_4,0.7,1)){
 //                        telemetry.addLine("at position #4");
