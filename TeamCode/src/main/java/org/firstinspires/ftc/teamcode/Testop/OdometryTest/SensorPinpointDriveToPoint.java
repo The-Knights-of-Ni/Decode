@@ -35,8 +35,9 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
 
 
     // Note: will overshoot the x-coordinate by the tolerance, but not the y-coordinate
-    static final Pose2D TARGET_1 = new Pose2D(DistanceUnit.MM,280,280, AngleUnit.DEGREES,0);
-//    static final Pose2D TARGET_2 = new Pose2D(DistanceUnit.MM, 280, 0, AngleUnit.DEGREES, 0);
+    static final Pose2D TARGET_1 = new Pose2D(DistanceUnit.MM,150,0, AngleUnit.DEGREES,90);
+    static final Pose2D TARGET_2 = new Pose2D(DistanceUnit.MM, 300, -150, AngleUnit.DEGREES, -90);
+    static double powerMultiplier = 0.85;
 //    static final Pose2D TARGET_3 = new Pose2D(DistanceUnit.MM, 300,150, AngleUnit.DEGREES,0);
 //    static final Pose2D TARGET_4 = new Pose2D(DistanceUnit.MM, 100, , AngleUnit.DEGREES, 90);
 //    static final Pose2D TARGET_5 = new Pose2D(DistanceUnit.MM, 100, 0, AngleUnit.DEGREES, 0);
@@ -105,25 +106,37 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
                     Once driveTo returns true, it prints a telemetry line and moves the state machine forward.
                      */
                     telemetry.addData("Reached target", nav.driveTo(odo.getPosition(), TARGET_1, 0.7, 0));
-                    if (nav.driveTo(odo.getPosition(), TARGET_1, 0.7, 1)){
+                    if (nav.driveTo(odo.getPosition(), TARGET_1, 0.7, 0.5)){
                         telemetry.addLine("at position #1!");
-                        odo.resetPosAndIMU();
-                        sleep(300);
-
+//                        odo.resetPosAndIMU();
+//                        sleep(300);
+                        powerMultiplier = 0.85;
                         stateMachine = StateMachine.DRIVE_TO_TARGET_2;
 //                        break;
                     }
                     else{
                         telemetry.addLine("going to position #1");
+                        if(getRuntime()>1 && powerMultiplier != 1){
+                            powerMultiplier = 1;
+                        }
                     }
                     break;
-//                case DRIVE_TO_TARGET_2:
-//                    //drive to the second target
-//                    if (nav.driveTo(odo.getPosition(), TARGET_2, 0.7, 1)){
-//                        telemetry.addLine("at position #2!");
-//                        stateMachine = StateMachine.DRIVE_TO_TARGET_3;
-//                    }
-//                    break;
+                case DRIVE_TO_TARGET_2:
+                    //drive to the second target
+                    if (nav.driveTo(odo.getPosition(), TARGET_2, 0.7, 0.5)){
+                        telemetry.addLine("at position #2!");
+                        stateMachine = StateMachine.DRIVE_TO_TARGET_3;
+                        powerMultiplier = 0.85;
+//                        odo.resetPosAndIMU();
+//                        sleep(300);
+                    }
+                    else{
+                        telemetry.addLine("going to position #2");
+                        if(getRuntime()>2.3 && powerMultiplier != 1){
+                            powerMultiplier = 1;
+                        }
+                    }
+                    break;
 //                case DRIVE_TO_TARGET_3:
 //                    if(nav.driveTo(odo.getPosition(), TARGET_3, 0.7, 3)){
 //                        telemetry.addLine("at position #3");
@@ -146,10 +159,10 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
 
 
             //nav calculates the power to set to each motor in a mecanum or tank drive. Use nav.getMotorPower to find that value.
-            leftFrontDrive.setPower(0.7*nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_FRONT));
-            rightFrontDrive.setPower(0.7*nav.getMotorPower(DriveToPoint.DriveMotor.RIGHT_FRONT));
-            leftBackDrive.setPower(0.7*nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_BACK));
-            rightBackDrive.setPower(0.7*nav.getMotorPower(DriveToPoint.DriveMotor.RIGHT_BACK));
+            leftFrontDrive.setPower(powerMultiplier*nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_FRONT));
+            rightFrontDrive.setPower(powerMultiplier*nav.getMotorPower(DriveToPoint.DriveMotor.RIGHT_FRONT));
+            leftBackDrive.setPower(powerMultiplier*nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_BACK));
+            rightBackDrive.setPower(powerMultiplier*    nav.getMotorPower(DriveToPoint.DriveMotor.RIGHT_BACK));
 
             telemetry.addData("current state:",stateMachine);
             telemetry.addData("LF motor power:",nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_FRONT));
