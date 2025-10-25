@@ -31,12 +31,14 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
     }
 
 
-    void DriveToTarget(Pose2D TARGET, double power, double holdTime, double powerMultiplier){
+    void DriveToTarget(Pose2D TARGET, double power, double holdTime, double powerMultiplier, double patience, double timeOut){
+        double startTime = getRuntime();
         while(opModeIsActive()){
             odo.update();
             //        telemetry.addData("Reached target", nav.driveTo(odo.getPosition(), TARGET_1, 0.7, 0));
             if (nav.driveTo(odo.getPosition(), TARGET, power, holdTime)){
                 telemetry.addLine("at position #1!");
+                // Sleep to give the reset position time, as it takes 0.25s
     //                        odo.resetPosAndIMU();
     //                        sleep(300);
                 powerMultiplier = 0.85;
@@ -44,8 +46,14 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
             }
             else{
                 telemetry.addLine("going to position #1");
-                if(getRuntime()>1 && powerMultiplier != 1){
+                if(getRuntime()-startTime>patience && powerMultiplier != 1){
+                    // If the robot has not reached the target after an adjustable amount of time, make it go faster
                     powerMultiplier = 1;
+                }
+                if(getRuntime()-startTime>timeOut && timeOut>0){
+                    // Stop if robot is taking too long if timeout is positive
+                    telemetry.addData("Exceeded time limit (seconds) of ", timeOut);
+                    break;
                 }
             }
             leftFrontDrive.setPower(powerMultiplier*nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_FRONT));
@@ -53,7 +61,6 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
             leftBackDrive.setPower(powerMultiplier*nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_BACK));
             rightBackDrive.setPower(powerMultiplier*nav.getMotorPower(DriveToPoint.DriveMotor.RIGHT_BACK));
 
-//            telemetry.addData("current state:",stateMachine);
             telemetry.addData("LF motor power:",nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_FRONT));
             telemetry.addData("RF motor power:",nav.getMotorPower(DriveToPoint.DriveMotor.RIGHT_FRONT));
             telemetry.addData("LB motor power:",nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_BACK));
@@ -68,21 +75,10 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
         }
     }
 
-    // Note: will overshoot the x-coordinate by the tolerance, but not the y-coordinate
-    static final Pose2D TARGET_1 = new Pose2D(DistanceUnit.MM,200,0, AngleUnit.DEGREES,0);
-    static final Pose2D TARGET_2 = new Pose2D(DistanceUnit.MM, 300, -200, AngleUnit.DEGREES, 0);
-    static double powerMultiplier = 0.85;
-//    static final Pose2D TARGET_3 = new Pose2D(DistanceUnit.MM, 300,150, AngleUnit.DEGREES,0);
-//    static final Pose2D TARGET_4 = new Pose2D(DistanceUnit.MM, 100, , AngleUnit.DEGREES, 90);
-//    static final Pose2D TARGET_5 = new Pose2D(DistanceUnit.MM, 100, 0, AngleUnit.DEGREES, 0);
 
-
-    @Override
-    public void runOpMode() {
-
+    void InitializeMotors(){
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
-
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "fl");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "fr");
         leftBackDrive   = hardwareMap.get(DcMotor.class, "rl");
@@ -95,7 +91,9 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
 
         leftFrontDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+    }
 
+    void InitializeOdometry(){
         odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
 //        odo.setOffsets(-142.0, 120.0); //these are tuned for 3110-0002-0001 Product Insight #1
         odo.setOffsets(-67.0, -168.0); // change later ?
@@ -106,6 +104,14 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
         odo.recalibrateIMU();
 
         odo.resetPosAndIMU();
+    }
+
+
+    @Override
+    public void runOpMode() {
+        InitializeMotors();
+
+        InitializeOdometry();
 
         //nav.setXYCoefficients(0.02,0.002,0.0,DistanceUnit.MM,12);
         //nav.setYawCoefficients(1,0,0.0, AngleUnit.DEGREES,2);
@@ -121,16 +127,24 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
         // Wait for the game to start (driver presses START)
         waitForStart();
         resetRuntime();
-//        Pose2D CurrentTARGET = TARGET_1;
+
         double power = 0.7, holdTime = 0.5;
-        DriveToTarget(makeTarget(200,0,0), power, holdTime, 0.7);
-        DriveToTarget(makeTarget(200,200,0), power, holdTime, 0.7);
-        DriveToTarget(makeTarget(-200,0,0), power, holdTime, 0.7);
-        DriveToTarget(makeTarget(200,-200,0), power, holdTime, 0.7);
-        DriveToTarget(makeTarget(0,0,90), power, holdTime, 0.7);
-        DriveToTarget(makeTarget(0,0,-90), power, holdTime, 0.7);
-        DriveToTarget(makeTarget(0,0,179), power, holdTime, 0.7);
-        DriveToTarget(makeTarget(0,0,0), power, holdTime, 0.7);
+
+        // Limitations:
+        // - It seems that if the robot executes a command to do ONLY ROTATION, it will rotate infinitely.
+        // 
+        DriveToTarget(makeTarget(0,0,180), 0.7, holdTime, 0.7,1,-1);
+        // Sleep to give the reset position time, as it takes 0.25s
+//        odo.resetPosAndIMU();
+//        sleep(300);
+//        DriveToTarget(makeTarget(0,0,90), 0.75, holdTime, 0.7,1,-1);
+//        DriveToTarget(makeTarget(200,200,0), power, holdTime, 0.7,1,-1);
+//        DriveToTarget(makeTarget(-200,0,0), power, holdTime, 0.7,1,-1);
+//        DriveToTarget(makeTarget(200,-200,0), power, holdTime, 0.7,1,-1);
+//        DriveToTarget(makeTarget(0,0,90), power, holdTime, 0.7,1,-1);
+//        DriveToTarget(makeTarget(0,0,-90), power, holdTime, 0.7,1,-1);
+//        DriveToTarget(makeTarget(0,0,179), power, holdTime, 0.7,1,-1);
+//        DriveToTarget(makeTarget(0,0,0), power, holdTime, 0.7,1,-1);
 
 
     }}

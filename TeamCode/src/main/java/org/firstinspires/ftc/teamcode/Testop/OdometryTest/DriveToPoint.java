@@ -218,7 +218,21 @@ public class DriveToPoint {
             return yPID.calculateAxisPID(yError, pGain, dGain, accel, PIDTimer.seconds());
         }
         if(direction == Direction.h){
-            double hError = targetPosition.getHeading(AngleUnit.RADIANS) - currentPosition.getHeading(AngleUnit.RADIANS);
+            double targetHeading = targetPosition.getHeading(AngleUnit.RADIANS);
+            double currentHeading = currentPosition.getHeading(AngleUnit.RADIANS);
+
+            if(targetHeading>=0 && currentHeading>=0){
+                // do nothing if both signs are same
+            } else if(targetHeading<0 && currentHeading<0) {
+                // do nothing if both signs are same
+            } else if(targetHeading>=0 && currentHeading<0){
+                currentHeading += 2*Math.PI;
+            } else if(targetHeading<0 && currentHeading>=0){
+                targetHeading += 2*Math.PI;
+            }
+
+            double hError = targetHeading - currentHeading;
+
             return hPID.calculateAxisPID(hError, yawPGain, yawDGain, yawAccel, PIDTimer.seconds());
         }
         return 0;
