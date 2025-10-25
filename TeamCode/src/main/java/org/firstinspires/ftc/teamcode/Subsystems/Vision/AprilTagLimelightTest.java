@@ -47,6 +47,7 @@ public class AprilTagLimelightTest extends OpMode{
             telemetry.addData("Target Y", llResult.getTy());
             telemetry.addData("Target Area", llResult.getTa());
             telemetry.addData("Botpose", botPose.toString());
+            telemetry.addData("Yaw", botPose.getOrientation().getYaw());
         }
     }
 }
