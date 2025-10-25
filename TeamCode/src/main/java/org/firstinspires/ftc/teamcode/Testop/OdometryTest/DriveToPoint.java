@@ -39,7 +39,7 @@ public class DriveToPoint {
     }
 
     private static double xyTolerance = 12;
-    private static double yawTolerance = 0.0349066;
+    private static double yawTolerance = 0.0549066;
     // private static double yawTolerance = 0.001; Modified yaw tolerance
 
     private static double pGain = 0.008;
