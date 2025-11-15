@@ -130,10 +130,34 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
 
         double power = 0.7, holdTime = 0.5;
 
-        // Limitations:
-        // - It seems that if the robot executes a command to do ONLY ROTATION, it will rotate infinitely.
-        // 
-        DriveToTarget(makeTarget(0,0,180), 0.7, holdTime, 0.7,1,-1);
+        // Stuff:
+        // each square of the game floor is 60cm (600mm)
+
+        // Path 1
+        DriveToTarget(makeTarget(2100,300,-45), 0.8, holdTime, 0.7,1,5);
+        DriveToTarget(makeTarget(300,-900,-146), 0.8, holdTime, 0.7,1,5);
+        DriveToTarget(makeTarget(900,300,45), 0.8, holdTime, 0.7,1,5);
+
+
+        // Path 2
+        // If this doesn't work split horizontal movement and rotation into two function calls
+        DriveToTarget(makeTarget(900,0,180), 0.8, holdTime, 0.7,1,5);
+        DriveToTarget(makeTarget(900,0,-90), 0.8, holdTime, 0.7,1,5);
+        //        // Robot starts at an angle which i have approximated as 45 degrees for convenience
+        DriveToTarget(makeTarget(900,600,-45), 0.8, holdTime, 0.7,1,5);
+        odo.resetPosAndIMU();
+        sleep(300);
+        DriveToTarget(makeTarget(500,0,0), 0.8, holdTime, 0.7,1,5);
+        DriveToTarget(makeTarget(500,600,90), 0.8, holdTime, 0.7,1,5);
+//
+
+        // using two motions instead of one for safety (robot may push the balls to the side instead)
+//        DriveToTarget(makeTarget(0,-600,0), 0.8, holdTime, 0.7,1,5);
+//        DriveToTarget(makeTarget(-300,-600,180), 0.8, holdTime, 0.7,1,5);
+//
+//        DriveToTarget(makeTarget(-300,0,180), 0.8, holdTime, 0.7,1,5);
+//        DriveToTarget(makeTarget(0,0,-45), 0.8, holdTime, 0.7,1,5);
+
         // Sleep to give the reset position time, as it takes 0.25s
 //        odo.resetPosAndIMU();
 //        sleep(300);
