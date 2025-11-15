@@ -23,8 +23,8 @@ public class AprilTagLimelightTest extends OpMode{
     public void init(){
         limelight = hardwareMap.get(Limelight3A.class, "limelight-camera");
         limelight.setPollRateHz(100);
-        limelight.pipelineSwitch(3); // 2-6 are the pipeline options
-        imu = hardwareMap.get(IMU.class, "imu"); //Don't know its imu
+        limelight.pipelineSwitch(4); //4 is all tags combined into one pipeline.
+        imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
         imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
 
