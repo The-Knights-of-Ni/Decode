@@ -138,29 +138,26 @@ public class Teleop extends LinearOpMode {
 
                 // Opening and closing the shooting flap
                 if (Robot.gamepad2.xButton.isPressed()) {
-                    if (flapOpen){
+                    if (flapOpen) {
                         robot.control.midFlap();
                         telemetry.log().add("Stopping the flap");
-                    }
-                    else {
+                    } else {
                         robot.control.wideFlap();
                         telemetry.log().add("Starting the flap");
                     }
                     flapOpen = !flapOpen;
                 }
-
-
             } else {
                 // TODO: single gamepad controls
             }
 
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                Thread.onSpinWait();
-            } else {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//                Thread.onSpinWait();
+//            } else {
                 //noinspection BusyWait
-                Thread.sleep(5); // Ten milli sleep so that the CPU doesn't die (this also means 5 ms baseline lag)
-            }
+            Thread.sleep(5); // Ten milli sleep so that the CPU doesn't die (this also means 5 ms baseline lag)
+//            }
             telemetry.update();
         }
     }

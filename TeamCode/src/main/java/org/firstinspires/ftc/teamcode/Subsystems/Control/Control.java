@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Control;
 
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -32,9 +33,11 @@ public class Control extends Subsystem {
      */
     public void initDevicesAuto() {
         shootMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        shootMotor.setDirection(DcMotor.Direction.FORWARD);
         shootMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intakeMotor.setDirection(DcMotor.Direction.FORWARD);
         shootFlap.setDirection(Servo.Direction.FORWARD);
     }
 
@@ -50,7 +53,6 @@ public class Control extends Subsystem {
         shootMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        shootFlap.setDirection(Servo.Direction.FORWARD);
     }
 
 
@@ -74,7 +76,7 @@ public class Control extends Subsystem {
 
     public void startIntake() {
         intakeMotor.setMotorEnable();
-        intakeMotor.setVelocity(10);
+        intakeMotor.setVelocity(-30);
     }
 
     public void stopIntake() {
@@ -85,12 +87,13 @@ public class Control extends Subsystem {
 
     public void startShoot() {
         shootMotor.setMotorEnable();
-        intakeMotor.setVelocity(10);
+        shootMotor.setVelocity(-40);
     }
+
 
     public void stopShoot() {
         shootMotor.setMotorDisable();
-        intakeMotor.setVelocity(0);
+        shootMotor.setVelocity(0);
     }
 
 //    /**
