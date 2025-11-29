@@ -147,17 +147,16 @@ public class Teleop extends LinearOpMode {
                     }
                     flapOpen = !flapOpen;
                 }
+
+                if (Robot.gamepad2.aButton.isPressed()) {
+                    robot.control.holdTurretVelocity(75);
+                    telemetry.log().add("Starting turret");
+                }
+
             } else {
                 // TODO: single gamepad controls
             }
 
-
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//                Thread.onSpinWait();
-//            } else {
-                //noinspection BusyWait
-            Thread.sleep(5); // Ten milli sleep so that the CPU doesn't die (this also means 5 ms baseline lag)
-//            }
             telemetry.update();
         }
     }
