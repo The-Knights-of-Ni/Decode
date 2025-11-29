@@ -110,7 +110,7 @@ public class Control extends Subsystem {
         double variable = feedForward + PIDCorrect;
 
 
-        turretMotor.setVelocity(variable);
+        shootMotor.setVelocity(variable);
     }
 
 }
