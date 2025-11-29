@@ -148,8 +148,16 @@ public class Teleop extends LinearOpMode {
                     flapOpen = !flapOpen;
                 }
 
-                if (Robot.gamepad2.aButton.isPressed()) {
-                    robot.control.holdTurretVelocity(75);
+                if (Robot.gamepad1.aButton.isPressed()) {
+                    robot.control.holdShootVelocity(25);
+                    telemetry.log().add("Starting turret");
+                }
+                if (Robot.gamepad1.bButton.isPressed()) {
+                    robot.control.holdShootVelocity(50);
+                    telemetry.log().add("Starting turret");
+                }
+                if (Robot.gamepad1.xButton.isPressed()) {
+                    robot.control.holdShootVelocity(75);
                     telemetry.log().add("Starting turret");
                 }
 

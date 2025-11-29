@@ -101,8 +101,8 @@ public class Control extends Subsystem {
         shootMotor.setVelocity(0);
     }
 
-    public void holdTurretVelocity(double targetVelocity) {
-        double currentVelocity = turretMotor.getVelocity();
+    public void holdShootVelocity(double targetVelocity) {
+        double currentVelocity = shootMotor.getVelocity();
         double feedForward = feedFowardVelocity.calculate(targetVelocity, targetVelocity-currentVelocity+0.1);
         double PIDCorrect = PIDVelocity.calculate(targetVelocity, currentVelocity);
 
