@@ -149,17 +149,26 @@ public class Teleop extends LinearOpMode {
                 }
 
                 if (Robot.gamepad1.aButton.isPressed()) {
-                    robot.control.holdShootVelocity(25);
-                    telemetry.log().add("Starting turret");
+                    robot.control.shootMotor.setPower(-0.65);
+//                    robot.control.holdShootVelocity(-5);
+                    telemetry.log().add("This is -0.65");
                 }
                 if (Robot.gamepad1.bButton.isPressed()) {
-                    robot.control.holdShootVelocity(50);
-                    telemetry.log().add("Starting turret");
+                    robot.control.shootMotor.setPower(-0.75);
+//                    robot.control.holdShootVelocity(-7.5);
+                    telemetry.log().add("This is -0.75");
                 }
                 if (Robot.gamepad1.xButton.isPressed()) {
-                    robot.control.holdShootVelocity(75);
-                    telemetry.log().add("Starting turret");
+                    robot.control.shootMotor.setPower(-0.85);
+//                    robot.control.holdShootVelocity(-10);
+                    telemetry.log().add("This is -0.85");
                 }
+                if (Robot.gamepad1.yButton.isPressed()) {
+                    robot.control.shootMotor.setPower(-0.95);
+//                    robot.control.holdShootVelocity(-10);
+                    telemetry.log().add("This is -0.95");
+                }
+                // We need to add incrementing button later
 
             } else {
                 // TODO: single gamepad controls
