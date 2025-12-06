@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-
+import org.firstinspires.ftc.teamcode.Subsystems.Vision.AprilTagLimelightTest;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -22,9 +22,14 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
     DcMotor rightFrontDrive;
     DcMotor leftBackDrive;
     DcMotor rightBackDrive;
+    DcMotor turret;
 
     GoBildaPinpointDriver odo; // Declare OpMode member for the Odometry Computer
     DriveToPoint nav = new DriveToPoint(this); //OpMode member for the point-to-point navigation class
+
+    AprilTagLimelightTest A = new AprilTagLimelightTest();
+
+    double kk = A.getBotXmm();
 
     Pose2D makeTarget(double xpos, double ypos, double hpos){
         return new Pose2D(DistanceUnit.MM,xpos,ypos, AngleUnit.DEGREES,hpos);
@@ -83,11 +88,13 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "fr");
         leftBackDrive   = hardwareMap.get(DcMotor.class, "rl");
         rightBackDrive  = hardwareMap.get(DcMotor.class, "rr");
+        turret  = hardwareMap.get(DcMotor.class, "turretMotor"); // ??
 
         leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         leftFrontDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -107,11 +114,44 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
     }
 
 
+    // use in auto for aiming the turret (shocking ik) shoot separately
+    void aimTurret(double timeOut){
+        double startTime = getRuntime();
+        while(getRuntime()-startTime < timeOut){
+            A.loop();
+
+            double Tx = A.getTargetX();
+            double Ty = A.getTargetY();
+            double distance = A.getDis();
+            double heading = A.getBotHeadingDeg();
+
+            double tolerance = 1000.0; // set to be smaller later for now keep it large for testing purposes
+            double target = 0.0; // change later
+
+            if(Math.abs(Tx-target)<tolerance/distance){
+                turret.setPower(0.0);
+                return;
+            }
+
+            // uncomment when testing actual aiming (may have to tweak motor power)
+//            if(Tx < target){
+//                turret.setPower(0.25);
+//            }
+//            else{
+//                turret.setPower(-0.25);
+//            }
+        }
+    }
+
     @Override
     public void runOpMode() {
         InitializeMotors();
 
         InitializeOdometry();
+
+        A.init();
+        A.start();
+
 
         //nav.setXYCoefficients(0.02,0.002,0.0,DistanceUnit.MM,12);
         //nav.setYawCoefficients(1,0,0.0, AngleUnit.DEGREES,2);
@@ -120,6 +160,7 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.addData("X offset", odo.getXOffset());
         telemetry.addData("Y offset", odo.getYOffset());
+
         telemetry.addData("Device Version Number:", odo.getDeviceVersion());
         telemetry.addData("Device Scalar", odo.getYawScalar());
         telemetry.update();

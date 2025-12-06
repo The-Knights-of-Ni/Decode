@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Vision;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -7,23 +10,23 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.IMU;
 
-import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.MM;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.firstinspires.ftc.teamcode.Util.Pose;
 
-@TeleOp
-public class AprilTagLimelightTest extends OpMode {
+//@TeleOp
+public class AprilTagLimelightTest {
 
     private Limelight3A limelight;
     private IMU imu;
     private double distance;
     private double botXmm;
     private double botYmm;
+    private double targetX;
+    private double targetY;
     private double botHeadingDeg;
 
-    @Override
+//    @Override
     public void init() {
         limelight = hardwareMap.get(Limelight3A.class, "limelight-camera");
         limelight.setPollRateHz(100);
@@ -35,12 +38,12 @@ public class AprilTagLimelightTest extends OpMode {
 
     }
 
-    @Override
+//    @Override
     public void start() {
         limelight.start();
     }
 
-    @Override
+//    @Override
     public void loop() {
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         limelight.updateRobotOrientation(orientation.getYaw(AngleUnit.DEGREES));
@@ -53,6 +56,8 @@ public class AprilTagLimelightTest extends OpMode {
             botYmm = botPose.getPosition().y;
             botHeadingDeg = botPose.getOrientation().getYaw();
 
+            targetX = llResult.getTx();
+            targetY = llResult.getTy();
             distance = getDistanceFromTags(llResult.getTa());
             telemetry.addData("Distance", distance);
             telemetry.addData("Target X", llResult.getTx());
@@ -78,7 +83,15 @@ public class AprilTagLimelightTest extends OpMode {
         return botYmm;
     }
 
+    public double getTargetX() {
+        return targetX;
+    }
+
+    public double getTargetY()  {return targetY;}
+
     public double getBotHeadingDeg() {
         return botHeadingDeg;
     }
+
+    public double getDis(){ return distance;}
 }
