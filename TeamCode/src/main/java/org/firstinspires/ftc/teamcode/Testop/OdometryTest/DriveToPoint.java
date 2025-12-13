@@ -39,7 +39,8 @@ public class DriveToPoint {
     }
 
     private static double xyTolerance = 12;
-    private static double yawTolerance = 0.0349066;
+    private static double yawTolerance = 0.0549066;
+    // private static double yawTolerance = 0.001; Modified yaw tolerance
 
     private static double pGain = 0.008;
     private static double dGain = 0.00001;
@@ -136,7 +137,7 @@ public class DriveToPoint {
             calculateTankOutput(xPWR * power, hPWR * power);
 
 
-        //Mecanum Drive Code:
+            //Mecanum Drive Code:
         } else {
             double xPWR = calculatePID(currentPosition, targetPosition, Direction.x);
             double yPWR = calculatePID(currentPosition, targetPosition, Direction.y);
@@ -217,7 +218,21 @@ public class DriveToPoint {
             return yPID.calculateAxisPID(yError, pGain, dGain, accel, PIDTimer.seconds());
         }
         if(direction == Direction.h){
-            double hError = targetPosition.getHeading(AngleUnit.RADIANS) - currentPosition.getHeading(AngleUnit.RADIANS);
+            double targetHeading = targetPosition.getHeading(AngleUnit.RADIANS);
+            double currentHeading = currentPosition.getHeading(AngleUnit.RADIANS);
+
+            if(targetHeading>=0 && currentHeading>=0){
+                // do nothing if both signs are same
+            } else if(targetHeading<0 && currentHeading<0) {
+                // do nothing if both signs are same
+            } else if(targetHeading>=0 && currentHeading<0){
+                currentHeading += 2*Math.PI;
+            } else if(targetHeading<0 && currentHeading>=0){
+                targetHeading += 2*Math.PI;
+            }
+
+            double hError = targetHeading - currentHeading;
+
             return hPID.calculateAxisPID(hError, yawPGain, yawDGain, yawAccel, PIDTimer.seconds());
         }
         return 0;
