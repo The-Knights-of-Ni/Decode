@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@TeleOp
+//@TeleOp
 public class TeleOpSliderPID extends LinearOpMode {
     DcMotor sl;         // slider left
     DcMotor sr;         // slider right

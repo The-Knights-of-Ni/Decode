@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.Servo.Direction;
 
-@TeleOp
+//@TeleOp
 public class TeleOp2024 extends LinearOpMode {
     DcMotor frontLeftMotor;
     DcMotor backLeftMotor;
