@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Subsystem;
  * Control subsystem for controlling arms and claws
  */
 public class Control extends Subsystem {
-    public final Servo shootFlap;
+//    public final Servo shootFlap;
     public final DcMotorEx shootMotor;
     public final DcMotorEx intakeMotor;
     public final DcMotorEx turretMotor;
@@ -26,7 +26,7 @@ public class Control extends Subsystem {
 
     public Control(Telemetry telemetry, Servo shootFlap, DcMotorEx intakeMotor, DcMotorEx shootMotor, DcMotorEx  turretMotor) {
         super(telemetry, "control");
-        this.shootFlap = shootFlap;
+//        this.shootFlap = shootFlap;
         this.shootMotor = shootMotor;
         this.intakeMotor = intakeMotor;
         this.turretMotor = turretMotor;
@@ -42,7 +42,7 @@ public class Control extends Subsystem {
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeMotor.setDirection(DcMotor.Direction.FORWARD);
-        shootFlap.setDirection(Servo.Direction.FORWARD);
+//        shootFlap.setDirection(Servo.Direction.FORWARD);
         turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
@@ -66,18 +66,18 @@ public class Control extends Subsystem {
      * Does not wait for the claw action to finish opening before terminating the method and
      * allowing other functions to begin.
      */
-    public void midFlap() {
-        shootFlap.setPosition(0.25);
-    }
+//    public void midFlap() {
+//        shootFlap.setPosition(0.25);
+//    }
 
     /**
      * Begins the process of closing the claw.
      * Does not wait for the claw action to finish opening before terminating the method and
      * allowing other functions to begin.
      */
-    public void wideFlap() {
-        shootFlap.setPosition(0.5);
-    }
+//    public void wideFlap() {
+//        shootFlap.setPosition(0.5);
+//    }
 
     public void startIntake() {
         intakeMotor.setMotorEnable();

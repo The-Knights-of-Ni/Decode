@@ -146,13 +146,13 @@ public class Teleop extends LinearOpMode {
 
                 // Opening and closing the shooting flap
                 if (Robot.gamepad2.xButton.isPressed()) {
-                    if (flapOpen) {
-                        robot.control.midFlap();
-                        telemetry.log().add("Stopping the flap");
-                    } else {
-                        robot.control.wideFlap();
-                        telemetry.log().add("Starting the flap");
-                    }
+//                    if (flapOpen) {
+//                        robot.control.midFlap();
+//                        telemetry.log().add("Stopping the flap");
+//                    } else {
+//                        robot.control.wideFlap();
+//                        telemetry.log().add("Starting the flap");
+//                    }
                     flapOpen = !flapOpen;
                 }
 
