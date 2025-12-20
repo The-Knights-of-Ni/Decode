@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Teleop;
 
 
 import android.os.Build;
+import org.firstinspires.ftc.teamcode.Subsystems.Vision.AprilTagLimelightTest;
 
 
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -76,9 +77,14 @@ public class Teleop extends LinearOpMode {
 
         final double sensitivityHighPower = 1.0; // multiply inputs with this on high power mode
         final double sensitivityLowPower = 0.5; // multiply inputs with this on non-high power mode
+        double ShootMotorPower = 0.0;
         boolean twoGamepads = true;
         boolean intakeOn = false;
         boolean flapOpen = false;
+
+        AprilTagLimelightTest LimeLight = new AprilTagLimelightTest();
+        LimeLight.init();
+        LimeLight.start();
 
         while (opModeIsActive()) {
             // Clears cache to refresh data
@@ -114,7 +120,9 @@ public class Teleop extends LinearOpMode {
                 // Starting the shooting motor (Trigger Left)
                 if (Robot.gamepad2.triggerLeft > 0.05) {
                     robot.control.startShoot();
+                    // put limelight tests for teleop here for now?
                     telemetry.log().add("Starting the shoot motor");
+                    LimeLight.loop();
                 }
 
                 // Stopping the shooting motor (Bumper Left)
@@ -149,27 +157,22 @@ public class Teleop extends LinearOpMode {
                 }
 
                 if (Robot.gamepad1.aButton.isPressed()) {
-                    robot.control.shootMotor.setPower(-0.65);
-//                    robot.control.holdShootVelocity(-5);
-                    telemetry.log().add("This is -0.65");
+                    ShootMotorPower += 0.10;
+                    telemetry.addData("Motor power reduced by 0.1 and is now ",ShootMotorPower);
                 }
                 if (Robot.gamepad1.bButton.isPressed()) {
-                    robot.control.shootMotor.setPower(-0.75);
-//                    robot.control.holdShootVelocity(-7.5);
-                    telemetry.log().add("This is -0.75");
+                    ShootMotorPower -= 0.10;
+                    telemetry.addData("Motor power increased by 0.1 and is now ",ShootMotorPower);
                 }
                 if (Robot.gamepad1.xButton.isPressed()) {
-                    robot.control.shootMotor.setPower(-0.85);
-//                    robot.control.holdShootVelocity(-10);
-                    telemetry.log().add("This is -0.85");
+                    ShootMotorPower = -0.85;
+                    telemetry.addData("Motor power is reset and is now ",ShootMotorPower);
                 }
                 if (Robot.gamepad1.yButton.isPressed()) {
-                    robot.control.shootMotor.setPower(-0.95);
-//                    robot.control.holdShootVelocity(-10);
-                    telemetry.log().add("This is -0.95");
+                    robot.control.shootMotor.setPower(ShootMotorPower);
+                    telemetry.log().add("Shooting motor with motor power", ShootMotorPower);
                 }
                 // We need to add incrementing button later
-
             } else {
                 // TODO: single gamepad controls
             }

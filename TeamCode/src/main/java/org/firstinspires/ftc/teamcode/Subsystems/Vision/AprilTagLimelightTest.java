@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.har
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -13,6 +14,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+
+import java.util.List;
 
 //@TeleOp
 public class AprilTagLimelightTest {
@@ -51,7 +54,7 @@ public class AprilTagLimelightTest {
         LLResult llResult = limelight.getLatestResult();
         if (llResult != null && llResult.isValid()) {
             Pose3D botPose = llResult.getBotpose_MT2();
-
+            List<LLResultTypes.FiducialResult> res = llResult.getFiducialResults();
             botXmm = botPose.getPosition().x;
             botYmm = botPose.getPosition().y;
             botHeadingDeg = botPose.getOrientation().getYaw();
@@ -67,6 +70,11 @@ public class AprilTagLimelightTest {
             telemetry.addData("X (mm)", botXmm);
             telemetry.addData("Y (mm)", botYmm);
             telemetry.addData("Heading (deg)", botHeadingDeg);
+            telemetry.addData("Results Size", res.size());
+            for(int i = 0; i<res.size(); i++){
+                telemetry.addData("Result[i] fudicial id = ", res.get(i).getFiducialId());
+                telemetry.addData("Result[i] family = ", res.get(i).getFamily());
+            }
         }
     }
 
