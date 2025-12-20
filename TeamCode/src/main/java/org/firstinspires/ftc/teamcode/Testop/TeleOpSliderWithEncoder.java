@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.Servo.Direction;
 
-@TeleOp
+//@TeleOp
 public class TeleOpSliderWithEncoder extends LinearOpMode {
     DcMotor sl;         // slider left
     DcMotor sr;         // slider right

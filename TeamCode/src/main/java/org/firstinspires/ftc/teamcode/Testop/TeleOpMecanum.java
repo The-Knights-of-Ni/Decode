@@ -11,17 +11,20 @@ public class TeleOpMecanum extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         // Declare our motors
         // Make sure your ID's match your configuration
-        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("fl");
-        DcMotor backLeftMotor = hardwareMap.dcMotor.get("rl");
-        DcMotor frontRightMotor = hardwareMap.dcMotor.get("fr");
-        DcMotor backRightMotor = hardwareMap.dcMotor.get("rr");
+        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("fl"); //1 port
+        DcMotor backLeftMotor = hardwareMap.dcMotor.get("rl");  //0
+        DcMotor frontRightMotor = hardwareMap.dcMotor.get("fr");    //3
+        DcMotor backRightMotor = hardwareMap.dcMotor.get("rr"); //2
+        DcMotor turretMotor = hardwareMap.dcMotor.get("turretMotor"); // ext 1
+        DcMotor shootMotor = hardwareMap.dcMotor.get("shootMotor"); // ext 0
+        DcMotor intakeMotor = hardwareMap.dcMotor.get("intakeMotor"); // ext 3
 
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
         // reverse the left side instead.
         // See the note about this earlier on this page.
-        frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         waitForStart();
 
@@ -45,6 +48,14 @@ public class TeleOpMecanum extends LinearOpMode {
             backLeftMotor.setPower(backLeftPower);
             frontRightMotor.setPower(frontRightPower);
             backRightMotor.setPower(backRightPower);
+
+            if (gamepad1.a) {
+                intakeMotor.setPower(-1);
+            }
+            if (gamepad1.b) {
+                intakeMotor.setPower(0);
+                intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            }
         }
     }
 }
