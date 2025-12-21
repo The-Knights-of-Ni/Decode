@@ -166,7 +166,6 @@ public class Robot {
 
         logger.debug("Control subsystem init started");
         control = new Control(telemetry,
-                (Servo) hardwareMap.get("shootFlap"),
                 (DcMotorEx) hardwareMap.get("intakeMotor"),
                 (DcMotorEx) hardwareMap.get("shootMotor"),
                 (DcMotorEx) hardwareMap.get("turretMotor"));

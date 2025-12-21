@@ -82,9 +82,10 @@ public class Teleop extends LinearOpMode {
         boolean intakeOn = false;
         boolean flapOpen = false;
 
-        AprilTagLimelightTest LimeLight = new AprilTagLimelightTest();
-        LimeLight.init();
-        LimeLight.start();
+        //AprilTagLimelightTest LimeLight = new AprilTagLimelightTest();
+        //LimeLight.init();
+        //LimeLight.start();
+        //Uncomment out limelight stuff when apriltaglimelighttest is fixed.
 
         while (opModeIsActive()) {
             // Clears cache to refresh data
@@ -122,7 +123,7 @@ public class Teleop extends LinearOpMode {
                     robot.control.startShoot();
                     // put limelight tests for teleop here for now?
                     telemetry.log().add("Starting the shoot motor");
-                    LimeLight.loop();
+                    //LimeLight.loop();
                 }
 
                 // Stopping the shooting motor (Bumper Left)

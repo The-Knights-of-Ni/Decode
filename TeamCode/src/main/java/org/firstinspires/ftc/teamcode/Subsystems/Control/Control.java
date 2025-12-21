@@ -24,7 +24,7 @@ public class Control extends Subsystem {
     private final FeedForward feedFowardVelocity = new FeedForward(10, 10);
     private final PID PIDVelocity = new PID(0.002, 0, 0.0002);
 
-    public Control(Telemetry telemetry, Servo shootFlap, DcMotorEx intakeMotor, DcMotorEx shootMotor, DcMotorEx  turretMotor) {
+    public Control(Telemetry telemetry, DcMotorEx intakeMotor, DcMotorEx shootMotor, DcMotorEx  turretMotor) {
         super(telemetry, "control");
 //        this.shootFlap = shootFlap;
         this.shootMotor = shootMotor;

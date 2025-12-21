@@ -31,14 +31,14 @@ public class AprilTagLimelightTest {
 
 //    @Override
     public void init() {
+        imu = hardwareMap.get(IMU.class, "imu");
         limelight = hardwareMap.get(Limelight3A.class, "limelight-camera");
         limelight.setPollRateHz(100);
         limelight.pipelineSwitch(4);
         //4 is all tags combined into one pipeline.
-        imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
         imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
-
+        //Something here in init is throwing an error that's making it not work with teleop
     }
 
 //    @Override
