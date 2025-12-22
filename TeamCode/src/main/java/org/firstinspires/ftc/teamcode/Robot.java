@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Vision.AprilTagLimelightTest;
 import org.firstinspires.ftc.teamcode.Subsystems.Vision.Vision;
 import org.firstinspires.ftc.teamcode.Subsystems.Web.WebLog;
 import org.firstinspires.ftc.teamcode.Subsystems.Web.WebThread;
+import org.firstinspires.ftc.teamcode.Subsystems.Odometry.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.Util.AllianceColor;
 import org.firstinspires.ftc.teamcode.Util.BasicAccelerationIntegrator;
 import org.firstinspires.ftc.teamcode.Util.MasterLogger;
@@ -38,9 +39,11 @@ public class Robot {
     private final boolean webEnabled;
     private final boolean odometryEnabled;
     private final boolean limelightEnabled;
+    private final boolean pinpointDriverEnabled;
     public final HardwareMap hardwareMap;
     private final Telemetry telemetry;
     public final AprilTagLimelightTest limelight;
+    public GoBildaPinpointDriver odo;
 
     public BNO055IMU imu;
     // Subsystems
@@ -85,11 +88,32 @@ public class Robot {
         this.webEnabled = flags.getOrDefault("web", false);
         this.odometryEnabled = flags.getOrDefault("odometry", false);
         this.limelightEnabled = flags.getOrDefault("limelight", true);
+        this.pinpointDriverEnabled = flags.getOrDefault("odo", true);
         Robot.gamepad1 = new GamepadWrapper(gamepad1);
         Robot.gamepad2 = new GamepadWrapper(gamepad2);
         this.limelight = new AprilTagLimelightTest(this.hardwareMap, telemetry);
 
         init();
+    }
+    void InitializeOdometry(){
+        odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
+//        odo.setOffsets(-142.0, 120.0); //these are tuned for 3110-0002-0001 Product Insight #1
+        odo.setOffsets(-67.0, -168.0); // change later ?
+
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+
+        odo.recalibrateIMU();
+
+        odo.resetPosAndIMU();
+
+        telemetry.addData("Status", "Initialized");
+        telemetry.addData("X offset", odo.getXOffset());
+        telemetry.addData("Y offset", odo.getYOffset());
+
+        telemetry.addData("Device Version Number:", odo.getDeviceVersion());
+        telemetry.addData("Device Scalar", odo.getYawScalar());
+        telemetry.update();
     }
 
     public static void updateGamepads() {
@@ -192,6 +216,14 @@ public class Robot {
         }
         else{
             logger.warning("Limelight subsystem init skipped");
+        }
+
+        if(pinpointDriverEnabled){
+            logger.debug("PinpointDriver subsystem init started");
+            InitializeOdometry();
+        }
+        else{
+            logger.warning("PinpointDriver subsystem init skipped");
         }
 
         if (webEnabled) {
