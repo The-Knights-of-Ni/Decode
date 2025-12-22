@@ -9,8 +9,10 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
@@ -28,6 +30,14 @@ public class AprilTagLimelightTest {
     private double targetX;
     private double targetY;
     private double botHeadingDeg;
+    private final HardwareMap hardwareMap;
+    private final Telemetry telemetry;
+
+    public AprilTagLimelightTest(HardwareMap hardwareMap, Telemetry telemetry){
+        this.hardwareMap = hardwareMap;
+        this.telemetry = telemetry;
+    }
+
 
 //    @Override
     public void init() {
@@ -75,6 +85,9 @@ public class AprilTagLimelightTest {
                 telemetry.addData("Result[i] fudicial id = ", res.get(i).getFiducialId());
                 telemetry.addData("Result[i] family = ", res.get(i).getFamily());
             }
+        }
+        else{
+            telemetry.addLine("No results :(");
         }
     }
 

@@ -82,9 +82,6 @@ public class Teleop extends LinearOpMode {
         boolean intakeOn = false;
         boolean flapOpen = false;
 
-        AprilTagLimelightTest LimeLight = new AprilTagLimelightTest();
-        LimeLight.init();
-        LimeLight.start();
 
         while (opModeIsActive()) {
             // Clears cache to refresh data
@@ -93,7 +90,8 @@ public class Teleop extends LinearOpMode {
             }
 
             // update data from gamepads
-            robot.updateGamepads();
+            Robot.updateGamepads();
+
 
             // Get current time and compute delta
             timeCurrent = timer.nanoseconds();
@@ -122,7 +120,7 @@ public class Teleop extends LinearOpMode {
                     robot.control.startShoot();
                     // put limelight tests for teleop here for now?
                     telemetry.log().add("Starting the shoot motor");
-                    LimeLight.loop();
+                    robot.limelight.loop();
                 }
 
                 // Stopping the shooting motor (Bumper Left)

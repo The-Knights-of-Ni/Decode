@@ -27,9 +27,9 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
     GoBildaPinpointDriver odo; // Declare OpMode member for the Odometry Computer
     DriveToPoint nav = new DriveToPoint(this); //OpMode member for the point-to-point navigation class
 
-    AprilTagLimelightTest A = new AprilTagLimelightTest();
+    AprilTagLimelightTest A;
 
-    double kk = A.getBotXmm();
+    double kk;
 
     Pose2D makeTarget(double xpos, double ypos, double hpos){
         return new Pose2D(DistanceUnit.MM,xpos,ypos, AngleUnit.DEGREES,hpos);
@@ -149,9 +149,12 @@ public class SensorPinpointDriveToPoint extends LinearOpMode {
 
         InitializeOdometry();
 
+        A = new AprilTagLimelightTest(hardwareMap,telemetry);
+
         A.init();
         A.start();
 
+        kk = A.getBotXmm();
 
         //nav.setXYCoefficients(0.02,0.002,0.0,DistanceUnit.MM,12);
         //nav.setYawCoefficients(1,0,0.0, AngleUnit.DEGREES,2);

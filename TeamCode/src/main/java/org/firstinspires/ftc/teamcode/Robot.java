@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Control.Control;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.Drive;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.MotorGeneric;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.PoseEstimationMethodChoice;
+import org.firstinspires.ftc.teamcode.Subsystems.Vision.AprilTagLimelightTest;
 import org.firstinspires.ftc.teamcode.Subsystems.Vision.Vision;
 import org.firstinspires.ftc.teamcode.Subsystems.Web.WebLog;
 import org.firstinspires.ftc.teamcode.Subsystems.Web.WebThread;
@@ -36,8 +37,10 @@ public class Robot {
     private final AllianceColor allianceColor;
     private final boolean webEnabled;
     private final boolean odometryEnabled;
+    private final boolean limelightEnabled;
     public final HardwareMap hardwareMap;
     private final Telemetry telemetry;
+    public final AprilTagLimelightTest limelight;
 
     public BNO055IMU imu;
     // Subsystems
@@ -81,8 +84,11 @@ public class Robot {
         this.visionEnabled = flags.getOrDefault("vision", true);
         this.webEnabled = flags.getOrDefault("web", false);
         this.odometryEnabled = flags.getOrDefault("odometry", false);
+        this.limelightEnabled = flags.getOrDefault("limelight", true);
         Robot.gamepad1 = new GamepadWrapper(gamepad1);
         Robot.gamepad2 = new GamepadWrapper(gamepad2);
+        this.limelight = new AprilTagLimelightTest(this.hardwareMap, telemetry);
+
         init();
     }
 
@@ -166,7 +172,6 @@ public class Robot {
 
         logger.debug("Control subsystem init started");
         control = new Control(telemetry,
-                (Servo) hardwareMap.get("shootFlap"),
                 (DcMotorEx) hardwareMap.get("intakeMotor"),
                 (DcMotorEx) hardwareMap.get("shootMotor"),
                 (DcMotorEx) hardwareMap.get("turretMotor"));
@@ -178,6 +183,15 @@ public class Robot {
             logger.info("Vision subsystem init finished");
         } else {
             logger.warning("Vision subsystem init skipped");
+        }
+
+        if(limelightEnabled) {
+            logger.debug("Limelight subsystem init started");
+            limelight.init();
+            limelight.start();
+        }
+        else{
+            logger.warning("Limelight subsystem init skipped");
         }
 
         if (webEnabled) {
