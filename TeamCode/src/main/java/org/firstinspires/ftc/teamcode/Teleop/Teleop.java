@@ -82,6 +82,7 @@ public class Teleop extends LinearOpMode {
 
         final double sensitivityHighPower = 1.0; // multiply inputs with this on high power mode
         final double sensitivityLowPower = 0.5; // multiply inputs with this on non-high power mode
+
         double ShootMotorPower = 0.0;
         boolean twoGamepads = true;
         boolean intakeOn = false;
@@ -97,7 +98,30 @@ public class Teleop extends LinearOpMode {
             // update data from gamepads
             Robot.updateGamepads();
 
+            if(Robot.gamepad1.aButton.toggle){
+                robot.limelight.loop();
+                if(robot.limelight.detectRed){
+                    double tolerance = 3;
+                    double dist = robot.limelight.redGoal.getTargetXDegrees();
+                    if(Math.abs(dist)>tolerance){
+                        telemetry.addLine("Goal not yet in tolerance");
 
+                        if(dist>0){
+                            robot.control.turretMotor.setMotorEnable();
+                            robot.control.turretMotor.setPower(Math.max(-0.5,-dist/6+0.5));
+                        }
+                        else{
+                            robot.control.turretMotor.setMotorEnable();
+                            robot.control.turretMotor.setPower(Math.max(0.5,-dist/6-0.5));
+                        }
+                    }
+                    else{
+                        telemetry.addLine("Goal not in tolerance, turning off auto-aiming");
+                        robot.control.turretMotor.setPower(0);
+//                        robot.control.turretMotor.setMotorDisable();
+                    }
+                }
+            }
 
             // Get current time and compute delta
             timeCurrent = timer.nanoseconds();
