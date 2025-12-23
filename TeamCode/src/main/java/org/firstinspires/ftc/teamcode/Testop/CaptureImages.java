@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  * by various means (e.g.: Device File Explorer in Android Studio; plugging the device into a PC and
  * using Media Transfer; ADB; etc.)
  */
-@TeleOp(name = "Capture Images", group = "Concept")
+//@TeleOp(name = "Capture Images", group = "Concept")
 public class CaptureImages extends LinearOpMode {
 
     //----------------------------------------------------------------------------------------------

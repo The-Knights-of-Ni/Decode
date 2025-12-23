@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.Auto.Auto;
 import org.firstinspires.ftc.teamcode.Util.AllianceColor;
 
-@Autonomous(name = "IMU Test", group = "Concept")
+//@Autonomous(name = "IMU Test", group = "Concept")
 public class IMUDirectionalTest extends Auto {
     /**
      * Override of runOpMode()
