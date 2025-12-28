@@ -40,6 +40,7 @@ public class Robot {
     private final boolean odometryEnabled;
     private final boolean limelightEnabled;
     private final boolean pinpointDriverEnabled;
+    private boolean driverv2Enabled;
     public final HardwareMap hardwareMap;
     private final Telemetry telemetry;
     public final AprilTagLimelightTest limelight;
@@ -89,6 +90,7 @@ public class Robot {
         this.odometryEnabled = flags.getOrDefault("odometry", false);
         this.limelightEnabled = flags.getOrDefault("limelight", true);
         this.pinpointDriverEnabled = flags.getOrDefault("odo", true);
+        this.driverv2Enabled = flags.getOrDefault("drive", false);
         Robot.gamepad1 = new GamepadWrapper(gamepad1);
         Robot.gamepad2 = new GamepadWrapper(gamepad2);
         this.limelight = new AprilTagLimelightTest(this.hardwareMap, telemetry);
@@ -169,36 +171,41 @@ public class Robot {
     }
 
     protected void subsystemInit() {
-        logger.debug("Drive subsystem init started");
-        DcMotorEx frontLeftDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("fl");
-        DcMotorEx frontRightDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("fr");
-        DcMotorEx rearLeftDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("rl");
-        DcMotorEx rearRightDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("rr");
-        if (odometryEnabled) {
-            DcMotorEx leftEncoder = (DcMotorEx) hardwareMap.dcMotor.get("leftEncoder");
-            DcMotorEx backEncoder = (DcMotorEx) hardwareMap.dcMotor.get("backEncoder");
-            DcMotorEx rightEncoder = (DcMotorEx) hardwareMap.dcMotor.get("rightEncoder");
-            drive = new Drive(
-                    new MotorGeneric<>(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor),
-                    new DcMotorEx[]{leftEncoder, backEncoder, rightEncoder},
-                    PoseEstimationMethodChoice.ODOMETRY,
-                    imu,
-                    telemetry);
-        } else {
-            drive = new Drive(
-                    new MotorGeneric<>(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor),
-                    null,
-                    PoseEstimationMethodChoice.MOTOR_ENCODERS,
-                    imu,
-                    telemetry);
+        if(driverv2Enabled) {
+            logger.debug("Drive subsystem init started");
+            DcMotorEx frontLeftDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("fl");
+            DcMotorEx frontRightDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("fr");
+            DcMotorEx rearLeftDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("rl");
+            DcMotorEx rearRightDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("rr");
+            if (odometryEnabled) {
+                DcMotorEx leftEncoder = (DcMotorEx) hardwareMap.dcMotor.get("leftEncoder");
+                DcMotorEx backEncoder = (DcMotorEx) hardwareMap.dcMotor.get("backEncoder");
+                DcMotorEx rightEncoder = (DcMotorEx) hardwareMap.dcMotor.get("rightEncoder");
+                drive = new Drive(
+                        new MotorGeneric<>(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor),
+                        new DcMotorEx[]{leftEncoder, backEncoder, rightEncoder},
+                        PoseEstimationMethodChoice.ODOMETRY,
+                        imu,
+                        telemetry);
+            } else {
+                drive = new Drive(
+                        new MotorGeneric<>(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor),
+                        null,
+                        PoseEstimationMethodChoice.MOTOR_ENCODERS,
+                        imu,
+                        telemetry);
+            }
+            logger.info("Drive subsystem init finished");
         }
-        logger.info("Drive subsystem init finished");
-
+        else{
+            logger.warning("Drive subsystem init skipped");
+        }
         logger.debug("Control subsystem init started");
         control = new Control(telemetry,
                 (DcMotorEx) hardwareMap.get("intakeMotor"),
                 (DcMotorEx) hardwareMap.get("shootMotor"),
-                (DcMotorEx) hardwareMap.get("turretMotor"));
+                (DcMotorEx) hardwareMap.get("turretMotor"),
+                (Servo) hardwareMap.get("lift"));
         logger.info("Control subsystem init finished");
 
         if (visionEnabled) {

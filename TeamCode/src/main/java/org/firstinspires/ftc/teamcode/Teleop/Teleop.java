@@ -13,6 +13,8 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Subsystems.Control.*;
@@ -44,11 +46,20 @@ public class Teleop extends LinearOpMode {
         timeCurrent = timer.nanoseconds();
         timePre = timeCurrent;
 
-
         telemetry.addData("Waiting for start", "...");
         telemetry.update();
     }
 
+
+    public double sigmoid(double x, double k){
+        return 1/(1+Math.exp(-k*x));
+    }
+
+    public double autoAimSpeed(double dist, double k){
+        double magnitude = 0.5, tolerance = 3.5;
+        return (-magnitude*sigmoid(dist-tolerance,k) +
+                magnitude-magnitude*sigmoid(dist+tolerance,k));
+    }
 
     /**
      * Override of runOpMode()
@@ -70,7 +81,6 @@ public class Teleop extends LinearOpMode {
         }
 
         ElapsedTime timer = new ElapsedTime();
-//        robot.control.initDevicesTeleop();
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
         telemetry.log().add("Initialized, ready to start");
         telemetry.update();
@@ -89,6 +99,18 @@ public class Teleop extends LinearOpMode {
         boolean flapOpen = false;
 
 
+        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("fl"); //1 port
+        DcMotor backLeftMotor = hardwareMap.dcMotor.get("rl");  //0
+        DcMotor frontRightMotor = hardwareMap.dcMotor.get("fr");    //3
+        DcMotor backRightMotor = hardwareMap.dcMotor.get("rr"); //2
+        DcMotor turretMotor = hardwareMap.dcMotor.get("turretMotor"); // ext 1
+        DcMotor shootMotor = hardwareMap.dcMotor.get("shootMotor"); // ext 0
+        DcMotor intakeMotor = hardwareMap.dcMotor.get("intakeMotor"); // ext 3
+//        Servo lift = hardwareMap.get(Servo.class, "lift"); // ext 0 servo
+
+        frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
         while (opModeIsActive()) {
             // Clears cache to refresh data
             for (LynxModule hub : allHubs) {
@@ -98,29 +120,19 @@ public class Teleop extends LinearOpMode {
             // update data from gamepads
             Robot.updateGamepads();
 
-            if(Robot.gamepad1.aButton.toggle){
-                robot.limelight.loop();
-                if(robot.limelight.detectRed){
-                    double tolerance = 3;
-                    double dist = robot.limelight.redGoal.getTargetXDegrees();
-                    if(Math.abs(dist)>tolerance){
-                        telemetry.addLine("Goal not yet in tolerance");
+            robot.limelight.loop();
+            if(gamepad1.dpad_down){
 
-                        if(dist>0){
-                            robot.control.turretMotor.setMotorEnable();
-                            robot.control.turretMotor.setPower(Math.max(-0.5,-dist/6+0.5));
-                        }
-                        else{
-                            robot.control.turretMotor.setMotorEnable();
-                            robot.control.turretMotor.setPower(Math.max(0.5,-dist/6-0.5));
-                        }
-                    }
-                    else{
-                        telemetry.addLine("Goal not in tolerance, turning off auto-aiming");
-                        robot.control.turretMotor.setPower(0);
-//                        robot.control.turretMotor.setMotorDisable();
-                    }
+                if(robot.limelight.detectBlue){
+                    double dist = robot.limelight.blueGoal.getTargetXDegrees();
+
+                    double aimSpeed = autoAimSpeed(dist,7);
+                    robot.control.turretMotor.setMotorEnable();
+                    robot.control.turretMotor.setPower(aimSpeed);
                 }
+            }
+            else{
+                robot.control.turretMotor.setPower(0);
             }
 
             // Get current time and compute delta
@@ -132,18 +144,55 @@ public class Teleop extends LinearOpMode {
             // y button activates low speed mode
             // it gets the x and y positioning from the left stick and turns based on the right stick's x
             // calcMotorPowers creates a MotorGeneric
-            MotorGeneric<Double> motorPowers;
-            if (Robot.gamepad1.yButton.toggle) {
-                motorPowers = robot.drive.calcMotorPowers(Robot.gamepad1.leftStickX * sensitivityHighPower, Robot.gamepad1.leftStickY * sensitivityHighPower, Robot.gamepad1.rightStickX * sensitivityHighPower);
-            } else {
-                motorPowers = robot.drive.calcMotorPowers(Robot.gamepad1.leftStickX * sensitivityLowPower, Robot.gamepad1.leftStickY * sensitivityLowPower, Robot.gamepad1.rightStickX * sensitivityLowPower);
-            }
-            robot.drive.setDrivePowers(motorPowers);
+//            MotorGeneric<Double> motorPowers;
+//            if (Robot.gamepad1.yButton.toggle) {
+//                motorPowers = robot.drive.calcMotorPowers(Robot.gamepad1.leftStickX * sensitivityHighPower, Robot.gamepad1.leftStickY * sensitivityHighPower, Robot.gamepad1.rightStickX * sensitivityHighPower);
+//            } else {
+//                motorPowers = robot.drive.calcMotorPowers(Robot.gamepad1.leftStickX * sensitivityLowPower, Robot.gamepad1.leftStickY * sensitivityLowPower, Robot.gamepad1.rightStickX * sensitivityLowPower);
+//            }
+//            robot.drive.setDrivePowers(motorPowers);
             // Switch to one gamepad
-            if (Robot.gamepad1.xButton.isPressed() || Robot.gamepad2.xButton.isPressed()) {
-                twoGamepads = !twoGamepads;
-                telemetry.log().add("Switching to " + (twoGamepads ? "two" : "one") + " gamepad mode");
+//            if (Robot.gamepad1.xButton.isPressed() || Robot.gamepad2.xButton.isPressed()) {
+//                twoGamepads = !twoGamepads;
+//                telemetry.log().add("Switching to " + (twoGamepads ? "two" : "one") + " gamepad mode");
+//            }
+
+            double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
+            double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
+            double rx = gamepad1.right_stick_x;
+
+            // Denominator is the largest motor power (absolute value) or 1
+            // This ensures all the powers maintain the same ratio,
+            // but only if at least one is out of the range [-1, 1]
+            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+            double frontLeftPower = (y + x + rx) / denominator;
+            double backLeftPower = (y - x + rx) / denominator;
+            double frontRightPower = (y - x - rx) / denominator;
+            double backRightPower = (y + x - rx) / denominator;
+
+
+            frontLeftMotor.setPower(frontLeftPower);
+            backLeftMotor.setPower(backLeftPower);
+            frontRightMotor.setPower(frontRightPower);
+            backRightMotor.setPower(backRightPower);
+
+            if (gamepad1.a) {
+                robot.control.startIntake();
             }
+            if (gamepad1.b) {
+                robot.control.stopIntake();
+            }
+            if (gamepad1.y) {
+                robot.control.startShoot();
+                Thread.sleep(5000);
+                robot.control.lift.setPosition(0.4);
+            }
+            if (gamepad1.x) {
+                robot.control.stopShoot();
+                robot.control.lift.setPosition(0);
+                shootMotor.setPower(0);
+            }
+
             if (twoGamepads) {
                 // Starting the shooting motor (Trigger Left)
                 if (Robot.gamepad2.triggerLeft > 0.05) {
@@ -170,18 +219,6 @@ public class Teleop extends LinearOpMode {
                         telemetry.log().add("Starting the intake");
                     }
                     intakeOn = !intakeOn;
-                }
-
-                // Opening and closing the shooting flap
-                if (Robot.gamepad2.xButton.isPressed()) {
-//                    if (flapOpen) {
-//                        robot.control.midFlap();
-//                        telemetry.log().add("Stopping the flap");
-//                    } else {
-//                        robot.control.wideFlap();
-//                        telemetry.log().add("Starting the flap");
-//                    }
-                    flapOpen = !flapOpen;
                 }
 
                 if (Robot.gamepad1.aButton.isPressed()) {

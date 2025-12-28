@@ -21,7 +21,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import java.util.List;
 import java.util.Locale;
 
-//@TeleOp
 public class AprilTagLimelightTest {
 
     private Limelight3A limelight;
@@ -59,7 +58,6 @@ public class AprilTagLimelightTest {
         //4 is all tags combined into one pipeline.
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
         imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
-        //Something here in init is throwing an error that's making it not work with teleop
     }
 
 //    @Override
@@ -80,29 +78,21 @@ public class AprilTagLimelightTest {
             botYmm = botPose.getPosition().y;
             botHeadingDeg = botPose.getOrientation().getYaw();
 
-//            targetX = llResult.getTx();
-//            targetY = llResult.getTy();
-//            distance = getDistanceFromTags(llResult.getTa());
-//            telemetry.addData("Distance", distance);
-//            telemetry.addData("Target X", llResult.getTx());
-//            telemetry.addData("Target Y", llResult.getTy());
-//            telemetry.addData("Target Area", llResult.getTa());
-            telemetry.addData("Botpose", botPose.toString());
-            telemetry.addData("X (mm)", botXmm);
-            telemetry.addData("Y (mm)", botYmm);
-            telemetry.addData("Heading (deg)", botHeadingDeg);
-//            telemetry.addData("Results Size", res.size());
+
+            String data1 = String.format(Locale.US, "{Botpose: %s, X (mm): %.3f, Y (mm): %.3f, Heading (deg): %.3f}", botPose.toString(), botXmm, botYmm, botHeadingDeg);
+            telemetry.addData("", data1);
             detectMotif = false;
             detectRed = false;
             detectBlue = false;
             for(int i = 0; i<res.size(); i++){
                 targetX = res.get(i).getTargetXDegrees();
                 targetY = res.get(i).getTargetYDegrees();
+
                 distance = getDistanceFromTags(res.get(i).getTargetArea());
-                String data = String.format(Locale.US, "{ID: %d, Distance: %.3f, Target X: %.3f, Target Y: %.3f, Area: %.3f}", res.get(i).getFiducialId(), distance,  targetX, targetY, res.get(i).getTargetArea());
+
+                String data = String.format(Locale.US, "{ID: %d, Distance: %.3f, Target X: %.3f, Target Y: %.3f, Area: %.5f}", res.get(i).getFiducialId(), distance,  targetX, targetY, res.get(i).getTargetArea());
                 telemetry.addData("", data);
-//                telemetry.addData("Result[i] fudicial id = ", res.get(i).getFiducialId());
-//                telemetry.addData("Result[i] family = ", res.get(i).getFamily());
+
                 if(res.get(i).getFiducialId() < 24 && res.get(i).getFiducialId() > 20){
                     motif = res.get(i);
                     detectMotif = true;
@@ -130,8 +120,7 @@ public class AprilTagLimelightTest {
 
 
     public double getDistanceFromTags(double ta) {
-        double scale = 17537.71;
-        return scale / ta;
+        return 18.3*(1/Math.sqrt(ta));
     }
 
     public double getBotXmm() {
