@@ -58,7 +58,7 @@ public class Control extends Subsystem {
     }
 
     public void startIntake() {
-        intakeMotor.setMotorEnable();
+//        intakeMotor.setMotorEnable();
         intakeMotor.setPower(-1);
     }
 
@@ -68,9 +68,9 @@ public class Control extends Subsystem {
 
     }
 
-    public void startShoot() {
+    public void startShoot(double power) {
         shootMotor.setMotorEnable();
-        shootMotor.setPower(-0.5);
+        shootMotor.setPower(-power);
     }
 
 

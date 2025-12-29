@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Control.Control;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.Drive;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.MotorGeneric;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.PoseEstimationMethodChoice;
+import org.firstinspires.ftc.teamcode.Subsystems.Drive.DriveToPoint;
 import org.firstinspires.ftc.teamcode.Subsystems.Vision.AprilTagLimelightTest;
 import org.firstinspires.ftc.teamcode.Subsystems.Vision.Vision;
 import org.firstinspires.ftc.teamcode.Subsystems.Web.WebLog;
@@ -39,12 +40,14 @@ public class Robot {
     private final boolean webEnabled;
     private final boolean odometryEnabled;
     private final boolean limelightEnabled;
+    private final boolean driveToPointEnabled;
     private final boolean pinpointDriverEnabled;
     private boolean driverv2Enabled;
     public final HardwareMap hardwareMap;
     private final Telemetry telemetry;
     public final AprilTagLimelightTest limelight;
     public GoBildaPinpointDriver odo;
+    public DriveToPoint nav;
 
     public BNO055IMU imu;
     // Subsystems
@@ -68,7 +71,7 @@ public class Robot {
      *    <li><i>odometry</i> - toggles odometry subsystem, disabled by default</li>
      * </ul>
      */
-    public Robot(HardwareMap hardwareMap, Telemetry telemetry, ElapsedTime timer,
+    public Robot(HardwareMap hardwareMap, Telemetry telemetry, ElapsedTime timer, DriveToPoint nav,
                  AllianceColor allianceColor, Gamepad gamepad1, Gamepad gamepad2, HashMap<String, Boolean> flags) {
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML); // Allow usage of some HTML tags
         telemetry.log().setDisplayOrder(Telemetry.Log.DisplayOrder.OLDEST_FIRST);
@@ -90,7 +93,9 @@ public class Robot {
         this.odometryEnabled = flags.getOrDefault("odometry", false);
         this.limelightEnabled = flags.getOrDefault("limelight", true);
         this.pinpointDriverEnabled = flags.getOrDefault("odo", true);
+        this.driveToPointEnabled = flags.getOrDefault("nav",true);
         this.driverv2Enabled = flags.getOrDefault("drive", false);
+        this.nav = nav;
         Robot.gamepad1 = new GamepadWrapper(gamepad1);
         Robot.gamepad2 = new GamepadWrapper(gamepad2);
         this.limelight = new AprilTagLimelightTest(this.hardwareMap, telemetry);
@@ -115,7 +120,6 @@ public class Robot {
 
         telemetry.addData("Device Version Number:", odo.getDeviceVersion());
         telemetry.addData("Device Scalar", odo.getYawScalar());
-        telemetry.update();
     }
 
     public static void updateGamepads() {
@@ -233,6 +237,14 @@ public class Robot {
             logger.warning("PinpointDriver subsystem init skipped");
         }
 
+        if(driveToPointEnabled){
+            nav.setDriveType(DriveToPoint.DriveType.MECANUM);
+            logger.debug("DriveToPoint subsystem init started");
+        }
+        else{
+            logger.warning("DriveToPoint subsystem init skipped");
+        }
+
         if (webEnabled) {
             try {
                 logger.debug("Web subsystem init started");
@@ -246,6 +258,7 @@ public class Robot {
         } else {
             logger.warning("Web subsystem init skipped");
         }
+
         telemetryBroadcast("Status", "all subsystems initialized");
     }
 

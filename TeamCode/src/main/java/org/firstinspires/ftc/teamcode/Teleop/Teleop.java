@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.teamcode.Subsystems.Drive.DriveToPoint;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Subsystems.Control.*;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.MotorGeneric;
@@ -34,6 +35,11 @@ public class Teleop extends LinearOpMode {
     double timePre;
     ElapsedTime timer;
     private Robot robot;
+    DcMotor frontLeftMotor;
+    DcMotor backLeftMotor;
+    DcMotor frontRightMotor;
+    DcMotor backRightMotor;
+    double ShootMotorPower = 0.0;
 
 
     private void initOpMode() {
@@ -42,12 +48,13 @@ public class Teleop extends LinearOpMode {
         HashMap<String, Boolean> flags = new HashMap<>();
         flags.put("web", true);
         flags.put("vision", false);
-        this.robot = new Robot(hardwareMap, telemetry, timer, AllianceColor.BLUE, gamepad1, gamepad2, flags);
+        DriveToPoint nav = new DriveToPoint(this);
+        this.robot = new Robot(hardwareMap, telemetry, timer, nav, AllianceColor.BLUE, gamepad1, gamepad2, flags);
         timeCurrent = timer.nanoseconds();
         timePre = timeCurrent;
 
         telemetry.addData("Waiting for start", "...");
-        telemetry.update();
+//        telemetry.update();
     }
 
 
@@ -56,9 +63,63 @@ public class Teleop extends LinearOpMode {
     }
 
     public double autoAimSpeed(double dist, double k){
-        double magnitude = 0.5, tolerance = 3.5;
+        double magnitude = 0.5, tolerance = 2.5;
         return (-magnitude*sigmoid(dist-tolerance,k) +
                 magnitude-magnitude*sigmoid(dist+tolerance,k));
+    }
+
+    Pose2D makeTarget(double xpos, double ypos, double hpos){
+        return new Pose2D(DistanceUnit.MM,xpos,ypos, AngleUnit.DEGREES,hpos);
+    }
+
+    void DriveToTarget(Pose2D TARGET, double power, double holdTime, double powerMultiplier, double patience, double timeOut){
+        double startTime = getRuntime();
+        while(opModeIsActive()){
+            robot.odo.update();
+            //        telemetry.addData("Reached target", nav.driveTo(odo.getPosition(), TARGET_1, 0.7, 0));
+            if (robot.nav.driveTo(robot.odo.getPosition(), TARGET, power, holdTime)){
+                telemetry.addLine("at position #1!");
+                // Sleep to give the reset position time, as it takes 0.25s
+                //                        odo.resetPosAndIMU();
+                //                        sleep(300);
+                powerMultiplier = 0.85;
+                break;
+            }
+            else{
+                telemetry.addLine("going to position #1");
+                if(getRuntime()-startTime>patience && powerMultiplier != 1){
+                    // If the robot has not reached the target after an adjustable amount of time, make it go faster
+                    powerMultiplier = 1;
+                }
+                if(getRuntime()-startTime>timeOut && timeOut>0){
+                    // Stop if robot is taking too long if timeout is positive
+                    telemetry.addData("Exceeded time limit (seconds) of ", timeOut);
+                    break;
+                }
+            }
+            frontLeftMotor.setPower(powerMultiplier*robot.nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_FRONT));
+            frontRightMotor.setPower(powerMultiplier*robot.nav.getMotorPower(DriveToPoint.DriveMotor.RIGHT_FRONT));
+            backLeftMotor.setPower(powerMultiplier*robot.nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_BACK));
+            backRightMotor.setPower(powerMultiplier*robot.nav.getMotorPower(DriveToPoint.DriveMotor.RIGHT_BACK));
+
+            telemetry.addData("LF motor power:",robot.nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_FRONT));
+            telemetry.addData("RF motor power:",robot.nav.getMotorPower(DriveToPoint.DriveMotor.RIGHT_FRONT));
+            telemetry.addData("LB motor power:",robot.nav.getMotorPower(DriveToPoint.DriveMotor.LEFT_BACK));
+            telemetry.addData("RB motor power:",robot.nav.getMotorPower(DriveToPoint.DriveMotor.RIGHT_BACK));
+
+            Pose2D pos = robot.odo.getPosition();
+            String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
+            telemetry.addData("Position", data);
+
+//            telemetry.update();
+        }
+    }
+
+    public void adjustAngle(double dist) {
+        robot.odo.update();
+        Pose2D pos = robot.odo.getPosition();
+        Pose2D TARGET = makeTarget(pos.getX(DistanceUnit.MM),pos.getY(DistanceUnit.MM),pos.getHeading(AngleUnit.DEGREES)-dist);
+        DriveToTarget(TARGET, 0.8, 0.5, 0.7, 1, 5);
     }
 
     /**
@@ -83,7 +144,7 @@ public class Teleop extends LinearOpMode {
         ElapsedTime timer = new ElapsedTime();
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
         telemetry.log().add("Initialized, ready to start");
-        telemetry.update();
+//        telemetry.update();
         waitForStart();
 
         telemetry.clearAll();
@@ -93,16 +154,15 @@ public class Teleop extends LinearOpMode {
         final double sensitivityHighPower = 1.0; // multiply inputs with this on high power mode
         final double sensitivityLowPower = 0.5; // multiply inputs with this on non-high power mode
 
-        double ShootMotorPower = 0.0;
+
         boolean twoGamepads = true;
         boolean intakeOn = false;
         boolean flapOpen = false;
 
-
-        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("fl"); //1 port
-        DcMotor backLeftMotor = hardwareMap.dcMotor.get("rl");  //0
-        DcMotor frontRightMotor = hardwareMap.dcMotor.get("fr");    //3
-        DcMotor backRightMotor = hardwareMap.dcMotor.get("rr"); //2
+        frontLeftMotor = hardwareMap.dcMotor.get("fl"); //1 port
+        backLeftMotor = hardwareMap.dcMotor.get("rl");  //0
+        frontRightMotor = hardwareMap.dcMotor.get("fr");    //3
+        backRightMotor = hardwareMap.dcMotor.get("rr"); //2
         DcMotor turretMotor = hardwareMap.dcMotor.get("turretMotor"); // ext 1
         DcMotor shootMotor = hardwareMap.dcMotor.get("shootMotor"); // ext 0
         DcMotor intakeMotor = hardwareMap.dcMotor.get("intakeMotor"); // ext 3
@@ -119,20 +179,51 @@ public class Teleop extends LinearOpMode {
 
             // update data from gamepads
             Robot.updateGamepads();
-
+            telemetry.addData("Shootmotor power is ", ShootMotorPower);
             robot.limelight.loop();
+            telemetry.addData("Shootmotor power is ", ShootMotorPower);
+            double distToTarget = 0.0;
+            if(robot.limelight.detectBlue){
+                distToTarget = robot.limelight.getDistanceFromTags( robot.limelight.blueGoal.getTargetArea() );
+            }
+            telemetry.addData("Target Shootmotor power is ", (0.002*distToTarget+0.45));
+            telemetry.addData("Distance is ", distToTarget);
             if(gamepad1.dpad_down){
-
                 if(robot.limelight.detectBlue){
                     double dist = robot.limelight.blueGoal.getTargetXDegrees();
-
-                    double aimSpeed = autoAimSpeed(dist,7);
-                    robot.control.turretMotor.setMotorEnable();
-                    robot.control.turretMotor.setPower(aimSpeed);
+                    if(Math.abs(dist)>15){
+                        adjustAngle(dist);
+                    }
+                    else {
+                        double aimSpeed = autoAimSpeed(dist, 7);
+                        robot.control.turretMotor.setMotorEnable();
+                        robot.control.turretMotor.setPower(aimSpeed);
+                    }
                 }
             }
             else{
                 robot.control.turretMotor.setPower(0);
+            }
+
+
+            if(gamepad1.dpad_up){
+                robot.odo.update();
+                Pose2D pos = robot.odo.getPosition();
+                telemetry.addLine("Trying to move in the x-direction");
+                Pose2D TARGET = makeTarget(pos.getX(DistanceUnit.MM)+100,pos.getY(DistanceUnit.MM),pos.getHeading(AngleUnit.DEGREES));
+                DriveToTarget(TARGET, 0.8, 0.5, 0.7, 1, 5);
+            }
+
+            if(Robot.gamepad1.dPadLeft.isPressed() && !Robot.gamepad1.dPadLeft.hasPressedPrev()){
+                ShootMotorPower -= 0.01;
+                telemetry.addData("Motor power is now",ShootMotorPower);
+//                telemetry.update();
+            }
+
+            if(Robot.gamepad1.dPadRight.isPressed() && !Robot.gamepad1.dPadRight.hasPressedPrev()){
+                ShootMotorPower += 0.01;
+                telemetry.addData("Motor power is now",ShootMotorPower);
+//                telemetry.update();
             }
 
             // Get current time and compute delta
@@ -183,9 +274,9 @@ public class Teleop extends LinearOpMode {
                 robot.control.stopIntake();
             }
             if (gamepad1.y) {
-                robot.control.startShoot();
+                robot.control.startShoot(ShootMotorPower);
                 Thread.sleep(5000);
-                robot.control.lift.setPosition(0.4);
+                robot.control.lift.setPosition(0.6);
             }
             if (gamepad1.x) {
                 robot.control.stopShoot();
@@ -193,10 +284,10 @@ public class Teleop extends LinearOpMode {
                 shootMotor.setPower(0);
             }
 
-            if (twoGamepads) {
+            if (twoGamepads && false) {
                 // Starting the shooting motor (Trigger Left)
                 if (Robot.gamepad2.triggerLeft > 0.05) {
-                    robot.control.startShoot();
+                    robot.control.startShoot(ShootMotorPower);
                     // put limelight tests for teleop here for now?
                     telemetry.log().add("Starting the shoot motor");
                     robot.limelight.loop();
