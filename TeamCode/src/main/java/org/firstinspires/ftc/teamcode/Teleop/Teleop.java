@@ -186,7 +186,7 @@ public class Teleop extends LinearOpMode {
             if(robot.limelight.detectBlue){
                 distToTarget = robot.limelight.getDistanceFromTags( robot.limelight.blueGoal.getTargetArea() );
             }
-            telemetry.addData("Target Shootmotor power is ", (0.002*distToTarget+0.45));
+            telemetry.addData("Target Shootmotor power is ", (0.002*distToTarget+0.15));
             telemetry.addData("Distance is ", distToTarget);
             if(gamepad1.dpad_down){
                 if(robot.limelight.detectBlue){
@@ -269,19 +269,20 @@ public class Teleop extends LinearOpMode {
 
             if (gamepad1.a) {
                 robot.control.startIntake();
+                robot.control.shootMotor.setPower(-0.75);
+                robot.control.turretMotor.setPower(0);
             }
             if (gamepad1.b) {
                 robot.control.stopIntake();
+                robot.control.shootMotor.setPower(0);
             }
             if (gamepad1.y) {
-                robot.control.startShoot(ShootMotorPower);
-                Thread.sleep(5000);
                 robot.control.lift.setPosition(0.6);
+                Thread.sleep(2000);
+                robot.control.lift.setPosition(0);
             }
             if (gamepad1.x) {
-                robot.control.stopShoot();
-                robot.control.lift.setPosition(0);
-                shootMotor.setPower(0);
+                robot.control.shootMotor.setPower(0);
             }
 
             if (twoGamepads && false) {

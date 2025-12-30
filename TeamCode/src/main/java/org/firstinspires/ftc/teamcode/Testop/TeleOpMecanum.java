@@ -53,20 +53,24 @@ public class TeleOpMecanum extends LinearOpMode {
             backRightMotor.setPower(backRightPower);
 
             if (gamepad1.a) {
-                intakeMotor.setPower(-1);
+                intakeMotor.setPower(-0.9);
+                shootMotor.setPower(-0.75);
+                turretMotor.setPower(0);
             }
             if (gamepad1.b) {
                 intakeMotor.setPower(0);
                 intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                shootMotor.setPower(0);
             }
             if (gamepad1.y) {
-                shootMotor.setPower(-0.5);
-                Thread.sleep(5000);
-                lift.setPosition(0.75);
+                lift.setPosition(0.6);
+                Thread.sleep(2000);
+                lift.setPosition(0);
             }
             if (gamepad1.x) {
-                lift.setPosition(0);
                 shootMotor.setPower(0);
+//                Thread.sleep(2000);
+//                intakeMotor2.setPower(0);
             }
         }
     }
