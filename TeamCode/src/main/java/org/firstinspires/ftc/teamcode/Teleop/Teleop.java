@@ -159,6 +159,8 @@ public class Teleop extends LinearOpMode {
         boolean intakeOn = false;
         boolean flapOpen = false;
 
+        telemetry.addLine("dwbug 0");
+
         frontLeftMotor = hardwareMap.dcMotor.get("fl"); //1 port
         backLeftMotor = hardwareMap.dcMotor.get("rl");  //0
         frontRightMotor = hardwareMap.dcMotor.get("fr");    //3
@@ -171,6 +173,17 @@ public class Teleop extends LinearOpMode {
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        telemetry.addLine("dwbug 1");
+
+        /*
+        * 0 = color not selected
+        * 1 = red
+        * 2 = blue
+        * */
+        int color = 0;
+
+        telemetry.addLine("dwbug 2");
+
         while (opModeIsActive()) {
             // Clears cache to refresh data
             for (LynxModule hub : allHubs) {
@@ -179,26 +192,83 @@ public class Teleop extends LinearOpMode {
 
             // update data from gamepads
             Robot.updateGamepads();
+
+            telemetry.addLine("While loop exists :D");
+
+            if(color == 0){
+                if (twoGamepads){
+                    if(Robot.gamepad1.bButton.isPressed() && Robot.gamepad2.bButton.isPressed()){
+                        // red alliance
+                        color = 1;
+                    }
+                    else if(Robot.gamepad1.xButton.isPressed() && Robot.gamepad2.xButton.isPressed()){
+                        // blue alliance
+                        color = 2;
+                    }
+                    else{
+                        // v v    ideally this doesn't happen too much
+                        telemetry.addLine("Alliance color not yet selected.");
+                        continue;
+                    }
+                }
+                else{
+                    if(Robot.gamepad1.bButton.hasPressedPrev()){
+                        // red alliance
+                        color = 1;
+                    }
+                    else if(Robot.gamepad1.xButton.hasPressedPrev()){
+                        // blue alliance
+                        color = 2;
+                    }
+                    else{
+                        // v v    ideally this doesn't happen too much
+                        telemetry.addLine("Alliance color not yet selected.");
+                        continue;
+                    }
+                }
+            }
+
+            if(color == 2){
+                telemetry.addLine("Color is blue");
+            }
+            else if(color == 1){
+                telemetry.addLine("Color is red");
+            }
             telemetry.addData("Shootmotor power is ", ShootMotorPower);
+
             robot.limelight.loop();
-            telemetry.addData("Shootmotor power is ", ShootMotorPower);
+
             double distToTarget = 0.0;
-            if(robot.limelight.detectBlue){
+
+            if(color == 2 && robot.limelight.detectBlue){
                 distToTarget = robot.limelight.getDistanceFromTags( robot.limelight.blueGoal.getTargetArea() );
             }
-            telemetry.addData("Target Shootmotor power is ", (0.002*distToTarget+0.15));
+            else if(color == 1 && robot.limelight.detectRed){
+                distToTarget = robot.limelight.getDistanceFromTags( robot.limelight.redGoal.getTargetArea() );
+            }
+
+            telemetry.addLine("\n");
+
+            telemetry.addData("Target Shootmotor power is ", (0.002*distToTarget+0.45));
             telemetry.addData("Distance is ", distToTarget);
+
             if(gamepad1.dpad_down){
-                if(robot.limelight.detectBlue){
-                    double dist = robot.limelight.blueGoal.getTargetXDegrees();
-                    if(Math.abs(dist)>15){
-                        adjustAngle(dist);
-                    }
-                    else {
-                        double aimSpeed = autoAimSpeed(dist, 7);
-                        robot.control.turretMotor.setMotorEnable();
-                        robot.control.turretMotor.setPower(aimSpeed);
-                    }
+                double degreeError = 0.0;
+
+                if(color == 2 && robot.limelight.detectBlue){
+                    degreeError = robot.limelight.blueGoal.getTargetXDegrees();
+                }
+                else if(color == 1 && robot.limelight.detectRed){
+                    degreeError = robot.limelight.redGoal.getTargetXDegrees();
+                }
+
+                if(Math.abs(degreeError) > 15){
+                    adjustAngle(degreeError);
+                }
+                else {
+                    double aimSpeed = autoAimSpeed(degreeError , 7);
+                    robot.control.turretMotor.setMotorEnable();
+                    robot.control.turretMotor.setPower(aimSpeed);
                 }
             }
             else{
@@ -269,23 +339,26 @@ public class Teleop extends LinearOpMode {
 
             if (gamepad1.a) {
                 robot.control.startIntake();
-                robot.control.shootMotor.setPower(-0.75);
-                robot.control.turretMotor.setPower(0);
             }
             if (gamepad1.b) {
                 robot.control.stopIntake();
-                robot.control.shootMotor.setPower(0);
             }
             if (gamepad1.y) {
+                robot.control.startShoot(ShootMotorPower);
+                Thread.sleep(5000);
                 robot.control.lift.setPosition(0.6);
-                Thread.sleep(2000);
-                robot.control.lift.setPosition(0);
             }
             if (gamepad1.x) {
-                robot.control.shootMotor.setPower(0);
+                robot.control.stopShoot();
+                robot.control.lift.setPosition(0);
+                shootMotor.setPower(0);
             }
 
+            // un-depreicate later
             if (twoGamepads && false) {
+                // Why is shooting and intake on separate gamepads??
+
+
                 // Starting the shooting motor (Trigger Left)
                 if (Robot.gamepad2.triggerLeft > 0.05) {
                     robot.control.startShoot(ShootMotorPower);
