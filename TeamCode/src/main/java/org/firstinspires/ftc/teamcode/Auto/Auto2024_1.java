@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
-@Autonomous(name = "Auto2024_1")
+//@Autonomous(name = "Auto2024_1")
 public class Auto2024_1 extends LinearOpMode {
     private static final double mmPerInch = 25.4;
     private static final double MOTOR_TICK_PER_REV_YELLOW_JACKET_312 = 537.6;
