@@ -33,13 +33,14 @@ public class Teleop extends LinearOpMode {
     double deltaT;
     double timeCurrent;
     double timePre;
+    double shootMotorConstant = 0.0;
     ElapsedTime timer;
     private Robot robot;
     DcMotor frontLeftMotor;
     DcMotor backLeftMotor;
     DcMotor frontRightMotor;
     DcMotor backRightMotor;
-    double ShootMotorPower = 0.0;
+    double ShootMotorPower = 0.6;
 
 
     private void initOpMode() {
@@ -54,7 +55,6 @@ public class Teleop extends LinearOpMode {
         timePre = timeCurrent;
 
         telemetry.addData("Waiting for start", "...");
-//        telemetry.update();
     }
 
 
@@ -76,7 +76,6 @@ public class Teleop extends LinearOpMode {
         double startTime = getRuntime();
         while(opModeIsActive()){
             robot.odo.update();
-            //        telemetry.addData("Reached target", nav.driveTo(odo.getPosition(), TARGET_1, 0.7, 0));
             if (robot.nav.driveTo(robot.odo.getPosition(), TARGET, power, holdTime)){
                 telemetry.addLine("at position #1!");
                 // Sleep to give the reset position time, as it takes 0.25s
@@ -111,7 +110,6 @@ public class Teleop extends LinearOpMode {
             String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
             telemetry.addData("Position", data);
 
-//            telemetry.update();
         }
     }
 
@@ -144,7 +142,6 @@ public class Teleop extends LinearOpMode {
         ElapsedTime timer = new ElapsedTime();
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
         telemetry.log().add("Initialized, ready to start");
-//        telemetry.update();
         waitForStart();
 
         telemetry.clearAll();
@@ -168,7 +165,6 @@ public class Teleop extends LinearOpMode {
         DcMotor turretMotor = hardwareMap.dcMotor.get("turretMotor"); // ext 1
         DcMotor shootMotor = hardwareMap.dcMotor.get("shootMotor"); // ext 0
         DcMotor intakeMotor = hardwareMap.dcMotor.get("intakeMotor"); // ext 3
-//        Servo lift = hardwareMap.get(Servo.class, "lift"); // ext 0 servo
 
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -182,7 +178,7 @@ public class Teleop extends LinearOpMode {
         * */
         int color = 0;
 
-        telemetry.addLine("dwbug 2");
+        boolean shootMotorActive = false;
 
         while (opModeIsActive()) {
             // Clears cache to refresh data
@@ -196,35 +192,18 @@ public class Teleop extends LinearOpMode {
             telemetry.addLine("While loop exists :D");
 
             if(color == 0){
-                if (twoGamepads){
-                    if(Robot.gamepad1.bButton.isPressed() && Robot.gamepad2.bButton.isPressed()){
-                        // red alliance
-                        color = 1;
-                    }
-                    else if(Robot.gamepad1.xButton.isPressed() && Robot.gamepad2.xButton.isPressed()){
-                        // blue alliance
-                        color = 2;
-                    }
-                    else{
-                        // v v    ideally this doesn't happen too much
-                        telemetry.addLine("Alliance color not yet selected.");
-                        continue;
-                    }
+                if(Robot.gamepad1.bButton.isPressed()){
+                    // red alliance
+                    color = 1;
+                }
+                else if(Robot.gamepad1.xButton.isPressed()){
+                    // blue alliance
+                    color = 2;
                 }
                 else{
-                    if(Robot.gamepad1.bButton.hasPressedPrev()){
-                        // red alliance
-                        color = 1;
-                    }
-                    else if(Robot.gamepad1.xButton.hasPressedPrev()){
-                        // blue alliance
-                        color = 2;
-                    }
-                    else{
-                        // v v    ideally this doesn't happen too much
-                        telemetry.addLine("Alliance color not yet selected.");
-                        continue;
-                    }
+                    telemetry.addLine("Alliance color not yet selected.");
+                    telemetry.update();
+                    continue;
                 }
             }
 
@@ -249,8 +228,20 @@ public class Teleop extends LinearOpMode {
 
             telemetry.addLine("\n");
 
-            telemetry.addData("Target Shootmotor power is ", (0.002*distToTarget+0.45));
+            telemetry.addData("Hard-coded Shootmotor power is ", robot.control.shootMotorVelocity(distToTarget)+shootMotorConstant);
+            telemetry.addData("ShootMotorConstant is ", shootMotorConstant);
             telemetry.addData("Distance is ", distToTarget);
+
+            if(robot.getBatteryVoltage() > 11){
+                shootMotorConstant = -0.01;
+            }
+            else if(robot.getBatteryVoltage() < 10){
+                shootMotorConstant = 0.01;
+            }
+
+            if(distToTarget != 0 && shootMotorActive){
+                robot.control.shootMotor.setPower(-robot.control.shootMotorVelocity(distToTarget));
+            }
 
             if(gamepad1.dpad_down){
                 double degreeError = 0.0;
@@ -275,48 +266,10 @@ public class Teleop extends LinearOpMode {
                 robot.control.turretMotor.setPower(0);
             }
 
-
-            if(gamepad1.dpad_up){
-                robot.odo.update();
-                Pose2D pos = robot.odo.getPosition();
-                telemetry.addLine("Trying to move in the x-direction");
-                Pose2D TARGET = makeTarget(pos.getX(DistanceUnit.MM)+100,pos.getY(DistanceUnit.MM),pos.getHeading(AngleUnit.DEGREES));
-                DriveToTarget(TARGET, 0.8, 0.5, 0.7, 1, 5);
-            }
-
-            if(Robot.gamepad1.dPadLeft.isPressed() && !Robot.gamepad1.dPadLeft.hasPressedPrev()){
-                ShootMotorPower -= 0.01;
-                telemetry.addData("Motor power is now",ShootMotorPower);
-//                telemetry.update();
-            }
-
-            if(Robot.gamepad1.dPadRight.isPressed() && !Robot.gamepad1.dPadRight.hasPressedPrev()){
-                ShootMotorPower += 0.01;
-                telemetry.addData("Motor power is now",ShootMotorPower);
-//                telemetry.update();
-            }
-
             // Get current time and compute delta
             timeCurrent = timer.nanoseconds();
             deltaT = timeCurrent - timePre;
             timePre = timeCurrent;
-
-            // gets the motor powers for drive from gamepad1
-            // y button activates low speed mode
-            // it gets the x and y positioning from the left stick and turns based on the right stick's x
-            // calcMotorPowers creates a MotorGeneric
-//            MotorGeneric<Double> motorPowers;
-//            if (Robot.gamepad1.yButton.toggle) {
-//                motorPowers = robot.drive.calcMotorPowers(Robot.gamepad1.leftStickX * sensitivityHighPower, Robot.gamepad1.leftStickY * sensitivityHighPower, Robot.gamepad1.rightStickX * sensitivityHighPower);
-//            } else {
-//                motorPowers = robot.drive.calcMotorPowers(Robot.gamepad1.leftStickX * sensitivityLowPower, Robot.gamepad1.leftStickY * sensitivityLowPower, Robot.gamepad1.rightStickX * sensitivityLowPower);
-//            }
-//            robot.drive.setDrivePowers(motorPowers);
-            // Switch to one gamepad
-//            if (Robot.gamepad1.xButton.isPressed() || Robot.gamepad2.xButton.isPressed()) {
-//                twoGamepads = !twoGamepads;
-//                telemetry.log().add("Switching to " + (twoGamepads ? "two" : "one") + " gamepad mode");
-//            }
 
             double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
             double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
@@ -339,19 +292,24 @@ public class Teleop extends LinearOpMode {
 
             if (gamepad1.a) {
                 robot.control.startIntake();
+                shootMotorActive = true;
+                robot.control.shootMotor.setPower(-robot.control.shootMotorVelocity(distToTarget)+shootMotorConstant);
+                robot.control.turretMotor.setPower(0);
             }
             if (gamepad1.b) {
                 robot.control.stopIntake();
+                robot.control.shootMotor.setPower(0);
+                shootMotorActive = false;
             }
             if (gamepad1.y) {
-                robot.control.startShoot(ShootMotorPower);
-                Thread.sleep(5000);
                 robot.control.lift.setPosition(0.6);
+                robot.control.setIntakePower(0.2);
+                Thread.sleep(2000);
+                robot.control.setIntakePower(1);
+                robot.control.lift.setPosition(0);
             }
             if (gamepad1.x) {
-                robot.control.stopShoot();
-                robot.control.lift.setPosition(0);
-                shootMotor.setPower(0);
+                robot.control.shootMotor.setPower(0);
             }
 
             // un-depreicate later

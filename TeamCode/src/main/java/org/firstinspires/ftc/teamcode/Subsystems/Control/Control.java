@@ -68,6 +68,11 @@ public class Control extends Subsystem {
 
     }
 
+    public void setIntakePower(double power) {
+        intakeMotor.setMotorEnable();
+        intakeMotor.setPower(-power);
+    }
+
     public void startShoot(double power) {
         shootMotor.setMotorEnable();
         shootMotor.setPower(-power);
@@ -87,6 +92,27 @@ public class Control extends Subsystem {
         double variable = feedForward + PIDCorrect;
 
         shootMotor.setVelocity(variable);
+    }
+
+    public double shootMotorVelocity(double distance){
+        if(distance < 120){
+            return 0.64;
+        }
+        else if(distance<140){
+            return 0.65;
+        }
+        else if(distance<160){
+            return 0.66;
+        }
+        else if(distance<190){
+            return 0.67;
+        }
+        else if(distance<220){
+            return 0.71;
+        }
+        else{
+            return 0.72;
+        }
     }
 
 }
