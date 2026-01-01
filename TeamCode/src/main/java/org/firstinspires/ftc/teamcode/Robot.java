@@ -10,9 +10,12 @@ import org.firstinspires.ftc.teamcode.Subsystems.Control.Control;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.Drive;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.MotorGeneric;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.PoseEstimationMethodChoice;
+import org.firstinspires.ftc.teamcode.Subsystems.Drive.DriveToPoint;
+import org.firstinspires.ftc.teamcode.Subsystems.Vision.AprilTagLimelightTest;
 import org.firstinspires.ftc.teamcode.Subsystems.Vision.Vision;
 import org.firstinspires.ftc.teamcode.Subsystems.Web.WebLog;
 import org.firstinspires.ftc.teamcode.Subsystems.Web.WebThread;
+import org.firstinspires.ftc.teamcode.Subsystems.Odometry.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.Util.AllianceColor;
 import org.firstinspires.ftc.teamcode.Util.BasicAccelerationIntegrator;
 import org.firstinspires.ftc.teamcode.Util.MasterLogger;
@@ -36,8 +39,15 @@ public class Robot {
     private final AllianceColor allianceColor;
     private final boolean webEnabled;
     private final boolean odometryEnabled;
+    private final boolean limelightEnabled;
+    private final boolean driveToPointEnabled;
+    private final boolean pinpointDriverEnabled;
+    private boolean driverv2Enabled;
     public final HardwareMap hardwareMap;
     private final Telemetry telemetry;
+    public final AprilTagLimelightTest limelight;
+    public GoBildaPinpointDriver odo;
+    public DriveToPoint nav;
 
     public BNO055IMU imu;
     // Subsystems
@@ -61,7 +71,7 @@ public class Robot {
      *    <li><i>odometry</i> - toggles odometry subsystem, disabled by default</li>
      * </ul>
      */
-    public Robot(HardwareMap hardwareMap, Telemetry telemetry, ElapsedTime timer,
+    public Robot(HardwareMap hardwareMap, Telemetry telemetry, ElapsedTime timer, DriveToPoint nav,
                  AllianceColor allianceColor, Gamepad gamepad1, Gamepad gamepad2, HashMap<String, Boolean> flags) {
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML); // Allow usage of some HTML tags
         telemetry.log().setDisplayOrder(Telemetry.Log.DisplayOrder.OLDEST_FIRST);
@@ -81,9 +91,35 @@ public class Robot {
         this.visionEnabled = flags.getOrDefault("vision", true);
         this.webEnabled = flags.getOrDefault("web", false);
         this.odometryEnabled = flags.getOrDefault("odometry", false);
+        this.limelightEnabled = flags.getOrDefault("limelight", true);
+        this.pinpointDriverEnabled = flags.getOrDefault("odo", true);
+        this.driveToPointEnabled = flags.getOrDefault("nav",true);
+        this.driverv2Enabled = flags.getOrDefault("drive", false);
+        this.nav = nav;
         Robot.gamepad1 = new GamepadWrapper(gamepad1);
         Robot.gamepad2 = new GamepadWrapper(gamepad2);
+        this.limelight = new AprilTagLimelightTest(this.hardwareMap, telemetry);
+
         init();
+    }
+    void InitializeOdometry(){
+        odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
+//        odo.setOffsets(-142.0, 120.0); //these are tuned for 3110-0002-0001 Product Insight #1
+        odo.setOffsets(-67.0, -168.0); // change later ?
+
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+
+        odo.recalibrateIMU();
+
+        odo.resetPosAndIMU();
+
+        telemetry.addData("Status", "Initialized");
+        telemetry.addData("X offset", odo.getXOffset());
+        telemetry.addData("Y offset", odo.getYOffset());
+
+        telemetry.addData("Device Version Number:", odo.getDeviceVersion());
+        telemetry.addData("Device Scalar", odo.getYawScalar());
     }
 
     public static void updateGamepads() {
@@ -139,33 +175,41 @@ public class Robot {
     }
 
     protected void subsystemInit() {
-        logger.debug("Drive subsystem init started");
-        DcMotorEx frontLeftDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("fl");
-        DcMotorEx frontRightDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("fr");
-        DcMotorEx rearLeftDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("rl");
-        DcMotorEx rearRightDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("rr");
-        if (odometryEnabled) {
-            DcMotorEx leftEncoder = (DcMotorEx) hardwareMap.dcMotor.get("leftEncoder");
-            DcMotorEx backEncoder = (DcMotorEx) hardwareMap.dcMotor.get("backEncoder");
-            DcMotorEx rightEncoder = (DcMotorEx) hardwareMap.dcMotor.get("rightEncoder");
-            drive = new Drive(
-                    new MotorGeneric<>(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor),
-                    new DcMotorEx[]{leftEncoder, backEncoder, rightEncoder},
-                    PoseEstimationMethodChoice.ODOMETRY,
-                    imu,
-                    telemetry);
-        } else {
-            drive = new Drive(
-                    new MotorGeneric<>(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor),
-                    null,
-                    PoseEstimationMethodChoice.MOTOR_ENCODERS,
-                    imu,
-                    telemetry);
+        if(driverv2Enabled) {
+            logger.debug("Drive subsystem init started");
+            DcMotorEx frontLeftDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("fl");
+            DcMotorEx frontRightDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("fr");
+            DcMotorEx rearLeftDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("rl");
+            DcMotorEx rearRightDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("rr");
+            if (odometryEnabled) {
+                DcMotorEx leftEncoder = (DcMotorEx) hardwareMap.dcMotor.get("leftEncoder");
+                DcMotorEx backEncoder = (DcMotorEx) hardwareMap.dcMotor.get("backEncoder");
+                DcMotorEx rightEncoder = (DcMotorEx) hardwareMap.dcMotor.get("rightEncoder");
+                drive = new Drive(
+                        new MotorGeneric<>(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor),
+                        new DcMotorEx[]{leftEncoder, backEncoder, rightEncoder},
+                        PoseEstimationMethodChoice.ODOMETRY,
+                        imu,
+                        telemetry);
+            } else {
+                drive = new Drive(
+                        new MotorGeneric<>(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor),
+                        null,
+                        PoseEstimationMethodChoice.MOTOR_ENCODERS,
+                        imu,
+                        telemetry);
+            }
+            logger.info("Drive subsystem init finished");
         }
-        logger.info("Drive subsystem init finished");
-
+        else{
+            logger.warning("Drive subsystem init skipped");
+        }
         logger.debug("Control subsystem init started");
-        control = new Control(telemetry, (Servo) hardwareMap.get("claw"), (DcMotorEx) hardwareMap.get("pivot"));
+        control = new Control(telemetry,
+                (DcMotorEx) hardwareMap.get("intakeMotor"),
+                (DcMotorEx) hardwareMap.get("shootMotor"),
+                (DcMotorEx) hardwareMap.get("turretMotor"),
+                (Servo) hardwareMap.get("lift"));
         logger.info("Control subsystem init finished");
 
         if (visionEnabled) {
@@ -174,6 +218,31 @@ public class Robot {
             logger.info("Vision subsystem init finished");
         } else {
             logger.warning("Vision subsystem init skipped");
+        }
+
+        if(limelightEnabled) {
+            logger.debug("Limelight subsystem init started");
+            limelight.init();
+            limelight.start();
+        }
+        else{
+            logger.warning("Limelight subsystem init skipped");
+        }
+
+        if(pinpointDriverEnabled){
+            logger.debug("PinpointDriver subsystem init started");
+            InitializeOdometry();
+        }
+        else{
+            logger.warning("PinpointDriver subsystem init skipped");
+        }
+
+        if(driveToPointEnabled){
+            nav.setDriveType(DriveToPoint.DriveType.MECANUM);
+            logger.debug("DriveToPoint subsystem init started");
+        }
+        else{
+            logger.warning("DriveToPoint subsystem init skipped");
         }
 
         if (webEnabled) {
@@ -189,6 +258,7 @@ public class Robot {
         } else {
             logger.warning("Web subsystem init skipped");
         }
+
         telemetryBroadcast("Status", "all subsystems initialized");
     }
 
