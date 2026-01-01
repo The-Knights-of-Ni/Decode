@@ -271,9 +271,10 @@ public class Teleop extends LinearOpMode {
             deltaT = timeCurrent - timePre;
             timePre = timeCurrent;
 
-            double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
-            double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
-            double rx = gamepad1.right_stick_x;
+            double sensitivity = 0.5; // less sensitive, 0.5=half speed
+            double y = -gamepad1.left_stick_y * sensitivity;    // Remember, Y stick value is reversed
+            double x = gamepad1.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
+            double rx = gamepad1.right_stick_x * sensitivity;
 
             // Denominator is the largest motor power (absolute value) or 1
             // This ensures all the powers maintain the same ratio,
@@ -292,27 +293,30 @@ public class Teleop extends LinearOpMode {
 
             if (gamepad1.a) {
                 robot.control.startIntake();
+            } else {
+                robot.control.stopIntake();
+            }
+
+            if (gamepad1.b) {
+                robot.control.shootMotor.setPower(0);
+                shootMotorActive = false;
+            }
+
+            if (gamepad1.y) {
+                double sm_power = robot.control.shootMotorVelocity(distToTarget)+shootMotorConstant;
+                robot.control.shootMotor.setPower(-sm_power);
+                telemetry.addData("Shootmotor power before lift is ", -sm_power);
+                robot.control.lift.setPosition(0.6);
+                Thread.sleep(2000);
+                robot.control.lift.setPosition(0);
+            }
+            if (gamepad1.x) {
                 shootMotorActive = true;
                 robot.control.shootMotor.setPower(-robot.control.shootMotorVelocity(distToTarget)+shootMotorConstant);
                 robot.control.turretMotor.setPower(0);
             }
-            if (gamepad1.b) {
-                robot.control.stopIntake();
-                robot.control.shootMotor.setPower(0);
-                shootMotorActive = false;
-            }
-            if (gamepad1.y) {
-                robot.control.lift.setPosition(0.6);
-                robot.control.setIntakePower(0.2);
-                Thread.sleep(2000);
-                robot.control.setIntakePower(1);
-                robot.control.lift.setPosition(0);
-            }
-            if (gamepad1.x) {
-                robot.control.shootMotor.setPower(0);
-            }
 
-            // un-depreicate later
+            // un-deprecate later
             if (twoGamepads && false) {
                 // Why is shooting and intake on separate gamepads??
 
