@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Teleop;
 
 
 import android.os.Build;
+import android.util.Log;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -63,7 +64,7 @@ public class Teleop extends LinearOpMode {
     }
 
     public double autoAimSpeed(double dist, double k){
-        double magnitude = 0.5, tolerance = 2.5;
+        double magnitude = 0.5, tolerance = 2.0;
         return (-magnitude*sigmoid(dist-tolerance,k) +
                 magnitude-magnitude*sigmoid(dist+tolerance,k));
     }
@@ -117,6 +118,10 @@ public class Teleop extends LinearOpMode {
         robot.odo.update();
         Pose2D pos = robot.odo.getPosition();
         Pose2D TARGET = makeTarget(pos.getX(DistanceUnit.MM),pos.getY(DistanceUnit.MM),pos.getHeading(AngleUnit.DEGREES)-dist);
+        telemetry.addData("Current Heading:", pos.getHeading(AngleUnit.DEGREES));
+        telemetry.addData("Degree difference:",dist);
+        String data = String.format(Locale.US, "%f, %f", pos.getHeading(AngleUnit.DEGREES), dist);
+        Log.println(Log.DEBUG, "ROBOT", data);
         DriveToTarget(TARGET, 0.8, 0.5, 0.7, 1, 5);
     }
 
@@ -189,7 +194,7 @@ public class Teleop extends LinearOpMode {
             // update data from gamepads
             Robot.updateGamepads();
 
-            telemetry.addLine("While loop exists :D");
+            telemetry.addLine("While loop exists :(");
 
             if(color == 0){
                 if(Robot.gamepad1.bButton.isPressed()){
@@ -203,8 +208,8 @@ public class Teleop extends LinearOpMode {
                 else{
                     telemetry.addLine("Alliance color not yet selected.");
                     telemetry.update();
-                    continue;
                 }
+                continue;
             }
 
             if(color == 2){
@@ -220,10 +225,10 @@ public class Teleop extends LinearOpMode {
             double distToTarget = 0.0;
 
             if(color == 2 && robot.limelight.detectBlue){
-                distToTarget = robot.limelight.getDistanceFromTags( robot.limelight.blueGoal.getTargetArea() );
+                distToTarget = robot.limelight.getDistanceFromTags( robot.limelight.blueGoal );
             }
             else if(color == 1 && robot.limelight.detectRed){
-                distToTarget = robot.limelight.getDistanceFromTags( robot.limelight.redGoal.getTargetArea() );
+                distToTarget = robot.limelight.getDistanceFromTags( robot.limelight.redGoal );
             }
 
             telemetry.addLine("\n");
@@ -232,18 +237,37 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("ShootMotorConstant is ", shootMotorConstant);
             telemetry.addData("Distance is ", distToTarget);
 
-            if(robot.getBatteryVoltage() > 11){
+            if(robot.getBatteryVoltage() > 12){
                 shootMotorConstant = -0.01;
             }
-            else if(robot.getBatteryVoltage() < 10){
-                shootMotorConstant = 0.01;
+            else if(robot.getBatteryVoltage() > 11.5) {
+                shootMotorConstant = 0.015;
+            }
+            else if(robot.getBatteryVoltage() > 11){
+                shootMotorConstant = 0.02;
+            }
+            else if(robot.getBatteryVoltage() > 10.5){
+                shootMotorConstant = 0.025;
             }
 
-            if(distToTarget != 0 && shootMotorActive){
-                robot.control.shootMotor.setPower(-robot.control.shootMotorVelocity(distToTarget));
+//            // Improved continuous voltage compensation for shooter
+//            double targetVoltage = 12.8; // ideal voltage
+//            double kVoltage = 0.02; // change as needed
+//            double voltage = robot.getBatteryVoltage();
+//            if (voltage < targetVoltage) {
+//                shootMotorConstant = kVoltage * (targetVoltage - voltage);
+//                telemetry.addData("ShootmotorConstant: ", shootMotorConstant);
+//            }
+
+            //            if(distToTarget != 0 && shootMotorActive){
+            // Continuously update shoot motor power if active
+            if (shootMotorActive) {
+                double sm_power = robot.control.shootMotorVelocity(distToTarget) + shootMotorConstant;
+                robot.control.shootMotor.setPower(-sm_power);
+                telemetry.addData("Shootmotor power (auto-updating)", -sm_power);
             }
 
-            if(gamepad1.dpad_down){
+            if(gamepad1.dpad_down && (robot.limelight.detectBlue || robot.limelight.detectRed)){
                 double degreeError = 0.0;
 
                 if(color == 2 && robot.limelight.detectBlue){
@@ -257,7 +281,7 @@ public class Teleop extends LinearOpMode {
                     adjustAngle(degreeError);
                 }
                 else {
-                    double aimSpeed = autoAimSpeed(degreeError , 7);
+                    double aimSpeed = autoAimSpeed(degreeError , 12);
                     robot.control.turretMotor.setMotorEnable();
                     robot.control.turretMotor.setPower(aimSpeed);
                 }
@@ -303,16 +327,17 @@ public class Teleop extends LinearOpMode {
             }
 
             if (gamepad1.y) {
-                double sm_power = robot.control.shootMotorVelocity(distToTarget)+shootMotorConstant;
+                double sm_power = robot.control.shootMotorVelocity(distToTarget) + shootMotorConstant;
                 robot.control.shootMotor.setPower(-sm_power);
-                telemetry.addData("Shootmotor power before lift is ", -sm_power);
+                telemetry.addData("Shoot motor power before lift is ", -sm_power);
                 robot.control.lift.setPosition(0.6);
                 Thread.sleep(2000);
                 robot.control.lift.setPosition(0);
             }
             if (gamepad1.x) {
                 shootMotorActive = true;
-                robot.control.shootMotor.setPower(-robot.control.shootMotorVelocity(distToTarget)+shootMotorConstant);
+                // No need to set power here, it will be set in the loop above
+//                robot.control.shootMotor.setPower(-robot.control.shootMotorVelocity(distToTarget)+shootMotorConstant);
                 robot.control.turretMotor.setPower(0);
             }
 

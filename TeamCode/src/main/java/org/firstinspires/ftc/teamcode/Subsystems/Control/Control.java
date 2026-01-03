@@ -96,22 +96,34 @@ public class Control extends Subsystem {
 
     public double shootMotorVelocity(double distance){
         if(distance < 120){
-            return 0.64;
+            return 0.62;
+        }
+        else if(distance<130){
+            return 0.63;
         }
         else if(distance<140){
+            return 0.64;
+        }
+        else if(distance<150){
             return 0.65;
         }
         else if(distance<160){
             return 0.66;
         }
-        else if(distance<190){
+        else if(distance<170){
             return 0.67;
         }
+        else if(distance<180){
+            return 0.68;
+        }
+        else if(distance<190){
+            return 0.69;
+        }
         else if(distance<220){
-            return 0.71;
+            return 0.79;
         }
         else{
-            return 0.72;
+            return 0.85;
         }
     }
 
