@@ -209,7 +209,8 @@ public class Robot {
                 (DcMotorEx) hardwareMap.get("intakeMotor"),
                 (DcMotorEx) hardwareMap.get("shootMotor"),
                 (DcMotorEx) hardwareMap.get("turretMotor"),
-                (Servo) hardwareMap.get("lift"));
+                (Servo) hardwareMap.get("lift"),
+                (Servo) hardwareMap.get("pushServo"));
         logger.info("Control subsystem init finished");
 
         if (visionEnabled) {

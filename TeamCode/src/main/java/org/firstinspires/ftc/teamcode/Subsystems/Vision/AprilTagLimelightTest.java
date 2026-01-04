@@ -125,7 +125,7 @@ public class AprilTagLimelightTest {
         double dX = fres.getTargetPoseCameraSpace().getPosition().x;
         double dY = fres.getTargetPoseCameraSpace().getPosition().y;
         double dZ = fres.getTargetPoseCameraSpace().getPosition().z;
-        return 1000*Math.sqrt(dX*dX + dY*dY + dZ*dZ);
+        return 100*Math.sqrt(dX*dX + dY*dY + dZ*dZ);
 //        return 18.3*(1/Math.sqrt(ta));
     }
 

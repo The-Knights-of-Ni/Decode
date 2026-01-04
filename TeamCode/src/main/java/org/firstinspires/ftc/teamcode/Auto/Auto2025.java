@@ -114,6 +114,8 @@ public class Auto2025 extends LinearOpMode {
         DriveToTarget(makeTarget(660,0,90), 0.6, 0.5, 0.7, 1, 3);
         DriveToTarget(makeTarget(660,0,0), 0.6, 0.5, 0.7, 1, 2);
         DriveToTarget(makeTarget(20,0,0), 0.5, 0.5, 0.7, 1, 3);
+        shootMotor.setPower(0.85);
+
 //        DriveToTarget(makeTarget(600,0,90), 0.8, 0.5, 0.7, 1, 5);
 
          // Shoot from starting postion for blue
