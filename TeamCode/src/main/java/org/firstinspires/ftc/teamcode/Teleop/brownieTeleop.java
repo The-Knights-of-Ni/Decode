@@ -423,7 +423,8 @@ public class brownieTeleop extends LinearOpMode {
 
                     robot.control.push.setPosition(-0.8); // pushes last two balls into shooter
 
-
+                    robot.control.lift.setPosition(0);
+                    robot.control.push.setPosition(0); // resets positions
                 }
 
 //                if (Robot.gamepad1.aButton.isPressed()) {
