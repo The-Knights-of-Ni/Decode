@@ -375,12 +375,14 @@ public class brownieTeleop extends LinearOpMode {
                 if (gamepad1.b) { // assume this is the new one
                     robot.control.push.setPosition(-0.8);
                     telemetry.addLine("Trying and probably failing to move push servo");
-//                    Thread.sleep(500);
-//                    robot.control.push.setPosition(0);
+                    Thread.sleep(500);
+                    robot.control.push.setPosition(0);
                 }
 
                 if (gamepad1.y) { //assume this is the old one
                     robot.control.lift.setPosition(0.6); //
+                    Thread.sleep(250);
+                    robot.control.push.setPosition(0);
                 }
 
                 if (Robot.gamepad1.bumperLeft.isPressed()){
@@ -393,7 +395,7 @@ public class brownieTeleop extends LinearOpMode {
                     robot.control.shootMotor.setPower(-sm_power);
                     telemetry.addData("Shoot motor power before lift is ", -sm_power);
                 }
-
+                // does following condition mean you have to keep holding x? idk
                 if (gamepad1.x && (robot.limelight.detectBlue || robot.limelight.detectRed)){ // auto shooting macro, copied from various sources.
                     double degreeError = 0.0;
 
@@ -477,10 +479,14 @@ public class brownieTeleop extends LinearOpMode {
 
                 if (gamepad1.x){
                     robot.control.lift.setPosition(0.6);
+                    Thread.sleep(250);
+                    robot.control.lift.setPosition(0);
                 }
 
                 if (gamepad1.b){
                     robot.control.push.setPosition(-0.8);
+                    Thread.sleep(500);
+                    robot.control.push.setPosition(0);
                 }
 
                 if (gamepad1.y){
