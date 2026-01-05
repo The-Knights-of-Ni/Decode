@@ -22,15 +22,18 @@ public class Control extends Subsystem {
     public final DcMotorEx turretMotor;
     public final Servo lift;
 
+    public final Servo push;
+
     private final FeedForward feedFowardVelocity = new FeedForward(10, 10);
     private final PID PIDVelocity = new PID(0.002, 0, 0.0002);
 
-    public Control(Telemetry telemetry, DcMotorEx intakeMotor, DcMotorEx shootMotor, DcMotorEx  turretMotor, Servo lift) {
+    public Control(Telemetry telemetry, DcMotorEx intakeMotor, DcMotorEx shootMotor, DcMotorEx  turretMotor, Servo lift, Servo push) {
         super(telemetry, "control");
         this.shootMotor = shootMotor;
         this.intakeMotor = intakeMotor;
         this.turretMotor = turretMotor;
         this.lift = lift;
+        this.push = push;
     }
 
     /**
@@ -96,22 +99,35 @@ public class Control extends Subsystem {
 
     public double shootMotorVelocity(double distance){
         if(distance < 120){
-            return 0.64;
+            return 0.58;
+        }
+        else if(distance<130){
+            return 0.60;
         }
         else if(distance<140){
+            return 0.61;
+        }
+        else if(distance<150){
             return 0.65;
         }
         else if(distance<160){
             return 0.66;
         }
-        else if(distance<190){
+        else if(distance<170){
             return 0.67;
         }
+        else if(distance<180){
+            return 0.68;
+        }
+        else if(distance<190){
+            return 0.69;
+        }
         else if(distance<220){
-            return 0.71;
+            return 0.79;
         }
         else{
-            return 0.72;
+            return 0.85;
+            // 0.85 for long distance shooting area, 0.6 for short
         }
     }
 

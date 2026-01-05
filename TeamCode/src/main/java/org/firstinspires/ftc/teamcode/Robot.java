@@ -44,7 +44,7 @@ public class Robot {
     private final boolean pinpointDriverEnabled;
     private boolean driverv2Enabled;
     public final HardwareMap hardwareMap;
-    private final Telemetry telemetry;
+    public final Telemetry telemetry;
     public final AprilTagLimelightTest limelight;
     public GoBildaPinpointDriver odo;
     public DriveToPoint nav;
@@ -209,7 +209,8 @@ public class Robot {
                 (DcMotorEx) hardwareMap.get("intakeMotor"),
                 (DcMotorEx) hardwareMap.get("shootMotor"),
                 (DcMotorEx) hardwareMap.get("turretMotor"),
-                (Servo) hardwareMap.get("lift"));
+                (Servo) hardwareMap.get("lift"),
+                (Servo) hardwareMap.get("pushServo"));
         logger.info("Control subsystem init finished");
 
         if (visionEnabled) {

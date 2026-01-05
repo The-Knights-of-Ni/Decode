@@ -71,6 +71,9 @@ public class AprilTagLimelightTest {
         limelight.updateRobotOrientation(orientation.getYaw(AngleUnit.DEGREES));
 
         LLResult llResult = limelight.getLatestResult();
+        detectMotif = false;
+        detectRed = false;
+        detectBlue = false;
         if (llResult != null && llResult.isValid()) {
             Pose3D botPose = llResult.getBotpose_MT2();
             List<LLResultTypes.FiducialResult> res = llResult.getFiducialResults();
@@ -81,28 +84,27 @@ public class AprilTagLimelightTest {
 
             String data1 = String.format(Locale.US, "{Botpose: %s, X (mm): %.3f, Y (mm): %.3f, Heading (deg): %.3f}", botPose.toString(), botXmm, botYmm, botHeadingDeg);
             telemetry.addData("", data1);
-            detectMotif = false;
-            detectRed = false;
-            detectBlue = false;
+
             for(int i = 0; i<res.size(); i++){
                 targetX = res.get(i).getTargetXDegrees();
                 targetY = res.get(i).getTargetYDegrees();
 
-                distance = getDistanceFromTags(res.get(i).getTargetArea());
+                distance = getDistanceFromTags(res.get(i));
 
-                String data = String.format(Locale.US, "{ID: %d, Distance: %.3f, Target X: %.3f, Target Y: %.3f, Area: %.5f}", res.get(i).getFiducialId(), distance,  targetX, targetY, res.get(i).getTargetArea());
+                String data = String.format(Locale.US, "{ID: %d, Distance: %.3f, Target X: %.3f, Target Y: %.3f, Area: %.5f}",
+                        res.get(i).getFiducialId(), distance,  targetX, targetY, res.get(i).getTargetArea());
                 telemetry.addData("", data);
 
                 if(res.get(i).getFiducialId() < 24 && res.get(i).getFiducialId() > 20){
                     motif = res.get(i);
                     detectMotif = true;
                 }
-                if(res.get(i).getFiducialId() == 24){
+                else if(res.get(i).getFiducialId() == 24){
                     // red
                     detectRed = true;
                     redGoal = res.get(i);
                 }
-                if(res.get(i).getFiducialId() == 20){
+                else if(res.get(i).getFiducialId() == 20){
                     // blue
                     detectBlue = true;
                     blueGoal = res.get(i);
@@ -119,8 +121,12 @@ public class AprilTagLimelightTest {
 
 
 
-    public double getDistanceFromTags(double ta) {
-        return 18.3*(1/Math.sqrt(ta));
+    public double getDistanceFromTags(LLResultTypes.FiducialResult fres) {
+        double dX = fres.getTargetPoseCameraSpace().getPosition().x;
+        double dY = fres.getTargetPoseCameraSpace().getPosition().y;
+        double dZ = fres.getTargetPoseCameraSpace().getPosition().z;
+        return 100*Math.sqrt(dX*dX + dY*dY + dZ*dZ);
+//        return 18.3*(1/Math.sqrt(ta));
     }
 
     public double getBotXmm() {

@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Locale;
 
 
-@TeleOp(name = "TeleOp")
-public class Teleop extends LinearOpMode {
+@TeleOp(name = "brownieTeleOp")
+public class brownieTeleop extends LinearOpMode {
     double deltaT;
     double timeCurrent;
     double timePre;
@@ -179,10 +179,10 @@ public class Teleop extends LinearOpMode {
         telemetry.addLine("dwbug 1");
 
         /*
-        * 0 = color not selected
-        * 1 = redf
-        * 2 = blue
-        * */
+         * 0 = color not selected
+         * 1 = redf
+         * 2 = blue
+         * */
         int color = 0;
 
         boolean shootMotorActive = false;
@@ -360,16 +360,27 @@ public class Teleop extends LinearOpMode {
                     robot.control.stopIntake();
                 }
 
+                if (gamepad2.a){ // for some reason, there was a stop motor but not a start motor. copied from main.
+                    robot.control.startShoot(ShootMotorPower);
+                    // put limelight tests for teleop here for now?
+                    telemetry.log().add("Starting the shoot motor");
+                    robot.limelight.loop();
+                }
+
                 if (gamepad2.b) {
                     robot.control.shootMotor.setPower(0);
                     shootMotorActive = false;
                 }
 
-                if (gamepad1.b) {
+                if (gamepad1.b) { // assume this is the new one
                     robot.control.push.setPosition(-0.8);
                     telemetry.addLine("Trying and probably failing to move push servo");
 //                    Thread.sleep(500);
 //                    robot.control.push.setPosition(0);
+                }
+
+                if (gamepad1.y) { //assume this is the old one
+                    robot.control.lift.setPosition(0.6); //
                 }
 
                 if (Robot.gamepad1.bumperLeft.isPressed()){
@@ -381,6 +392,36 @@ public class Teleop extends LinearOpMode {
                     double sm_power = 0.6 + shootMotorConstant;
                     robot.control.shootMotor.setPower(-sm_power);
                     telemetry.addData("Shoot motor power before lift is ", -sm_power);
+                }
+
+                if (gamepad1.x && (robot.limelight.detectBlue || robot.limelight.detectRed)){ // auto shooting macro, copied from various sources.
+                    double degreeError = 0.0;
+
+                    if(color == 2 && robot.limelight.detectBlue){
+                        degreeError = robot.limelight.blueGoal.getTargetXDegrees();
+                    }
+                    else if(color == 1 && robot.limelight.detectRed){
+                        degreeError = robot.limelight.redGoal.getTargetXDegrees();
+                    }
+
+                    if(Math.abs(degreeError) > 15){
+                        adjustAngle(degreeError);
+                    }
+                    else {
+                        double aimSpeed = autoAimSpeed(degreeError , 12);
+                        robot.control.turretMotor.setMotorEnable();
+                        robot.control.turretMotor.setPower(aimSpeed);
+                    } // motor auto aiming above
+
+                    robot.control.lift.setPosition(0.6); // trigger first ball launch
+
+                    robot.control.startIntake();
+                    Thread.sleep(500); // wait for a set time before stopping, magic number.
+                    robot.control.stopIntake();
+
+                    robot.control.push.setPosition(-0.8); // pushes last two balls into shooter
+
+
                 }
 
 //                if (Robot.gamepad1.aButton.isPressed()) {
@@ -400,8 +441,74 @@ public class Teleop extends LinearOpMode {
 //                    telemetry.log().add("Shooting motor with motor power", ShootMotorPower);
 //                }
                 // We need to add incrementing button later
-            } else {
-                // TODO: single gamepad controls
+            } else { // singular gamepad
+                // Get current time and compute delta
+                timeCurrent = timer.nanoseconds();
+                deltaT = timeCurrent - timePre;
+                timePre = timeCurrent;
+
+                double sensitivity = 0.6; // less sensitive, 0.5=half speed
+                double y = -gamepad2.left_stick_y * sensitivity;    // Remember, Y stick value is reversed
+                double x = gamepad2.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
+                double rx = gamepad2.right_stick_x * sensitivity;
+
+                // Denominator is the largest motor power (absolute value) or 1
+                // This ensures all the powers maintain the same ratio,
+                // but only if at least one is out of the range [-1, 1]
+                double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+                double frontLeftPower = (y + x + rx) / denominator;
+                double backLeftPower = (y - x + rx) / denominator;
+                double frontRightPower = (y - x - rx) / denominator;
+                double backRightPower = (y + x - rx) / denominator;
+
+
+
+                frontLeftMotor.setPower(frontLeftPower);
+                backLeftMotor.setPower(backLeftPower);
+                frontRightMotor.setPower(frontRightPower);
+                backRightMotor.setPower(backRightPower);
+
+                if (gamepad1.a){ // starts shoot motor, no off since we dont realy need to turn off
+                    robot.control.startShoot(ShootMotorPower);
+                    // put limelight tests for teleop here for now?
+                    telemetry.log().add("Starting the shoot motor");
+                    robot.limelight.loop();
+                }
+
+                if (gamepad1.x){
+                    robot.control.lift.setPosition(0.6);
+                }
+
+                if (gamepad1.b){
+                    robot.control.push.setPosition(-0.8);
+                }
+
+                if (gamepad1.y){
+                    robot.control.startIntake();
+                } else{robot.control.stopIntake();}
+
+                if(gamepad1.dpad_down && (robot.limelight.detectBlue || robot.limelight.detectRed)){
+                    double degreeError = 0.0;
+
+                    if(color == 2 && robot.limelight.detectBlue){
+                        degreeError = robot.limelight.blueGoal.getTargetXDegrees();
+                    }
+                    else if(color == 1 && robot.limelight.detectRed){
+                        degreeError = robot.limelight.redGoal.getTargetXDegrees();
+                    }
+
+                    if(Math.abs(degreeError) > 15){
+                        adjustAngle(degreeError);
+                    }
+                    else {
+                        double aimSpeed = autoAimSpeed(degreeError , 12);
+                        robot.control.turretMotor.setMotorEnable();
+                        robot.control.turretMotor.setPower(aimSpeed);
+                    }
+                }
+                else{
+                    robot.control.turretMotor.setPower(0);
+                }
             }
 
             telemetry.update();
