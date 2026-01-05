@@ -44,7 +44,7 @@ public class Robot {
     private final boolean pinpointDriverEnabled;
     private boolean driverv2Enabled;
     public final HardwareMap hardwareMap;
-    private final Telemetry telemetry;
+    public final Telemetry telemetry;
     public final AprilTagLimelightTest limelight;
     public GoBildaPinpointDriver odo;
     public DriveToPoint nav;
