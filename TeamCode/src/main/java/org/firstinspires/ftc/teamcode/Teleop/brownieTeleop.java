@@ -335,9 +335,9 @@ public class brownieTeleop extends LinearOpMode {
                 timePre = timeCurrent;
 
                 double sensitivity = 0.6; // less sensitive, 0.5=half speed
-                double y = -gamepad2.left_stick_y * sensitivity;    // Remember, Y stick value is reversed
-                double x = gamepad2.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
-                double rx = gamepad2.right_stick_x * sensitivity;
+                double y = gamepad2.left_stick_y * sensitivity;    // Remember, Y stick value is reversed // i reversed it back to drive backwards because of field orientation
+                double x = -gamepad2.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing // now this is reversed
+                double rx = -gamepad2.right_stick_x * sensitivity;
 
                 // Denominator is the largest motor power (absolute value) or 1
                 // This ensures all the powers maintain the same ratio,
@@ -447,9 +447,9 @@ public class brownieTeleop extends LinearOpMode {
                 timePre = timeCurrent;
 
                 double sensitivity = 0.6; // less sensitive, 0.5=half speed
-                double y = -gamepad2.left_stick_y * sensitivity;    // Remember, Y stick value is reversed
-                double x = gamepad2.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
-                double rx = gamepad2.right_stick_x * sensitivity;
+                double y = gamepad1.left_stick_y * sensitivity;
+                double x = -gamepad1.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
+                double rx = -gamepad1.right_stick_x * sensitivity;
 
                 // Denominator is the largest motor power (absolute value) or 1
                 // This ensures all the powers maintain the same ratio,
