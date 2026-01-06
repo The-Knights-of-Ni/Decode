@@ -480,17 +480,17 @@ public class brownieTeleop extends LinearOpMode {
                     robot.limelight.loop();
                 }
 
-                if (gamepad1.bumperLeft){
+                if (gamepad1.left_bumper){
                     robot.control.lift.setPosition(0.6);
                 }
 
-                if (gamepad1.bumperRight){
+                if (gamepad1.right_bumper){
                     robot.control.push.setPosition(-0.8);
                 }
 
                 if (gamepad1.x){ // resets positions
-                    robot.control.push.setPosition(0)
-                    robot.control.lift.setPosition(0)
+                    robot.control.push.setPosition(0);
+                    robot.control.lift.setPosition(0);
                 }
 
                 if (gamepad1.a){
