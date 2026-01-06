@@ -473,26 +473,27 @@ public class brownieTeleop extends LinearOpMode {
                 frontRightMotor.setPower(frontRightPower);
                 backRightMotor.setPower(backRightPower);
 
-                if (gamepad1.a){ // starts shoot motor, no off since we dont realy need to turn off
+                if (gamepad1.y){ // starts shoot motor, no off since we dont realy need to turn off
                     robot.control.startShoot(ShootMotorPower);
                     // put limelight tests for teleop here for now?
                     telemetry.log().add("Starting the shoot motor");
                     robot.limelight.loop();
                 }
 
-                if (gamepad1.x){
+                if (gamepad1.bumperLeft){
                     robot.control.lift.setPosition(0.6);
-                    Thread.sleep(250);
-                    robot.control.lift.setPosition(0);
                 }
 
-                if (gamepad1.b){
+                if (gamepad1.bumperRight){
                     robot.control.push.setPosition(-0.8);
-                    Thread.sleep(500);
-                    robot.control.push.setPosition(0);
                 }
 
-                if (gamepad1.y){
+                if (gamepad1.x){ // resets positions
+                    robot.control.push.setPosition(0)
+                    robot.control.lift.setPosition(0)
+                }
+
+                if (gamepad1.a){
                     robot.control.startIntake();
                 } else{robot.control.stopIntake();}
 
@@ -517,6 +518,20 @@ public class brownieTeleop extends LinearOpMode {
                 }
                 else{
                     robot.control.turretMotor.setPower(0);
+                }
+
+                if (gamepad1.y){ // shoot all balls, remember to hold aim. 
+                    robot.control.lift.setPosition(0.6); // trigger first ball launch
+
+                    robot.control.startIntake();
+                    Thread.sleep(500); // wait for a set time before stopping, magic number.
+                    robot.control.stopIntake();
+                    Thread.sleep(250);
+
+                    robot.control.push.setPosition(-0.8); // pushes last two balls into shooter
+
+                    robot.control.lift.setPosition(0);
+                    robot.control.push.setPosition(0); // resets positions
                 }
             }
 
