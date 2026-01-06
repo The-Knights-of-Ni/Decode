@@ -474,11 +474,11 @@ public class brownieTeleop extends LinearOpMode {
                     robot.limelight.loop();
                 }
 
-                if (gamepad1.left_trigger > 0){
+                if (gamepad1.left_trigger > 0.05){
                     robot.control.lift.setPosition(0.6);
                 }
 
-                if (gamepad1.right_trigger > 0){
+                if (gamepad1.right_trigger > 0.05){
                     robot.control.push.setPosition(-0.8);
                 }
 
@@ -517,6 +517,17 @@ public class brownieTeleop extends LinearOpMode {
                 if (gamepad1.y){ // shoot all balls, remember to hold aim. 
                     robot.control.shootAll();
                 }
+
+                if (Robot.gamepad1.bumperLeft.isPressed()){
+                    double sm_power = 0.85 + shootMotorConstant;
+                    robot.control.shootMotor.setPower(-sm_power);
+                    telemetry.addData("Shoot motor power before lift is ", -sm_power);
+                }
+                if (Robot.gamepad1.bumperRight.isPressed()){
+                    double sm_power = 0.6 + shootMotorConstant;
+                    robot.control.shootMotor.setPower(-sm_power);
+                    telemetry.addData("Shoot motor power before lift is ", -sm_power);
+                } // added these buttons for easier shooting for 1 gamepad.
             }
 
             telemetry.update();
