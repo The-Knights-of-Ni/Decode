@@ -397,8 +397,8 @@ public class brownieTeleop extends LinearOpMode {
                     robot.control.shootMotor.setPower(-sm_power);
                     telemetry.addData("Shoot motor power before lift is ", -sm_power);
                 }
-                // does following condition mean you have to keep holding x? idk
-                if (gamepad1.x && (robot.limelight.detectBlue || robot.limelight.detectRed)){ // auto shooting macro, copied from various sources.
+
+                if(gamepad1.dpad_down && (robot.limelight.detectBlue || robot.limelight.detectRed)){
                     double degreeError = 0.0;
 
                     if(color == 2 && robot.limelight.detectBlue){
@@ -415,19 +415,13 @@ public class brownieTeleop extends LinearOpMode {
                         double aimSpeed = autoAimSpeed(degreeError , 12);
                         robot.control.turretMotor.setMotorEnable();
                         robot.control.turretMotor.setPower(aimSpeed);
-                    } // motor auto aiming above
-
-                    robot.control.lift.setPosition(0.6); // trigger first ball launch
-
-                    robot.control.startIntake();
-                    Thread.sleep(500); // wait for a set time before stopping, magic number.
-                    robot.control.stopIntake();
-
-                    robot.control.push.setPosition(-0.8); // pushes last two balls into shooter
-
-                    robot.control.lift.setPosition(0);
-                    robot.control.push.setPosition(0); // resets positions
+                    }
                 }
+
+                if (gamepad1.x){
+                    robot.control.shootAll();
+                }
+                // does following condition mean you have to keep holding x? idk
 
 //                if (Robot.gamepad1.aButton.isPressed()) {
 //                    ShootMotorPower += 0.10;
@@ -480,11 +474,11 @@ public class brownieTeleop extends LinearOpMode {
                     robot.limelight.loop();
                 }
 
-                if (gamepad1.left_bumper){
+                if (gamepad1.left_trigger > 0){
                     robot.control.lift.setPosition(0.6);
                 }
 
-                if (gamepad1.right_bumper){
+                if (gamepad1.right_trigger > 0){
                     robot.control.push.setPosition(-0.8);
                 }
 
@@ -521,17 +515,7 @@ public class brownieTeleop extends LinearOpMode {
                 }
 
                 if (gamepad1.y){ // shoot all balls, remember to hold aim. 
-                    robot.control.lift.setPosition(0.6); // trigger first ball launch
-
-                    robot.control.startIntake();
-                    Thread.sleep(500); // wait for a set time before stopping, magic number.
-                    robot.control.stopIntake();
-                    Thread.sleep(250);
-
-                    robot.control.push.setPosition(-0.8); // pushes last two balls into shooter
-
-                    robot.control.lift.setPosition(0);
-                    robot.control.push.setPosition(0); // resets positions
+                    robot.control.shootAll();
                 }
             }
 
@@ -539,3 +523,16 @@ public class brownieTeleop extends LinearOpMode {
         }
     }
 }
+
+// launch all not from robot.control
+//robot.control.lift.setPosition(0.6); // trigger first ball launch
+//
+//                    robot.control.startIntake();
+//                    Thread.sleep(500); // wait for a set time before stopping, magic number.
+//                    robot.control.stopIntake();
+//                    Thread.sleep(250);
+//
+//                    robot.control.push.setPosition(-0.8); // pushes last two balls into shooter
+//
+//                    robot.control.lift.setPosition(0);
+//                    robot.control.push.setPosition(0); // resets positions
