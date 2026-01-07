@@ -156,9 +156,10 @@ public class brownieTeleop extends LinearOpMode {
         final double sensitivityLowPower = 0.5; // multiply inputs with this on non-high power mode
 
 
-        boolean twoGamepads = true;
+        boolean twoGamepads = false;
         boolean intakeOn = false;
         boolean flapOpen = false;
+        boolean reversedDrive = false;
 
         telemetry.addLine("dwbug 0");
 
@@ -268,7 +269,7 @@ public class brownieTeleop extends LinearOpMode {
 
             //            if(distToTarget != 0 && shootMotorActive){
             // Continuously update shoot motor power if active
-            if (shootMotorActive) {
+            if (shootMotorActive) { // wouldn't this be commented out?
                 double sm_power = robot.control.shootMotorVelocity(distToTarget) + shootMotorConstant;
                 robot.control.shootMotor.setPower(-sm_power);
                 telemetry.addData("Shootmotor power (auto-updating)", -sm_power);
@@ -446,10 +447,28 @@ public class brownieTeleop extends LinearOpMode {
                 deltaT = timeCurrent - timePre;
                 timePre = timeCurrent;
 
-                double sensitivity = 0.6; // less sensitive, 0.5=half speed
-                double y = gamepad1.left_stick_y * sensitivity;
-                double x = -gamepad1.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
-                double rx = -gamepad1.right_stick_x * sensitivity;
+                double y = 0;
+                double x = 0;
+                double rx = 0; // initialize to zero to escape the if statement?
+                double sensitivity = 0.85; // less sensitive, 0.5=half speed
+
+                if (gamepad1.dpad_left){
+                    reversedDrive = true;
+                } else if (gamepad1.dpad_right){
+                    reversedDrive = false;
+                }
+
+                if (reversedDrive){
+                    telemetry.addLine("Drive is reversed");
+                    y = -gamepad1.left_stick_y * sensitivity;
+                    x = gamepad1.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
+                    rx = gamepad1.right_stick_x * sensitivity;
+                } else{
+                    telemetry.addLine("Drive is not reversed");
+                    y = gamepad1.left_stick_y * sensitivity;
+                    x = -gamepad1.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
+                    rx = -gamepad1.right_stick_x * sensitivity;
+                }
 
                 // Denominator is the largest motor power (absolute value) or 1
                 // This ensures all the powers maintain the same ratio,
@@ -462,7 +481,7 @@ public class brownieTeleop extends LinearOpMode {
 
 
 
-                frontLeftMotor.setPower(frontLeftPower);
+                frontLeftMotor.setPower(frontLeftPower); // what if setting motor power is equivalent?
                 backLeftMotor.setPower(backLeftPower);
                 frontRightMotor.setPower(frontRightPower);
                 backRightMotor.setPower(backRightPower);
@@ -514,8 +533,9 @@ public class brownieTeleop extends LinearOpMode {
                     robot.control.turretMotor.setPower(0);
                 }
 
-                if (gamepad1.y){ // shoot all balls, remember to hold aim. 
+                if (gamepad1.b){ // shoot all balls, remember to hold aim.
                     robot.control.shootAll();
+                    telemetry.addLine("All Balls Shot");
                 }
 
                 if (Robot.gamepad1.bumperLeft.isPressed()){
