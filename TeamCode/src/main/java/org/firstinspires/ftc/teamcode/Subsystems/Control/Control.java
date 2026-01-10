@@ -99,17 +99,22 @@ public class Control extends Subsystem {
 
     public void shootAll() throws InterruptedException{
 
-            lift.setPosition(0.6); // trigger first ball launch
+            lift.setPosition(0.65); // trigger first ball launch
+            Thread.sleep(500); // wait for a set time before stopping, magic number.
+            lift.setPosition(0);
 
             startIntake();
-            Thread.sleep(500); // wait for a set time before stopping, magic number.
+            Thread.sleep(1500);
             stopIntake();
-            Thread.sleep(250);
 
-            push.setPosition(-0.8); // pushes last two balls into shooter
+            push.setPosition(0);
+            Thread.sleep(500);
 
+            lift.setPosition(0.65); // trigger first ball launch
+            Thread.sleep(500); // wait for a set time before stopping, magic number.
             lift.setPosition(0);
-            push.setPosition(0); // resets position
+
+            push.setPosition(0.6);  //back to origin
     }
 
     public double shootMotorVelocity(double distance){

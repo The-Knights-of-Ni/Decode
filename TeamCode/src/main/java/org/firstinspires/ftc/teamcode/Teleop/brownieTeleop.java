@@ -174,7 +174,7 @@ public class brownieTeleop extends LinearOpMode {
 
         Servo push = hardwareMap.servo.get("pushServo");
 
-        Servo lift = hardwareMap.servo.get("liftServo");
+        Servo lift = hardwareMap.servo.get("lift");
 
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -383,6 +383,7 @@ public class brownieTeleop extends LinearOpMode {
                 }
 
                 if (gamepad1.y) { //assume this is the old one
+                    telemetry.addLine("Y pressed successfully");
                     robot.control.lift.setPosition(0.6); //
                     Thread.sleep(250);
                     robot.control.lift.setPosition(0);
@@ -494,16 +495,22 @@ public class brownieTeleop extends LinearOpMode {
                 }
 
                 if (gamepad1.left_trigger > 0.05){
-                    robot.control.lift.setPosition(0.6);
+                    telemetry.log().add("Starting the lift");
+                    robot.control.lift.setPosition(0.7);
+                    Thread.sleep(500);
+                    robot.control.lift.setPosition(0);
                 }
 
                 if (gamepad1.right_trigger > 0.05){
-                    robot.control.push.setPosition(-0.8);
+                    telemetry.log().add("Starting the push");
+                    robot.control.push.setPosition(0);    // to push 0
+                    Thread.sleep(1000);
+                    robot.control.push.setPosition(0.5);    // back to origin 0.5
                 }
 
                 if (gamepad1.x){ // resets positions
-                    robot.control.push.setPosition(0);
-                    robot.control.lift.setPosition(0);
+//                    robot.control.push.setPosition(0);
+//                    robot.control.lift.setPosition(0);
                 }
 
                 if (gamepad1.a){
