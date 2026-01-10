@@ -271,4 +271,32 @@ public class Robot {
         }
         Log.i(caption, value);
     }
+
+    public double sigmoid(double x, double k){
+        return 1/(1+Math.exp(-k*x));
+    }
+
+    public double autoAimSpeed(double dist, double k){
+        double magnitude = 0.55, tolerance = 2.0;
+        return (-magnitude*sigmoid(dist-tolerance,k) +
+                magnitude-magnitude*sigmoid(dist+tolerance,k));
+    }
+
+    public void waitAim(double waitTime) throws InterruptedException {
+        control.turretMotor.setMotorEnable();
+        for(int i = 0; i<waitTime/10; i++) {
+            limelight.loop();
+            double degreeError = 0.0;
+            if(!limelight.detectRed){
+                Thread.sleep(10);
+                continue;
+            }
+            degreeError = limelight.redGoal.getTargetXDegrees();
+            double aimSpeed = autoAimSpeed(degreeError, 12);
+            control.turretMotor.setPower(aimSpeed);
+            telemetry.update();
+            Thread.sleep(10);
+        }
+    }
+
 }

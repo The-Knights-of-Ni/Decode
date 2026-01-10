@@ -98,98 +98,17 @@ public class Auto2025BlueNear extends LinearOpMode {
                 magnitude-magnitude*sigmoid(dist+tolerance,k));
     }
 
-    public void doubleShoot(Servo lift, DcMotor shootMotor, DcMotor intakeMotor, double shootPower, long waitTime) throws InterruptedException {
-        robot.control.turretMotor.setMotorEnable();
-        for(int i = 0; i<10; i++) {
-            robot.limelight.loop();
-            double degreeError = 0.0;
-            if(!robot.limelight.detectBlue){
-                Thread.sleep(10);
-                continue;
-            }
-            degreeError = robot.limelight.blueGoal.getTargetXDegrees();
-            double aimSpeed = autoAimSpeed(degreeError, 12);
 
-
-            robot.control.turretMotor.setPower(aimSpeed);
-            robot.telemetry.update();
-            Thread.sleep(10);
-
-        }
-
-        robot.control.turretMotor.setPower(0);
-
-        lift.setPosition(0);
-        shootMotor.setPower(-shootPower);     // from far
-        Thread.sleep(waitTime);
-
-        for(int i = 0; i<10; i++) {
-            robot.limelight.loop();
-            double degreeError = 0.0;
-            if(!robot.limelight.detectBlue){
-                Thread.sleep(10);
-                continue;
-            }
-            degreeError = robot.limelight.blueGoal.getTargetXDegrees();
-            double aimSpeed = autoAimSpeed(degreeError, 12);
-
-            robot.control.turretMotor.setMotorEnable();
-            robot.control.turretMotor.setPower(aimSpeed);
-            Thread.sleep(10);
-        }
-
-        robot.control.turretMotor.setPower(0);
-
-        lift.setPosition(0.6);
-        Thread.sleep(500);
-        lift.setPosition(0);
-        Thread.sleep(500);
-
-        intakeMotor.setPower(-1);
-        Thread.sleep(500);
-        intakeMotor.setPower(0);
-
-        lift.setPosition(0.6);
-        Thread.sleep(500);
-        lift.setPosition(0);
-    }
 
     public void tripleShoot(Servo lift, DcMotor shootMotor, DcMotor intakeMotor, double shootPower, long waitTime) throws InterruptedException {
         robot.control.turretMotor.setMotorEnable();
-        for(int i = 0; i<5; i++) {
-            robot.limelight.loop();
-            double degreeError = 0.0;
-            if(!robot.limelight.detectBlue){
-                Thread.sleep(10);
-                continue;
-            }
-            degreeError = robot.limelight.blueGoal.getTargetXDegrees();
-            double aimSpeed = autoAimSpeed(degreeError, 12);
-            robot.control.turretMotor.setPower(aimSpeed);
-            robot.telemetry.update();
-            Thread.sleep(10);
-        }
+        robot.waitAim(50);
 
-        robot.control.turretMotor.setPower(0);
+//        robot.control.turretMotor.setPower(0);
 
         lift.setPosition(0);
         shootMotor.setPower(-shootPower);
-        Thread.sleep(waitTime);
-
-        for(int i = 0; i<10; i++) {
-            robot.limelight.loop();
-            double degreeError = 0.0;
-            if(!robot.limelight.detectBlue){
-                Thread.sleep(10);
-                continue;
-            }
-            degreeError = robot.limelight.blueGoal.getTargetXDegrees();
-            double aimSpeed = autoAimSpeed(degreeError, 12);
-
-            robot.control.turretMotor.setMotorEnable();
-            robot.control.turretMotor.setPower(aimSpeed);
-            Thread.sleep(10);
-        }
+        robot.waitAim(waitTime);
 
         robot.control.turretMotor.setPower(-0.1*shootPower);
 
