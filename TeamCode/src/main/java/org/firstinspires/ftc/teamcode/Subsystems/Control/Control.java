@@ -97,6 +97,26 @@ public class Control extends Subsystem {
         shootMotor.setVelocity(variable);
     }
 
+    public void shootAll() throws InterruptedException{
+
+            lift.setPosition(0.65); // trigger first ball launch
+            Thread.sleep(500); // wait for a set time before stopping, magic number.
+            lift.setPosition(0);
+
+            startIntake();
+            Thread.sleep(1500);
+            stopIntake();
+
+            push.setPosition(0);
+            Thread.sleep(500);
+
+            lift.setPosition(0.65); // trigger first ball launch
+            Thread.sleep(500); // wait for a set time before stopping, magic number.
+            lift.setPosition(0);
+
+            push.setPosition(0.6);  //back to origin
+    }
+
     public double shootMotorVelocity(double distance){
         if(distance < 120){
             return 0.58;
