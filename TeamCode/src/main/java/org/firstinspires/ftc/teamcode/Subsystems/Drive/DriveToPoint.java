@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.Subsystems.Drive;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.RADIANS;
 import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.MM;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -143,7 +145,7 @@ public class DriveToPoint {
             double yPWR = calculatePID(currentPosition, targetPosition, Direction.y);
             double hOutput = calculatePID(currentPosition, targetPosition, Direction.h);
 
-            double heading = currentPosition.getHeading(AngleUnit.RADIANS);
+            double heading = currentPosition.getHeading(RADIANS);
             double cosine = Math.cos(heading);
             double sine = Math.sin(heading);
 
@@ -218,8 +220,8 @@ public class DriveToPoint {
             return yPID.calculateAxisPID(yError, pGain, dGain, accel, PIDTimer.seconds());
         }
         if(direction == Direction.h){
-            double targetHeading = targetPosition.getHeading(AngleUnit.RADIANS);
-            double currentHeading = currentPosition.getHeading(AngleUnit.RADIANS);
+            double targetHeading = targetPosition.getHeading(RADIANS);
+            double currentHeading = currentPosition.getHeading(RADIANS);
 
             if(targetHeading>=0 && currentHeading>=0){
                 // do nothing if both signs are same
@@ -231,8 +233,17 @@ public class DriveToPoint {
                 targetHeading += 2*Math.PI;
             }
 
+
             double hError = targetHeading - currentHeading;
 
+            if(hError>Math.PI){
+                hError -= 2*Math.PI;
+            }
+            if(hError<-Math.PI){
+                hError += 2*Math.PI;
+            }
+
+            Log.println(Log.DEBUG, "ROBOT", "hError: " + String.valueOf(hError));
             return hPID.calculateAxisPID(hError, yawPGain, yawDGain, yawAccel, PIDTimer.seconds());
         }
         return 0;

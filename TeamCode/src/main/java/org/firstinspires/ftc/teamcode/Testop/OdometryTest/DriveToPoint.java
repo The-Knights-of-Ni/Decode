@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.Testop.OdometryTest;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.RADIANS;
 import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.MM;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -233,6 +235,15 @@ public class DriveToPoint {
 
             double hError = targetHeading - currentHeading;
 
+            if(hError > Math.PI){
+                hError -= 2*Math.PI;
+            }
+            if(hError < -Math.PI){
+                hError += 2*Math.PI;
+            }
+
+//            double hError = targetHeading - currentHeading;
+            Log.println(Log.DEBUG, "ROBOT", "hError: " + String.valueOf(hError));
             return hPID.calculateAxisPID(hError, yawPGain, yawDGain, yawAccel, PIDTimer.seconds());
         }
         return 0;
