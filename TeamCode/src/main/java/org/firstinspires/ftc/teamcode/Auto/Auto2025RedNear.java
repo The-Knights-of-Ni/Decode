@@ -17,8 +17,8 @@ import org.firstinspires.ftc.teamcode.Util.AllianceColor;
 import java.util.HashMap;
 import java.util.Locale;
 
-@Autonomous(name = "Auto2025BlueFar")
-public class Auto2025BlueFar extends LinearOpMode {
+@Autonomous(name = "Auto2025RedNear")
+public class Auto2025RedNear extends LinearOpMode {
     ElapsedTime timer;
     private Robot robot;
     double timeCurrent;
@@ -35,7 +35,7 @@ public class Auto2025BlueFar extends LinearOpMode {
         flags.put("web", true);
         flags.put("vision", false);
         DriveToPoint nav = new DriveToPoint(this);
-        this.robot = new Robot(hardwareMap, telemetry, timer, nav, AllianceColor.BLUE, gamepad1, gamepad2, flags);
+        this.robot = new Robot(hardwareMap, telemetry, timer, nav, AllianceColor.RED, gamepad1, gamepad2, flags);
         timeCurrent = timer.nanoseconds();
         timePre = timeCurrent;
 
@@ -102,12 +102,13 @@ public class Auto2025BlueFar extends LinearOpMode {
         for(int i = 0; i<10; i++) {
             robot.limelight.loop();
             double degreeError = 0.0;
-            if(!robot.limelight.detectBlue){
+            if(!robot.limelight.detectRed){
                 Thread.sleep(10);
                 continue;
             }
-            degreeError = robot.limelight.blueGoal.getTargetXDegrees();
+            degreeError = robot.limelight.redGoal.getTargetXDegrees();
             double aimSpeed = autoAimSpeed(degreeError, 12);
+
 
             robot.control.turretMotor.setPower(aimSpeed);
             robot.telemetry.update();
@@ -124,11 +125,11 @@ public class Auto2025BlueFar extends LinearOpMode {
         for(int i = 0; i<10; i++) {
             robot.limelight.loop();
             double degreeError = 0.0;
-            if(!robot.limelight.detectBlue){
+            if(!robot.limelight.detectRed){
                 Thread.sleep(10);
                 continue;
             }
-            degreeError = robot.limelight.blueGoal.getTargetXDegrees();
+            degreeError = robot.limelight.redGoal.getTargetXDegrees();
             double aimSpeed = autoAimSpeed(degreeError, 12);
 
             robot.control.turretMotor.setMotorEnable();
@@ -142,7 +143,6 @@ public class Auto2025BlueFar extends LinearOpMode {
         Thread.sleep(500);
         lift.setPosition(0);
         Thread.sleep(500);
-
 
         intakeMotor.setPower(-1);
         Thread.sleep(500);
@@ -158,17 +158,18 @@ public class Auto2025BlueFar extends LinearOpMode {
         for(int i = 0; i<5; i++) {
             robot.limelight.loop();
             double degreeError = 0.0;
-            if(!robot.limelight.detectBlue){
+            if(!robot.limelight.detectRed){
                 Thread.sleep(10);
                 continue;
             }
-            degreeError = robot.limelight.blueGoal.getTargetXDegrees();
+            degreeError = robot.limelight.redGoal.getTargetXDegrees();
             double aimSpeed = autoAimSpeed(degreeError, 12);
             robot.control.turretMotor.setPower(aimSpeed);
             robot.telemetry.update();
             Thread.sleep(10);
         }
-        robot.control.turretMotor.setPower(-0.1*shootPower);
+
+        robot.control.turretMotor.setPower(0);
 
         lift.setPosition(0);
         shootMotor.setPower(-shootPower);
@@ -177,11 +178,11 @@ public class Auto2025BlueFar extends LinearOpMode {
         for(int i = 0; i<10; i++) {
             robot.limelight.loop();
             double degreeError = 0.0;
-            if(!robot.limelight.detectBlue){
+            if(!robot.limelight.detectRed){
                 Thread.sleep(10);
                 continue;
             }
-            degreeError = robot.limelight.blueGoal.getTargetXDegrees();
+            degreeError = robot.limelight.redGoal.getTargetXDegrees();
             double aimSpeed = autoAimSpeed(degreeError, 12);
 
             robot.control.turretMotor.setMotorEnable();
@@ -192,6 +193,7 @@ public class Auto2025BlueFar extends LinearOpMode {
         robot.control.turretMotor.setPower(-0.1*shootPower);
 
         robot.control.shootAll();
+
     }
 
     @Override
@@ -213,50 +215,38 @@ public class Auto2025BlueFar extends LinearOpMode {
 
         robot.odo.update();
 
+        //add two shoot commands here
 
-        double powerDiff = robot.getBatteryVoltage() - 13.0;
+//        Thread.sleep(1000);
 
-        tripleShoot(lift, shootMotor, intakeMotor,0.80 - powerDiff * 0.05,3600);
+        double shotPower = 0.58;
+        // for warming up the motor to prevent sleep
+        shootMotor.setPower(-shotPower);
+        DriveToTarget(makeTarget(100,0,0), 0.5, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(100,0,45), 0.5, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(960,0,45), 0.5, 0.2, 0.7, 1, 1.5);
+        DriveToTarget(makeTarget(960,450,45), 0.5, 0.2, 0.7, 1, 1.5);
+        DriveToTarget(makeTarget(960,450,135), 0.5, 0.2, 0.7, 1, 1.5);
+        DriveToTarget(makeTarget(960,450,225), 0.5, 0.2, 0.7, 1, 1.5);
 
+        tripleShoot(lift, shootMotor, intakeMotor, shotPower,100);
+        Thread.sleep(500);
 
-        DriveToTarget(makeTarget(680,0,0), 0.5, 0.2, 0.7, 1, 2);
-        DriveToTarget(makeTarget(680,0,90), 0.5, 0.2, 0.7, 1, 2);
+        DriveToTarget(makeTarget(960,700,-180), 0.5, 0.2, 0.7, 1, 1.5);
+        DriveToTarget(makeTarget(750,700,-180), 0.5, 0.2, 0.7, 1, 1.5);
 
-        turretMotor.setPower(-0.35);
-
-        // first intake
         intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(680,250,90), 0.5, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(440,700,-180), 0.5, 0.2, 0.7, 1, 1);
         intakeMotor.setPower(0);
         intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(680,470,90), 0.4, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(220,700,-180), 0.4, 0.2, 0.7, 1, 1);
         intakeMotor.setPower(0);
 
-        DriveToTarget(makeTarget(680,470,-45), 0.6, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(960,450,-180), 0.5, 0.2, 0.7, 1, 1.5);
+        DriveToTarget(makeTarget(960,450,-135), 0.5, 0.2, 0.7, 1, 1.5);
+        tripleShoot(lift, shootMotor, intakeMotor, shotPower,500);
+        Thread.sleep(500);
 
-        DriveToTarget(makeTarget(1800,-390,-45), 0.4, 0.2, 0.7, 1, 2);
-        DriveToTarget(makeTarget(1800,-390,45), 0.4, 0.2, 0.7, 1, 2);
-
-//        shootMotor.setPower(0.85); // add auto aim later
-        turretMotor.setPower(0);
-        //  use 0.61 with high voltage
-        tripleShoot(lift, shootMotor, intakeMotor,0.60 - powerDiff * 0.05,2500);
-
-        DriveToTarget(makeTarget(1800,-390,90), 0.4, 0.2, 0.7, 1, 1);
-        DriveToTarget(makeTarget(1310,0,90), 0.5, 0.2, 0.7, 1, 2);
-
-        //second intake
-        intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(1310,250,90), 0.5, 0.2, 0.7, 1, 1);
-        intakeMotor.setPower(0);
-        intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(1310,470,90), 0.4, 0.2, 0.7, 1, 1);
-        intakeMotor.setPower(0);
-
-        DriveToTarget(makeTarget(1800,-390,90), 0.4, 0.2, 0.7, 1, 1);
-        DriveToTarget(makeTarget(1800,-390,45), 0.4, 0.2, 0.7, 1, 1);
-
-        DriveToTarget(makeTarget(600,0,90), 0.8, 0.2, 0.7, 1, 5);
 
     }
 }
