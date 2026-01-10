@@ -332,6 +332,7 @@ public class Teleop extends LinearOpMode {
                 deltaT = timeCurrent - timePre;
                 timePre = timeCurrent;
 
+                // ===== Gamepad 2 - Drive Only =====
                 double sensitivity = 0.6; // less sensitive, 0.5=half speed
                 double y = -gamepad2.left_stick_y * sensitivity;    // Remember, Y stick value is reversed
                 double x = gamepad2.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
@@ -346,59 +347,63 @@ public class Teleop extends LinearOpMode {
                 double frontRightPower = (y - x - rx) / denominator;
                 double backRightPower = (y + x - rx) / denominator;
 
-
-
                 frontLeftMotor.setPower(frontLeftPower);
                 backLeftMotor.setPower(backLeftPower);
                 frontRightMotor.setPower(frontRightPower);
                 backRightMotor.setPower(backRightPower);
 
-                //
-                if (gamepad1.a) {
+                // ===== Gamepad 1 - Intake, Shoot =====
+                if (gamepad1.a) {        // Intake on/off
                     robot.control.startIntake();
                 } else {
                     robot.control.stopIntake();
                 }
 
-                if (gamepad2.b) {
+                if (gamepad1.x) {        // Shootmotor starts with default power
+                    robot.control.shootMotor.setPower(0.6);
+                    shootMotorActive = true;
+                }
+
+                if (gamepad1.b) {        // Shootmotor stops
                     robot.control.shootMotor.setPower(0);
                     shootMotorActive = false;
                 }
 
-                if (gamepad1.b) {
-                    robot.control.push.setPosition(-0.8);
-                    telemetry.addLine("Trying and probably failing to move push servo");
-//                    Thread.sleep(500);
-//                    robot.control.push.setPosition(0);
+                if (gamepad1.y) {       // Lift starts and stops
+                    telemetry.log().add("Starting the lift");
+                    robot.control.lift.setPosition(0.7);
+                    Thread.sleep(500);
+                    robot.control.lift.setPosition(0);
                 }
 
-                if (Robot.gamepad1.bumperLeft.isPressed()){
+                if(gamepad1.dpad_left) {    // Set Shootmotor FAR Power
                     double sm_power = 0.85 + shootMotorConstant;
                     robot.control.shootMotor.setPower(-sm_power);
-                    telemetry.addData("Shoot motor power before lift is ", -sm_power);
-                }
-                if (Robot.gamepad1.bumperRight.isPressed()){
-                    double sm_power = 0.6 + shootMotorConstant;
-                    robot.control.shootMotor.setPower(-sm_power);
-                    telemetry.addData("Shoot motor power before lift is ", -sm_power);
+                    telemetry.addData("Shoot motor power set for FAR: ", -sm_power);
                 }
 
-//                if (Robot.gamepad1.aButton.isPressed()) {
-//                    ShootMotorPower += 0.10;
-//                    telemetry.addData("Motor power reduced by 0.1 and is now ",ShootMotorPower);
-//                }
-//                if (Robot.gamepad1.bButton.isPressed()) {
-//                    ShootMotorPower -= 0.10;
-//                    telemetry.addData("Motor power increased by 0.1 and is now ",ShootMotorPower);
-//                }
-//                if (Robot.gamepad1.xButton.isPressed()) {
-//                    ShootMotorPower = -0.85;
-//                    telemetry.addData("Motor power is reset and is now ",ShootMotorPower);
-//                }
-//                if (Robot.gamepad1.yButton.isPressed()) {
-//                    robot.control.shootMotor.setPower(ShootMotorPower);
-//                    telemetry.log().add("Shooting motor with motor power", ShootMotorPower);
-//                }
+                if(gamepad1.dpad_right) {    // Set Shootmotor NEAR Power
+                    double sm_power = 0.62 + shootMotorConstant;
+                    robot.control.shootMotor.setPower(-sm_power);
+                    telemetry.addData("Shoot motor power set for NEAR: ", -sm_power);
+                }
+
+                if (Robot.gamepad1.bumperRight.isPressed()){     // Push servo starts and stops
+                    telemetry.log().add("Starting the push");
+                    robot.control.push.setPosition(0);    // to push 0
+                    Thread.sleep(1000);
+                    robot.control.push.setPosition(0.5);    // back to origin 0.5
+                }
+
+                if (Robot.gamepad1.bumperLeft.isPressed()){     // Piush servo back to origin if stuck
+                    robot.control.push.setPosition(0.5);    // back to origin 0.5
+                }
+
+                if (gamepad1.right_trigger > 0.05){         // To shoot 3 balls
+                    robot.control.shootAll();
+                    telemetry.addLine("All Balls Shot");
+                }
+
                 // We need to add incrementing button later
             } else {
                 // TODO: single gamepad controls
