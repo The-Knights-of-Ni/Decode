@@ -186,6 +186,9 @@ public class Teleop extends LinearOpMode {
         int color = 0;
 
         boolean shootMotorActive = false;
+        double tempx = robot.odo.getPosX();
+        double tempy = robot.odo.getPosY();
+        double temph = robot.odo.getHeading(); // for turning
 
         while (opModeIsActive()) {
             // Clears cache to refresh data
@@ -402,6 +405,29 @@ public class Teleop extends LinearOpMode {
                 if (gamepad1.right_trigger > 0.05){         // To shoot 3 balls
                     robot.control.shootAll();
                     telemetry.addLine("All Balls Shot");
+                }
+
+                if (gamepad2.left_trigger > 0.05){
+                    tempx = robot.odo.getPosX();
+                    tempy = robot.odo.getPosY();
+                    temph = robot.odo.getHeading(); // updating current position
+
+                    double newh = temph + 2.4; // rad
+                    Pose2D here = makeTarget(tempx, tempy, temph);
+                    Pose2D target = makeTarget(tempx, tempy, newh);
+
+                    robot.nav.driveTo(here, target,1,0.5);
+                }
+
+                if (gamepad2.right_trigger > 0.05){
+                    double nowx = robot.odo.getPosX();
+                    double nowy = robot.odo.getPosY();
+                    double nowh = robot.odo.getHeading();
+
+                    Pose2D here = makeTarget (nowx, nowy, nowh);
+                    Pose2D target = makeTarget (tempx, tempy, temph);
+
+                    robot.nav.driveTo(here, target, 1, 0.5);
                 }
 
                 // We need to add incrementing button later
