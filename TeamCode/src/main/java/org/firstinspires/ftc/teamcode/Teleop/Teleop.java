@@ -159,6 +159,7 @@ public class Teleop extends LinearOpMode {
         boolean twoGamepads = true;
         boolean intakeOn = false;
         boolean flapOpen = false;
+        boolean reversedDrive = false;
 
         telemetry.addLine("dwbug 0");
 
@@ -428,6 +429,24 @@ public class Teleop extends LinearOpMode {
                     Pose2D target = makeTarget (tempx, tempy, temph);
 
                     robot.nav.driveTo(here, target, 1, 0.5);
+                }
+
+                if (gamepad2.dpad_left){
+                    reversedDrive = true;
+                } else if (gamepad2.dpad_right){
+                    reversedDrive = false;
+                }
+
+                if (reversedDrive){
+                    telemetry.addLine("Drive is reversed");
+                    y = -gamepad1.left_stick_y * sensitivity;
+                    x = gamepad1.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
+                    rx = gamepad1.right_stick_x * sensitivity;
+                } else{
+                    telemetry.addLine("Drive is not reversed");
+                    y = gamepad1.left_stick_y * sensitivity;
+                    x = -gamepad1.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
+                    rx = -gamepad1.right_stick_x * sensitivity;
                 }
 
                 // We need to add incrementing button later
