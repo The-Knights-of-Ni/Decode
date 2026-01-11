@@ -337,10 +337,32 @@ public class Teleop extends LinearOpMode {
                 timePre = timeCurrent;
 
                 // ===== Gamepad 2 - Drive Only =====
-                double sensitivity = 0.6; // less sensitive, 0.5=half speed
-                double y = -gamepad2.left_stick_y * sensitivity;    // Remember, Y stick value is reversed
-                double x = gamepad2.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
-                double rx = gamepad2.right_stick_x * sensitivity;
+
+                double x = 0;
+                double y = 0;
+                double rx = 0;
+                double sensitivity = 0.70;
+
+                if (gamepad2.dpad_left){
+                    reversedDrive = true;
+                }
+
+                if (gamepad2.dpad_right){
+                    reversedDrive = false;
+                }
+
+                if (reversedDrive){
+                    telemetry.addLine("Drive is reversed");
+                    y = -gamepad2.left_stick_y * sensitivity;
+                    x = gamepad2.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
+                    rx = gamepad2.right_stick_x * sensitivity;
+                } else{
+                    telemetry.addLine("Drive is not reversed");
+                    y = gamepad2.left_stick_y * sensitivity;
+                    x = -gamepad2.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
+                    rx = -gamepad2.right_stick_x * sensitivity;
+                }
+
 
                 // Denominator is the largest motor power (absolute value) or 1
                 // This ensures all the powers maintain the same ratio,
@@ -404,7 +426,7 @@ public class Teleop extends LinearOpMode {
                 }
 
                 if (gamepad1.right_trigger > 0.05){         // To shoot 3 balls
-                    robot.control.shootAll();
+                    robot.shootAll2();
                     telemetry.addLine("All Balls Shot");
                 }
 
@@ -431,23 +453,7 @@ public class Teleop extends LinearOpMode {
                     robot.nav.driveTo(here, target, 1, 0.5);
                 }
 
-                if (gamepad2.dpad_left){
-                    reversedDrive = true;
-                } else if (gamepad2.dpad_right){
-                    reversedDrive = false;
-                }
 
-                if (reversedDrive){
-                    telemetry.addLine("Drive is reversed");
-                    y = -gamepad1.left_stick_y * sensitivity;
-                    x = gamepad1.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
-                    rx = gamepad1.right_stick_x * sensitivity;
-                } else{
-                    telemetry.addLine("Drive is not reversed");
-                    y = gamepad1.left_stick_y * sensitivity;
-                    x = -gamepad1.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
-                    rx = -gamepad1.right_stick_x * sensitivity;
-                }
 
                 // We need to add incrementing button later
             } else {

@@ -100,9 +100,10 @@ public class Control extends Subsystem {
     // turret will drift during the sleeps, move this to robot so auto aiming can be used.
     public void shootAll() throws InterruptedException{
         lift.setPosition(0.65); // trigger first ball launch
-        Thread.sleep(500); // wait for a set time before stopping, magic number.
+        Thread.sleep(500);
+        // wait for a set time before stopping, magic number.
         lift.setPosition(0);
-        Thread.sleep(250);
+        Thread.sleep(500);
 
         startIntake();
         Thread.sleep(1500);

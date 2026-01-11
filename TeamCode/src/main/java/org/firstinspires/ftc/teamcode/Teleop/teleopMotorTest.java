@@ -495,20 +495,46 @@ public class teleopMotorTest extends LinearOpMode {
 
                 if (gamepad1.b){
                     robot.control.startShoot(0.6);
+                    motorPower = 0.6;
                 }
 
-                if (gamepad1.left_trigger > 0.05){
+                if (gamepad1.left_bumper){
                     motorPower = motorPower - 0.05;
                 }
 
-                if (gamepad1.right_trigger > 0.05){
+                if (gamepad1.right_bumper){
                     motorPower = motorPower + 0.05;
                 }
 
                 if (gamepad1.y){
-                    robot.control.shootAll();
+                    robot.control.lift.setPosition(0.6);
+                    Thread.sleep(500);
+                    robot.control.lift.setPosition(0.0);
+                }
+                if(gamepad1.dpad_down && (robot.limelight.detectBlue || robot.limelight.detectRed)){
+                    double degreeError = 0.0;
+
+                    if(color == 2 && robot.limelight.detectBlue){
+                        degreeError = robot.limelight.blueGoal.getTargetXDegrees();
+                    }
+                    else if(color == 1 && robot.limelight.detectRed){
+                        degreeError = robot.limelight.redGoal.getTargetXDegrees();
+                    }
+
+                    if(Math.abs(degreeError) > 15){
+                        adjustAngle(degreeError);
+                    }
+                    else {
+                        double aimSpeed = autoAimSpeed(degreeError , 12);
+                        robot.control.turretMotor.setMotorEnable();
+                        robot.control.turretMotor.setPower(aimSpeed);
+                    }
+                }
+                else{
+                    robot.control.turretMotor.setPower(0);
                 }
 
+                robot.control.shootMotor.setPower(-motorPower);
 
 
             }
