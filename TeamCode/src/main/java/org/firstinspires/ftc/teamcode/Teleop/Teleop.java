@@ -174,6 +174,10 @@ public class Teleop extends LinearOpMode {
 
         Servo push = hardwareMap.servo.get("pushServo");
 
+        shootMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        shootMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shootMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 

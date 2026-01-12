@@ -110,17 +110,15 @@ public class Control extends Subsystem {
         stopIntake();
 
         Thread.sleep(800);
-        push.setPosition(0.3);
+        push.setPosition(0.4);
         Thread.sleep(500);
         push.setPosition(0.0);
-        Thread.sleep(500);
 
         lift.setPosition(0.65); // trigger third ball launch
         Thread.sleep(500); // wait for a set time before stopping, magic number.
         lift.setPosition(0);
 
         push.setPosition(0.6);  //back to origin
-        Thread.sleep(500);
     }
 
     public double shootMotorVelocity(double distance){
