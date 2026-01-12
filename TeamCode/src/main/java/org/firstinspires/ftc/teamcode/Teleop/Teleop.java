@@ -431,26 +431,27 @@ public class Teleop extends LinearOpMode {
                 }
 
                 if (gamepad2.left_trigger > 0.05){
-                    tempx = robot.odo.getPosX();
-                    tempy = robot.odo.getPosY();
-                    temph = robot.odo.getHeading(); // updating current position
-
-                    double newh = temph + 2.4; // rad
-                    Pose2D here = makeTarget(tempx, tempy, temph);
-                    Pose2D target = makeTarget(tempx, tempy, newh);
-
-                    robot.nav.driveTo(here, target,1,0.5);
+                    adjustAngle(135); // for near shooting
                 }
 
                 if (gamepad2.right_trigger > 0.05){
-                    double nowx = robot.odo.getPosX();
-                    double nowy = robot.odo.getPosY();
-                    double nowh = robot.odo.getHeading();
+                    adjustAngle(-135);
+                }
 
-                    Pose2D here = makeTarget (nowx, nowy, nowh);
-                    Pose2D target = makeTarget (tempx, tempy, temph);
+                if (gamepad2.left_bumper){
+                    adjustAngle(153); // for far shooting.
+                }
 
-                    robot.nav.driveTo(here, target, 1, 0.5);
+                if (gamepad2.left_bumper){
+                    adjustAngle(-153);
+                }
+
+                if (gamepad2.a){
+                    robot.control.runShootMotor(5100); // using 0.85 * 6000
+                }
+
+                if (gamepad2.b){
+                    robot.control.runShootMotor(3900); // using 0.65 * 6000
                 }
 
 

@@ -55,7 +55,7 @@ public class Control extends Subsystem {
      */
     public void initDevicesTeleop() {
         shootMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        shootMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shootMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
@@ -155,6 +155,11 @@ public class Control extends Subsystem {
             return 0.85;
             // 0.85 for long distance shooting area, 0.6 for short
         }
+    }
+
+    public void runShootMotor(double rpm){
+        double tps = (rpm * 28)/60; // 28 points per rotation
+        shootMotor.setVelocity(tps);
     }
 
 }
