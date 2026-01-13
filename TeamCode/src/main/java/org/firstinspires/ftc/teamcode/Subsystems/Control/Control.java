@@ -156,7 +156,7 @@ public class Control extends Subsystem {
     }
 
     public void runShootMotor(double rpm){
-        double tps = (rpm * 28)/60; // 28 points per rotation
+        double tps = -(rpm * 28)/60; // 28 points per rotation
         shootMotor.setVelocity(tps);
     }
 
