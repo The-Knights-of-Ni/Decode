@@ -202,7 +202,7 @@ public class blueTeleop extends LinearOpMode {
             double actualVelocity = (shootMotor.getVelocity()*60)/28;
             telemetry.addData("Intended Shootmotor Velocity is ", intendedShootVelocity);
             telemetry.addData("Shootmotor Velocity is ", actualVelocity);
-            shootMotorGood = actualVelocity >= intendedShootVelocity - 50 || actualVelocity <= intendedShootVelocity + 50;
+            shootMotorGood = actualVelocity >= intendedShootVelocity - 50 && actualVelocity <= intendedShootVelocity + 50;
             if (shootMotorGood){
                 telemetry.addLine("Shoot Motor is GOOD");
             } else{
@@ -372,23 +372,36 @@ public class blueTeleop extends LinearOpMode {
                     telemetry.addLine("All Balls Shot");
                 }
 
-                if (gamepad2.left_trigger > 0.05){
-                    adjustAngle(135); // for near shooting
+                if (gamepad1.left_trigger > 0.05){
+                    robot.control.push.setPosition(0);
+                    robot.waitAim(250);
+                    robot.control.lift.setPosition(0.65);
+                    robot.waitAim(250);
+                    robot.control.push.setPosition(0.6);
+                    robot.control.lift.setPosition(0);
                 }
 
-                if (gamepad2.right_trigger > 0.05){
-                    adjustAngle(-135);
+                if (reversedDrive){ // different rotations if reversed (as intuitive). may have to switch signs
+                    if (gamepad2.left_trigger > 0.05){
+                        adjustAngle(-45);}
+                    if (gamepad2.right_trigger > 0.05){
+                        adjustAngle(45);}
+                    if (gamepad2.left_bumper){
+                        adjustAngle(-62);}
+                    if (gamepad2.right_bumper){
+                        adjustAngle(62);}
+                } else{
+                    if (gamepad2.left_trigger > 0.05){
+                    adjustAngle(135);} // for near shooting
+                    if (gamepad2.right_trigger > 0.05){
+                    adjustAngle(-135);}
+                    if (gamepad2.left_bumper){
+                    adjustAngle(118);} // for far shooting.
+                    if (gamepad2.right_bumper){
+                    adjustAngle(-118);}
                 }
 
-                if (gamepad2.left_bumper){
-                    adjustAngle(118); // for far shooting.
-                }
-
-                if (gamepad2.left_bumper){
-                    adjustAngle(-118);
-                }
-
-                if (gamepad2.a){
+                if (gamepad2.a){ // move instead of .setPower on gamepad1 if works.
                     shootMotorActive = false;
                     robot.control.runShootMotor(5100); // using 0.85 * 6000
                     intendedShootVelocity = 5100;

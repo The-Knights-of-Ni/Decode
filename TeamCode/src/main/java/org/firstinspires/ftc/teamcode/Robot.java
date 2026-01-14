@@ -319,9 +319,70 @@ public class Robot {
         control.lift.setPosition(0.65); // trigger third ball launch
         waitAim(500); // wait for a set time before stopping, magic number.
         control.lift.setPosition(0);
-
         control.push.setPosition(0.6);  //back to origin
-        waitAim(500);
     }
 
+    public void waitAim2(double waitTime, double motorVelocity, boolean waitForVelocity) throws InterruptedException{
+        control.turretMotor.setMotorEnable();
+        boolean shootMotorGood = false;
+        double motorRPM = (motorVelocity * 28)/60; // converts to tps
+
+        for(int i = 0; i<waitTime/10; i++) {
+            limelight.loop();
+            double degreeError = 0.0;
+            if(!limelight.detectRed){
+                Thread.sleep(10);
+                continue;
+            }
+            degreeError = limelight.redGoal.getTargetXDegrees();
+            double aimSpeed = autoAimSpeed(degreeError, 12);
+            control.turretMotor.setPower(aimSpeed);
+            telemetry.update();
+            Thread.sleep(10);
+        }
+        if (waitForVelocity){
+            while (!shootMotorGood){
+                control.runShootMotor(motorVelocity);
+                double actualVelocity = -(control.shootMotor.getVelocity() * 60)/28;
+                if (actualVelocity > motorRPM - 50 && actualVelocity < motorRPM + 50){
+                    shootMotorGood = true;
+                }
+                limelight.loop();
+                double degreeError = 0.0;
+                if(!limelight.detectRed){
+                    Thread.sleep(10);
+                    continue;
+                }
+                degreeError = limelight.redGoal.getTargetXDegrees();
+                double aimSpeed = autoAimSpeed(degreeError, 12);
+                control.turretMotor.setPower(aimSpeed);
+                telemetry.update();
+                 // copy pasted from above, there is probably a better way to do this....
+            }
+        }
+    }
+    public void shootAll3(double shootRPM) throws InterruptedException{
+        double shootVelocity = (shootRPM * 28)/60;
+
+        control.lift.setPosition(0.65); // trigger first ball launch
+        waitAim(500);
+        // wait for a set time before stopping, magic number.
+        control.lift.setPosition(0);
+        waitAim(500);
+
+        control.startIntake();
+        waitAim(1500);
+        control.stopIntake();
+        waitAim2(0, shootVelocity, true);
+
+        control.push.setPosition(0.3);
+        waitAim2(0, shootVelocity, true);
+        control.push.setPosition(0.0);
+        waitAim(500);
+
+        control.lift.setPosition(0.65); // trigger third ball launch
+        waitAim(500); // wait for a set time before stopping, magic number.
+        control.lift.setPosition(0);
+        control.push.setPosition(0.6);  //back to origin
+    }
 }
