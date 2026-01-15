@@ -114,7 +114,7 @@ public class Teleop2 extends LinearOpMode {
             double voltage = battery.getVoltage();
 
             // update PIDF when voltage meaningfully changes
-            if (Math.abs(voltage - lastVoltage) > 0.2) {
+            if (Math.abs(voltage - lastVoltage) > 0.1) {
                 double scaledF = BASE_F * (REFERENCE_VOLTAGE / voltage);
                 flywheel.setPIDFCoefficients(
                         DcMotor.RunMode.RUN_USING_ENCODER,
