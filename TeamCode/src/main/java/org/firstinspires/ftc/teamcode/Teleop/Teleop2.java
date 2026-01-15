@@ -114,6 +114,10 @@ public class Teleop2 extends LinearOpMode {
             double voltage = battery.getVoltage();
 
             // update PIDF when voltage meaningfully changes
+            // PID stands for Proportional, Integral, Derivative. These three terms control how the motor responds
+            // to error (difference between target and actual value).
+            // PIDF adds a Feedforward ("F") term. The F term predicts the needed output based on the target value,
+            // helping the motor reach the target faster and more accurately, especially for velocity control.
             if (Math.abs(voltage - lastVoltage) > 0.1) {
                 double scaledF = BASE_F * (REFERENCE_VOLTAGE / voltage);
                 flywheel.setPIDFCoefficients(
