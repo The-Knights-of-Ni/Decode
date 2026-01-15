@@ -199,7 +199,7 @@ public class blueTeleop extends LinearOpMode {
 
             telemetry.addData("Shootmotor power is ", ShootMotorPower);
 
-            double actualVelocity = (shootMotor.getVelocity()*60)/28;
+            double actualVelocity = -(shootMotor.getVelocity()*60)/28;
             telemetry.addData("Intended Shootmotor Velocity is ", intendedShootVelocity);
             telemetry.addData("Shootmotor Velocity is ", actualVelocity);
             shootMotorGood = actualVelocity >= intendedShootVelocity - 50 && actualVelocity <= intendedShootVelocity + 50;
@@ -207,7 +207,6 @@ public class blueTeleop extends LinearOpMode {
                 telemetry.addLine("Shoot Motor is GOOD");
             } else{
                 telemetry.addLine("Shoot Motor is BAD");
-
             }
 
             robot.limelight.loop();
@@ -328,7 +327,7 @@ public class blueTeleop extends LinearOpMode {
                 }
 
                 if (gamepad1.x) {        // Shootmotor starts with default power
-                    robot.control.shootMotor.setPower(0.6);
+                    robot.control.shootMotor.setPower(-0.6); // why was this positive before :(
                     shootMotorActive = true;
                 }
 
@@ -345,15 +344,17 @@ public class blueTeleop extends LinearOpMode {
                 }
 
                 if(gamepad1.dpad_left) {    // Set Shootmotor FAR Power
-                    double sm_power = 0.85 + shootMotorConstant;
+                    double sm_power = 0.85;
                     robot.control.shootMotor.setPower(-sm_power);
                     telemetry.addData("Shoot motor power set for FAR: ", -sm_power);
+                    intendedShootVelocity = 5100;
                 }
 
                 if(gamepad1.dpad_right) {    // Set Shootmotor NEAR Power
-                    double sm_power = 0.62 + shootMotorConstant;
+                    double sm_power = 0.62;
                     robot.control.shootMotor.setPower(-sm_power);
                     telemetry.addData("Shoot motor power set for NEAR: ", -sm_power);
+                    intendedShootVelocity = 3720;
                 }
 
                 if (Robot.gamepad1.bumperRight.isPressed()){     // Push servo starts and stops

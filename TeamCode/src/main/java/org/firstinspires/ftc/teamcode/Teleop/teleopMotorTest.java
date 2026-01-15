@@ -13,6 +13,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -160,6 +161,10 @@ public class teleopMotorTest extends LinearOpMode {
         boolean intakeOn = false;
         boolean flapOpen = false;
 
+        double intendedShootVelocity = 0.0;
+        boolean shootMotorGood = false;
+        double actualVelocity = 0.0;
+
         telemetry.addLine("dwbug 0");
 
         frontLeftMotor = hardwareMap.dcMotor.get("fl"); //1 port
@@ -168,10 +173,13 @@ public class teleopMotorTest extends LinearOpMode {
         backRightMotor = hardwareMap.dcMotor.get("rr"); //2
 
         DcMotor turretMotor = hardwareMap.dcMotor.get("turretMotor"); // ext 1
-        DcMotor shootMotor = hardwareMap.dcMotor.get("shootMotor"); // ext 0
+        DcMotorEx shootMotor = hardwareMap.get(DcMotorEx.class, "shootMotor"); // ext 0
         DcMotor intakeMotor = hardwareMap.dcMotor.get("intakeMotor"); // ext 3
 
         Servo push = hardwareMap.servo.get("pushServo");
+
+        shootMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shootMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -202,6 +210,16 @@ public class teleopMotorTest extends LinearOpMode {
             Robot.updateGamepads();
 
             telemetry.addLine("While loop exists :(");
+
+            actualVelocity = -(shootMotor.getVelocity()*60)/28;
+            telemetry.addData("Intended Shootmotor Velocity is ", intendedShootVelocity);
+            telemetry.addData("Shootmotor Velocity is ", actualVelocity);
+            shootMotorGood = actualVelocity >= intendedShootVelocity - 50 && actualVelocity <= intendedShootVelocity + 50;
+            if (shootMotorGood){
+                telemetry.addLine("Shoot Motor is GOOD");
+            } else{
+                telemetry.addLine("Shoot Motor is BAD");
+            }
 
             if(color == 0){
                 if(Robot.gamepad1.bButton.isPressed()){
@@ -365,7 +383,7 @@ public class teleopMotorTest extends LinearOpMode {
                 }
 
                 if (gamepad1.x) {        // Shootmotor starts with default power
-                    robot.control.shootMotor.setPower(0.6);
+                    robot.control.shootMotor.setPower(-0.6);
                     shootMotorActive = true;
                 }
 
@@ -382,13 +400,13 @@ public class teleopMotorTest extends LinearOpMode {
                 }
 
                 if(gamepad1.dpad_left) {    // Set Shootmotor FAR Power
-                    double sm_power = 0.85 + shootMotorConstant;
+                    double sm_power = 0.85;
                     robot.control.shootMotor.setPower(-sm_power);
                     telemetry.addData("Shoot motor power set for FAR: ", -sm_power);
                 }
 
                 if(gamepad1.dpad_right) {    // Set Shootmotor NEAR Power
-                    double sm_power = 0.62 + shootMotorConstant;
+                    double sm_power = 0.62;
                     robot.control.shootMotor.setPower(-sm_power);
                     telemetry.addData("Shoot motor power set for NEAR: ", -sm_power);
                 }
@@ -493,24 +511,29 @@ public class teleopMotorTest extends LinearOpMode {
                     robot.control.stopIntake();
                 }
 
+                if (gamepad1.x){
+                    robot.control.runShootMotor(3900);
+                    intendedShootVelocity = 3900;
+                }
+
                 if (gamepad1.b){
-                    robot.control.startShoot(0.6);
-                    motorPower = 0.6;
+                    robot.shootAll2();
                 }
 
-                if (gamepad1.left_bumper){
-                    motorPower = motorPower - 0.05;
+                if (gamepad1.left_trigger > 0.05){
+                    intendedShootVelocity = intendedShootVelocity - gamepad1.left_trigger;
                 }
 
-                if (gamepad1.right_bumper){
-                    motorPower = motorPower + 0.05;
+                if (gamepad1.right_trigger > 0.05){
+                    intendedShootVelocity = intendedShootVelocity + gamepad1.right_trigger;
                 }
 
                 if (gamepad1.y){
                     robot.control.lift.setPosition(0.6);
-                    Thread.sleep(500);
+                    robot.waitAim(500);
                     robot.control.lift.setPosition(0.0);
                 }
+
                 if(gamepad1.dpad_down && (robot.limelight.detectBlue || robot.limelight.detectRed)){
                     double degreeError = 0.0;
 
@@ -534,9 +557,8 @@ public class teleopMotorTest extends LinearOpMode {
                     robot.control.turretMotor.setPower(0);
                 }
 
-                robot.control.shootMotor.setPower(-motorPower);
-
-
+                double intendedTPS = -(intendedShootVelocity*28)/60;
+                robot.control.runShootMotor(intendedTPS);
             }
 
             telemetry.update();
