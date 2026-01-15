@@ -142,6 +142,15 @@ public class teleopCustomPIDF extends LinearOpMode {
         DriveToTarget(TARGET, 0.8, 0.5, 0.7, 1, 5);
     }
 
+    private double getTargetRPM(double distance){
+        if (distance < 160){
+            telemetry.addLine("Too Close!");
+            return 2800;
+        }
+        double targetRPM = 5.7298 * distance + 1844.68582; // with the data from racgael's branch, r^2 greater than 0.95.
+        return targetRPM;
+    }
+
     /**
      * Override of runOpMode()
      *
@@ -281,9 +290,8 @@ public class teleopCustomPIDF extends LinearOpMode {
 
             // Continuously update shoot motor power if active
             if (shootMotorActive) {
-                double sm_power = robot.control.shootMotorVelocity(distToTarget) + shootMotorConstant;
-                robot.control.shootMotor.setPower(-sm_power);
-                telemetry.addData("Shootmotor power (auto-updating)", -sm_power);
+                robot.control.runShootMotor(getTargetRPM(distToTarget));
+                telemetry.addData("Auto Speed Active, at ", getTargetRPM(distToTarget));
             }
 
 
@@ -438,15 +446,15 @@ public class teleopCustomPIDF extends LinearOpMode {
                 }
 
                 if (gamepad2.a){ // move instead of .setPower on gamepad1 if works.
-                    shootMotorActive = false;
-                    robot.control.runShootMotor(5100); // using 0.85 * 6000
-                    intendedShootVelocity = 5100;
+                    shootMotorActive = true;
+                    robot.control.runShootMotor(3800); // using 0.85 * 6000
+                    intendedShootVelocity = 3800;
                 }
 
                 if (gamepad2.b){
-                    shootMotorActive = false;
-                    robot.control.runShootMotor(3900); // using 0.65 * 6000
-                    intendedShootVelocity = 3900;
+                    shootMotorActive = true;
+                    robot.control.runShootMotor(2900); // using 0.65 * 6000
+                    intendedShootVelocity = 2900;
                 }
                 // We need to add incrementing button later
             } else {
