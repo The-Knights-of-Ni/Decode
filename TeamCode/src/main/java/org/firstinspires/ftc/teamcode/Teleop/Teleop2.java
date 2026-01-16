@@ -92,9 +92,9 @@ public class Teleop2 extends LinearOpMode {
             backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
             double sensitivity = 0.6; // less sensitive, 0.5=half speed
-            double y = -gamepad1.left_stick_y * sensitivity; // Remember, Y stick value is reversed
-            double x = gamepad1.left_stick_x * 1.1 * sensitivity; // Counteract imperfect strafing
-            double rx = gamepad1.right_stick_x * sensitivity;
+            double y = -gamepad2.left_stick_y * sensitivity; // Remember, Y stick value is reversed
+            double x = gamepad2.left_stick_x * 1.1 * sensitivity; // Counteract imperfect strafing
+            double rx = gamepad2.right_stick_x * sensitivity;
 
             // Denominator is the largest motor power (absolute value) or 1
             // This ensures all the powers maintain the same ratio,
@@ -138,13 +138,19 @@ public class Teleop2 extends LinearOpMode {
             }
             // ToDO for redGoal
 
-            // Toggle shooterActive on gamepad1.a press (not held).
+            if (gamepad1.a) {        // Intake on/off
+                robot.control.startIntake();
+            } else {
+                robot.control.stopIntake();
+            }
+
+            // Toggle shooterActive on gamepad1.x press (not held).
             // The flywheel runs and updates velocity based on distance until toggled off with another press.
             // Pressing gamepad1.b will also turn off the shooter.
-            if (gamepad1.a && !prevA) {
+            if (gamepad1.x && !prevA) {
                 shooterActive = !shooterActive;
             }
-            prevA = gamepad1.a;
+            prevA = gamepad1.x;
 
             double targetRPM = 0.0;
             double targetVelocity = 0.0;
@@ -158,23 +164,16 @@ public class Teleop2 extends LinearOpMode {
                 targetVelocity = targetRPM * TICKS_PER_REV / 60.0;
                 flywheel.setVelocity(targetVelocity);
             }
-            if (gamepad1.x && shooterActive) {
-                targetRPM = getTargetRPM(300);
-                targetVelocity = targetRPM * TICKS_PER_REV / 60.0;
-                flywheel.setVelocity(targetVelocity);
-                telemetry.addLine("Target velocity for Far - ");
-                telemetry.addLine(String.valueOf(targetVelocity));
-            }
-            // Set flywheel for near shot when dpad_down is pressed
-            if (gamepad1.dpad_down && shooterActive) {
+            // Set flywheel for near shot when dpad_right is pressed
+            if (gamepad1.dpad_right && shooterActive) {
                 targetRPM = 2800;
                 targetVelocity = targetRPM * TICKS_PER_REV / 60.0;
                 flywheel.setVelocity(targetVelocity);
                 telemetry.addLine("Target velocity for Near - ");
                 telemetry.addLine(String.valueOf(targetVelocity));
             }
-            // Set flywheel for far shot when dpad_up is pressed
-            if (gamepad1.dpad_up && shooterActive) {
+            // Set flywheel for far shot when dpad_left is pressed
+            if (gamepad1.dpad_left && shooterActive) {
                 targetRPM = 3920;
                 targetVelocity = targetRPM * TICKS_PER_REV / 60.0;
                 flywheel.setVelocity(targetVelocity);
@@ -183,16 +182,29 @@ public class Teleop2 extends LinearOpMode {
             }
 
             double error = Math.abs(flywheel.getVelocity() - targetVelocity);
-            boolean shooterReady = error < 50 && targetVelocity > 0;
-//            if (gamepad1.y && shooterReady && shooterActive) {
-                if (gamepad1.y && shooterActive) {
-                    telemetry.log().add("Starting the lift");
-                    robot.control.lift.setPosition(0.7);
-                    Thread.sleep(500);
-                    robot.control.lift.setPosition(0);
-                } else if (gamepad1.y && shooterActive) {//&& !shooterReady) {
-                    telemetry.addLine("Shooter not ready: waiting for correct speed");
-                }
+            boolean shooterReady = error < 50 && targetVelocity > 0;    // Todo: use this
+            if (gamepad1.y && shooterActive) {
+                telemetry.log().add("Starting the lift");
+                robot.control.lift.setPosition(0.7);
+                Thread.sleep(500);
+                robot.control.lift.setPosition(0);
+            }
+
+            if (Robot.gamepad1.bumperRight.isPressed()){     // Push servo starts and stops
+                telemetry.log().add("Starting the push");
+                robot.control.push.setPosition(0);    // to push 0
+                Thread.sleep(1000);
+                robot.control.push.setPosition(0.5);    // back to origin 0.5
+            }
+
+            if (Robot.gamepad1.bumperLeft.isPressed()){     // Piush servo back to origin if stuck
+                robot.control.push.setPosition(0.5);    // back to origin 0.5
+            }
+
+            if (gamepad1.right_trigger > 0.05){         // To shoot 3 balls
+                robot.shootAll2();
+                telemetry.addLine("All Balls Shot");
+            }
 
             // Telemetry
             telemetry.addData("Target RPM (auto)", getTargetRPM(distToTarget));

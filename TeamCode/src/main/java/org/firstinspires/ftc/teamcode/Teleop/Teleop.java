@@ -337,32 +337,10 @@ public class Teleop extends LinearOpMode {
                 timePre = timeCurrent;
 
                 // ===== Gamepad 2 - Drive Only =====
-
-                double x = 0;
-                double y = 0;
-                double rx = 0;
                 double sensitivity = 0.70;
-
-                if (gamepad2.dpad_left){
-                    reversedDrive = true;
-                }
-
-                if (gamepad2.dpad_right){
-                    reversedDrive = false;
-                }
-
-                if (reversedDrive){
-                    telemetry.addLine("Drive is reversed");
-                    y = -gamepad2.left_stick_y * sensitivity;
-                    x = gamepad2.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
-                    rx = gamepad2.right_stick_x * sensitivity;
-                } else{
-                    telemetry.addLine("Drive is not reversed");
-                    y = gamepad2.left_stick_y * sensitivity;
-                    x = -gamepad2.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
-                    rx = -gamepad2.right_stick_x * sensitivity;
-                }
-
+                double y = -gamepad2.left_stick_y * sensitivity; // Remember, Y stick value is reversed
+                double x = gamepad2.left_stick_x * 1.1 * sensitivity; // Counteract imperfect strafing
+                double rx = gamepad2.right_stick_x * sensitivity;
 
                 // Denominator is the largest motor power (absolute value) or 1
                 // This ensures all the powers maintain the same ratio,
@@ -403,7 +381,7 @@ public class Teleop extends LinearOpMode {
                 }
 
                 if(gamepad1.dpad_left) {    // Set Shootmotor FAR Power
-                    double sm_power = 0.85 + shootMotorConstant;
+                    double sm_power = 0.80 + shootMotorConstant;
                     robot.control.shootMotor.setPower(-sm_power);
                     telemetry.addData("Shoot motor power set for FAR: ", -sm_power);
                 }
