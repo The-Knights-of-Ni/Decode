@@ -362,7 +362,6 @@ public class Robot {
         }
     }
     public void shootAll3(double shootRPM) throws InterruptedException{
-        double shootVelocity = (shootRPM * 28)/60;
 
         control.lift.setPosition(0.65); // trigger first ball launch
         waitAim(500);
@@ -373,10 +372,10 @@ public class Robot {
         control.startIntake();
         waitAim(1500);
         control.stopIntake();
-        waitAim2(0, shootVelocity, true);
+        waitAim2(0, shootRPM, true);
 
         control.push.setPosition(0.3);
-        waitAim2(0, shootVelocity, true);
+        waitAim2(0, shootRPM, true);
         control.push.setPosition(0.0);
         waitAim(500);
 

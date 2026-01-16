@@ -289,9 +289,10 @@ public class teleopCustomPIDF extends LinearOpMode {
 //            double voltage = robot.getBatteryVoltage();
 
             // Continuously update shoot motor power if active
-            if (shootMotorActive) {
-                robot.control.runShootMotor(getTargetRPM(distToTarget));
-                telemetry.addData("Auto Speed Active, at ", getTargetRPM(distToTarget));
+            if (shootMotorActive && !gamepad2.a && !gamepad2.b && robot.limelight.detectBlue) {
+                intendedShootVelocity = getTargetRPM(distToTarget);
+                robot.control.runShootMotor(intendedShootVelocity);
+                telemetry.addData("Auto Speed Active, at ", intendedShootVelocity);
             }
 
 
@@ -386,19 +387,19 @@ public class teleopCustomPIDF extends LinearOpMode {
                     robot.control.lift.setPosition(0);
                 }
 
-                if(gamepad1.dpad_left) {    // Set Shootmotor FAR Power
-                    double sm_power = 0.85;
-                    robot.control.shootMotor.setPower(-sm_power);
-                    telemetry.addData("Shoot motor power set for FAR: ", -sm_power);
-                    intendedShootVelocity = 5100;
-                }
+//                if(gamepad1.dpad_left) {    // Set Shootmotor FAR Power
+//                    double sm_power = 0.85;
+//                    robot.control.shootMotor.setPower(-sm_power);
+//                    telemetry.addData("Shoot motor power set for FAR: ", -sm_power);
+//                    intendedShootVelocity = 5100;
+//                }
 
-                if(gamepad1.dpad_right) {    // Set Shootmotor NEAR Power
-                    double sm_power = 0.62;
-                    robot.control.shootMotor.setPower(-sm_power);
-                    telemetry.addData("Shoot motor power set for NEAR: ", -sm_power);
-                    intendedShootVelocity = 3720;
-                }
+//                if(gamepad1.dpad_right) {    // Set Shootmotor NEAR Power
+//                    double sm_power = 0.62;
+//                    robot.control.shootMotor.setPower(-sm_power);
+//                    telemetry.addData("Shoot motor power set for NEAR: ", -sm_power);
+//                    intendedShootVelocity = 3720;
+//                }
 
                 if (Robot.gamepad1.bumperRight.isPressed()){     // Push servo starts and stops
                     telemetry.log().add("Starting the push");
@@ -447,13 +448,13 @@ public class teleopCustomPIDF extends LinearOpMode {
 
                 if (gamepad2.a){ // move instead of .setPower on gamepad1 if works.
                     shootMotorActive = true;
-                    robot.control.runShootMotor(3800); // using 0.85 * 6000
+                    robot.control.runShootMotor(3800);
                     intendedShootVelocity = 3800;
                 }
 
                 if (gamepad2.b){
                     shootMotorActive = true;
-                    robot.control.runShootMotor(2900); // using 0.65 * 6000
+                    robot.control.runShootMotor(2900);
                     intendedShootVelocity = 2900;
                 }
                 // We need to add incrementing button later
