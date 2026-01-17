@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.Util.AllianceColor;
 import java.util.HashMap;
 
 @TeleOp(name = "TeleOp Blue", group = "Test")
-public class Teleop2 extends LinearOpMode {
+public class TeleopBlue extends LinearOpMode {
     private Robot robot;
     // Hardware
     private DcMotorEx flywheel;
