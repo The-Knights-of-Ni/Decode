@@ -304,25 +304,36 @@ public class Robot {
         DO NOT CHANGE NUMBERS OR SEQUENCES - WORKING VERSION
          */
         control.lift.setPosition(0.65); // trigger first ball launch - move up
-        waitAim(500);        // wait to get there
+        Thread.sleep(500);        // wait to get there
         control.lift.setPosition(0);    // move down
-        waitAim(500);        // wait to get there
+        Thread.sleep(500);        // wait to get there
 
         control.startIntake();          // run intake to move 2 balls up
-        waitAim(1000);       // run enough to have enough power to move balls up
+        Thread.sleep(1000);       // run enough to have enough power to move balls up
         control.stopIntake();           // stop
 
         control.lift.setPosition(0.65); // trigger second ball launch - move up
-        waitAim(500);        // wait to get there
+        Thread.sleep(500);        // wait to get there
         control.lift.setPosition(0);    // move down
-        waitAim(500);        // wait to get there
+        Thread.sleep(500);        // wait to get there
 
-        waitAim(800);        // wait for flywheel to get back to speed after first ball is shot
+        Thread.sleep(800);        // wait for flywheel to get back to speed after first ball is shot
         control.push.setPosition(0.0);  // push third ball up - 0.0
-        waitAim(500);        // wait to get there
+        Thread.sleep(500);        // wait to get there
 
         control.lift.setPosition(0.65); // trigger third ball launch - move up
-        waitAim(500);        // wait to get there
+        Thread.sleep(500);        // wait to get there
+        control.lift.setPosition(0);    // move down
+
+        control.push.setPosition(0.55);  // put back push 0.6
+    }
+
+    public void shootRemainingMiddleBall() throws InterruptedException {
+        control.push.setPosition(0.0);  // push remaining ball up - 0.0
+        Thread.sleep(500);        // wait to get there
+
+        control.lift.setPosition(0.65); // trigger third ball launch - move up
+        Thread.sleep(500);        // wait to get there
         control.lift.setPosition(0);    // move down
 
         control.push.setPosition(0.55);  // put back push 0.6

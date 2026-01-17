@@ -205,6 +205,11 @@ public class TeleopBlue extends LinearOpMode {
                 robot.shootAll2();
                 telemetry.addLine("All Balls Shot");
             }
+
+            if (gamepad1.left_trigger > 0.05){         // To shoot the remaining middle ball
+                robot.shootRemainingMiddleBall();
+            }
+
             if(gamepad1.dpad_down && (robot.limelight.detectBlue)){
                 double degreeError = 0.0;
                 degreeError = robot.limelight.blueGoal.getTargetXDegrees();
