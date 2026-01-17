@@ -302,26 +302,34 @@ public class Robot {
     public void shootAll2() throws InterruptedException{
         control.lift.setPosition(0.65); // trigger first ball launch
         waitAim(500);
+//        Thread.sleep(500);
         // wait for a set time before stopping, magic number.
         control.lift.setPosition(0);
         waitAim(500);
+//        Thread.sleep(500);
 
         control.startIntake();
-        waitAim(1500);
+        waitAim(500);
+//        Thread.sleep(500);
         control.stopIntake();
 
-        waitAim(800);
+        waitAim(500);
+//        Thread.sleep(500);
         control.push.setPosition(0.3);
         waitAim(500);
+//        Thread.sleep(500);
         control.push.setPosition(0.0);
-        waitAim(1000);
+        waitAim(500);
+//        Thread.sleep(500);
 
         control.lift.setPosition(0.65); // trigger third ball launch
         waitAim(500); // wait for a set time before stopping, magic number.
+//        Thread.sleep(500);
         control.lift.setPosition(0);
 
         control.push.setPosition(0.6);  //back to origin
         waitAim(500);
+//        Thread.sleep(500);
     }
 
 }
