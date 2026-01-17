@@ -314,7 +314,7 @@ public class Robot {
         control.push.setPosition(0.3);
         waitAim(500);
         control.push.setPosition(0.0);
-        waitAim(500);
+        waitAim(1000);
 
         control.lift.setPosition(0.65); // trigger third ball launch
         waitAim(500); // wait for a set time before stopping, magic number.

@@ -205,6 +205,29 @@ public class Teleop2 extends LinearOpMode {
                 robot.shootAll2();
                 telemetry.addLine("All Balls Shot");
             }
+//
+            if(gamepad1.dpad_down && (robot.limelight.detectBlue)){
+                double degreeError = 0.0;
+
+//                if(color == 2 && robot.limelight.detectBlue){
+                    degreeError = robot.limelight.blueGoal.getTargetXDegrees();
+//                }
+//                else if(color == 1 && robot.limelight.detectRed){
+//                    degreeError = robot.limelight.redGoal.getTargetXDegrees();
+//                }
+
+//                if(Math.abs(degreeError) > 15){
+//                    adjustAngle(degreeError);
+//                }
+//                else {
+                    double aimSpeed = robot.autoAimSpeed(degreeError , 12);
+                    robot.control.turretMotor.setMotorEnable();
+                    robot.control.turretMotor.setPower(aimSpeed);
+//                }
+            }
+            else{
+                robot.control.turretMotor.setPower(0);
+            }
 
             // Telemetry
             telemetry.addData("Target RPM (auto)", getTargetRPM(distToTarget));
