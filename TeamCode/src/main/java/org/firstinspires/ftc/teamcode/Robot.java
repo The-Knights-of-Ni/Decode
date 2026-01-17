@@ -304,25 +304,25 @@ public class Robot {
         DO NOT CHANGE NUMBERS OR SEQUENCES - WORKING VERSION
          */
         control.lift.setPosition(0.65); // trigger first ball launch - move up
-        Thread.sleep(500);        // wait to get there
+        waitAim(500);        // wait to get there
         control.lift.setPosition(0);    // move down
-        Thread.sleep(500);        // wait to get there
+        waitAim(500);        // wait to get there
 
         control.startIntake();          // run intake to move 2 balls up
-        Thread.sleep(1000);       // run enough to have enough power to move balls up
+        waitAim(1000);       // run enough to have enough power to move balls up
         control.stopIntake();           // stop
 
         control.lift.setPosition(0.65); // trigger second ball launch - move up
-        Thread.sleep(500);        // wait to get there
+        waitAim(500);        // wait to get there
         control.lift.setPosition(0);    // move down
-        Thread.sleep(500);        // wait to get there
+        waitAim(500);        // wait to get there
 
-        Thread.sleep(800);        // wait for flywheel to get back to speed after first ball is shot
+        waitAim(800);        // wait for flywheel to get back to speed after first ball is shot
         control.push.setPosition(0.0);  // push third ball up - 0.0
-        Thread.sleep(500);        // wait to get there
+        waitAim(500);        // wait to get there
 
         control.lift.setPosition(0.65); // trigger third ball launch - move up
-        Thread.sleep(500);        // wait to get there
+        waitAim(500);        // wait to get there
         control.lift.setPosition(0);    // move down
 
         control.push.setPosition(0.55);  // put back push 0.6

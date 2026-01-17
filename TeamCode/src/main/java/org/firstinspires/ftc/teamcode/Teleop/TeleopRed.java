@@ -16,8 +16,8 @@ import org.firstinspires.ftc.teamcode.Util.AllianceColor;
 
 import java.util.HashMap;
 
-@TeleOp(name = "TeleOp Blue", group = "Test")
-public class Teleop2 extends LinearOpMode {
+@TeleOp(name = "TeleOp Red", group = "Test")
+public class TeleopRed extends LinearOpMode {
     private Robot robot;
     // Hardware
     private DcMotorEx flywheel;
@@ -52,7 +52,7 @@ public class Teleop2 extends LinearOpMode {
         HashMap<String, Boolean> flags = new HashMap<>();
         flags.put("web", true);
         flags.put("vision", false);
-        this.robot = new Robot(hardwareMap, telemetry, timer, nav, AllianceColor.BLUE, gamepad1, gamepad2, flags);
+        this.robot = new Robot(hardwareMap, telemetry, timer, nav, AllianceColor.RED, gamepad1, gamepad2, flags);
 
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -129,9 +129,9 @@ public class Teleop2 extends LinearOpMode {
 
             // --- Distance-based flywheel velocity ---
             double distToTarget = 0.0;
-            robot.limelight.loop(); // initialize robot.limelight.blueGoal
-            if (robot.limelight.blueGoal != null && robot.limelight.detectBlue) {
-                distToTarget = robot.limelight.getDistanceFromTags(robot.limelight.blueGoal);
+            robot.limelight.loop(); // initialize robot.limelight.redGoal
+            if (robot.limelight.redGoal != null && robot.limelight.detectRed) {
+                distToTarget = robot.limelight.getDistanceFromTags(robot.limelight.redGoal);
             } else {
                 distToTarget = 150.0;
                 telemetry.addLine("Warning: Limelight tag not detected");
@@ -205,9 +205,9 @@ public class Teleop2 extends LinearOpMode {
                 robot.shootAll2();
                 telemetry.addLine("All Balls Shot");
             }
-            if(gamepad1.dpad_down && (robot.limelight.detectBlue)){
+            if(gamepad1.dpad_down && (robot.limelight.detectRed)){
                 double degreeError = 0.0;
-                degreeError = robot.limelight.blueGoal.getTargetXDegrees();
+                degreeError = robot.limelight.redGoal.getTargetXDegrees();
                 double aimSpeed = robot.autoAimSpeed(degreeError , 12);
                 robot.control.turretMotor.setMotorEnable();
                 robot.control.turretMotor.setPower(aimSpeed);
