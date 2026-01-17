@@ -244,6 +244,7 @@ public class hanTeleop extends LinearOpMode {
         boolean shootMotorActive = false;
         double intendedShootVelocity = 0.0;
         boolean shootMotorGood = false;
+        long lastReversed = 0;
 
         // ==== TELEOP ====
         while (opModeIsActive()) {
@@ -433,7 +434,8 @@ public class hanTeleop extends LinearOpMode {
                 frontRightMotor.setPower(frontRightPower);
                 backRightMotor.setPower(backRightPower);
 
-                if (gamepad2.dpad_down){
+                if (gamepad2.dpad_down && System.currentTimeMillis() - lastReversed > 500){
+                    lastReversed = System.currentTimeMillis();
                     reversedDrive = !reversedDrive;
                 }
 
@@ -468,8 +470,8 @@ public class hanTeleop extends LinearOpMode {
 
                 if (gamepad2.a){ // move instead of .setPower on gamepad1 if works.
                     shootMotorActive = true;
-                    runShootMotor(3800);
-                    intendedShootVelocity = 3800;
+                    runShootMotor(3920);
+                    intendedShootVelocity = 3920;
                 }
 
                 if (gamepad2.b){
