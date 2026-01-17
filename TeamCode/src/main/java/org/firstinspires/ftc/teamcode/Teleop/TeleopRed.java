@@ -233,8 +233,9 @@ public class TeleopRed extends LinearOpMode {
     private double getTargetRPM(double distanceMm) {
         if (distanceMm < 160) return 2800;
         if (distanceMm < 180) return 2950;
-        if (distanceMm < 220) return 3050;
-        if (distanceMm < 250) return 3150;
+        if (distanceMm < 200) return 3050;
+        if (distanceMm < 220) return 3150;
+        if (distanceMm < 250) return 3250;
         if (distanceMm < 350) return 3920;
         return 3920;
     }
