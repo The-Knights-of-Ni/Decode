@@ -245,6 +245,7 @@ public class hanTeleop extends LinearOpMode {
         double intendedShootVelocity = 0.0;
         boolean shootMotorGood = false;
         long lastReversed = 0;
+        double distToTarget = 0.0;
 
         // ==== TELEOP ====
         while (opModeIsActive()) {
@@ -291,7 +292,7 @@ public class hanTeleop extends LinearOpMode {
 
             robot.limelight.loop();
 
-            double distToTarget = 0.0;
+
 
             if (robot.limelight.detectBlue && color == 2) {
                 distToTarget = robot.limelight.getDistanceFromTags(robot.limelight.blueGoal);
@@ -383,7 +384,7 @@ public class hanTeleop extends LinearOpMode {
                 }
 
                 if (gamepad1.right_trigger > 0.05){         // To shoot 3 balls
-                    shootAll();
+                    robot.shootAll2();
                     telemetry.addLine("All Balls Shot");
                 }
 
@@ -392,12 +393,7 @@ public class hanTeleop extends LinearOpMode {
                 } else {robot.control.lift.setPosition(0);}
 
                 if (gamepad1.left_trigger > 0.05){
-                    robot.control.push.setPosition(0);
-                    robot.waitAim(250);
-                    robot.control.lift.setPosition(0.65);
-                    robot.waitAim(250);
-                    robot.control.push.setPosition(0.6);
-                    robot.control.lift.setPosition(0);
+                    robot.shootRemainingMiddleBall();
                 }
 
                 // ===== Gamepad 2 - Drive Only =====

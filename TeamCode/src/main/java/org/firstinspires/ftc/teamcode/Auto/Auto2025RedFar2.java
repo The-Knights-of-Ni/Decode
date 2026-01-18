@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -17,8 +18,8 @@ import org.firstinspires.ftc.teamcode.Util.AllianceColor;
 import java.util.HashMap;
 import java.util.Locale;
 
-//@Autonomous(name = "Auto2025BlueFar")
-public class Auto2025BlueFar extends LinearOpMode {
+@Autonomous(name = "Auto2025RedFar2")
+public class Auto2025RedFar2 extends LinearOpMode {
     ElapsedTime timer;
     private Robot robot;
     double timeCurrent;
@@ -27,19 +28,32 @@ public class Auto2025BlueFar extends LinearOpMode {
     DcMotor backLeftMotor;
     DcMotor frontRightMotor;
     DcMotor backRightMotor;
+//    private DcMotorEx flywheel;
+    private VoltageSensor battery;
+//    // Base PIDF (tuned at REFERENCE_VOLTAGE)
+//    private static final double BASE_P = 20.0;
+//    private static final double BASE_I = 0.0;
+//    private static final double BASE_D = 2.0;
+//    private static final double BASE_F = 11.7;
 
     private void initOpMode() {
         // Initialize DC motor objects
         timer = new ElapsedTime();
         HashMap<String, Boolean> flags = new HashMap<>();
+//        flywheel = hardwareMap.get(DcMotorEx.class, "shootMotor");
         flags.put("web", true);
         flags.put("vision", false);
         DriveToPoint nav = new DriveToPoint(this);
-        this.robot = new Robot(hardwareMap, telemetry, timer, nav, AllianceColor.BLUE, gamepad1, gamepad2, flags);
+        this.robot = new Robot(hardwareMap, telemetry, timer, nav, AllianceColor.RED, gamepad1, gamepad2, flags);
         timeCurrent = timer.nanoseconds();
         timePre = timeCurrent;
 
+        battery = hardwareMap.voltageSensor.iterator().next();
         telemetry.addData("Waiting for start", "...");
+
+//        flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+//        flywheel.setDirection(DcMotor.Direction.REVERSE);
     }
 
     void DriveToTarget(Pose2D TARGET, double power, double holdTime, double powerMultiplier, double patience, double timeOut){
@@ -48,9 +62,6 @@ public class Auto2025BlueFar extends LinearOpMode {
             robot.odo.update();
             if (robot.nav.driveTo(robot.odo.getPosition(), TARGET, power, holdTime)){
                 telemetry.addLine("at position #1!");
-                // Sleep to give the reset position time, as it takes 0.25s
-                //                        odo.resetPosAndIMU();
-                //                        sleep(300);
                 powerMultiplier = 0.85;
                 break;
             }
@@ -90,16 +101,13 @@ public class Auto2025BlueFar extends LinearOpMode {
 
     public void tripleShoot(Servo lift, DcMotor shootMotor, DcMotor intakeMotor, double shootPower, long waitTime) throws InterruptedException {
         robot.control.turretMotor.setMotorEnable();
-        robot.waitAim(100);
-//        robot.control.turretMotor.setPower(-0.1*shootPower);
+        robot.waitAim(50);
 
-        lift.setPosition(0);
+        robot.control.turretMotor.setPower(0);
         shootMotor.setPower(-shootPower);
-        robot.waitAim(waitTime);
-
-        robot.control.turretMotor.setPower(-0.1*shootPower);
-
-        robot.control.shootAll();
+        Thread.sleep(waitTime);
+        robot.waitAim(50);
+        robot.shootAll2();
     }
 
     @Override
@@ -119,52 +127,86 @@ public class Auto2025BlueFar extends LinearOpMode {
 
         waitForStart();
 
+//        // PIDF for flywheel
+//        double lastVoltage = 0;
+//        lastVoltage = battery.getVoltage();
+//        double voltage = battery.getVoltage();
+//        double REFERENCE_VOLTAGE = 13.0;
+//
+//        // update PIDF when voltage meaningfully changes
+//        // PID stands for Proportional, Integral, Derivative. These three terms control how the motor responds
+//        // to error (difference between target and actual value).
+//        // PIDF adds a Feedforward ("F") term. The F term predicts the needed output based on the target value,
+//        // helping the motor reach the target faster and more accurately, especially for velocity control.
+//        if (Math.abs(voltage - lastVoltage) > 0.1) {
+//            double scaledF = BASE_F * (REFERENCE_VOLTAGE / voltage);
+//            flywheel.setPIDFCoefficients(
+//                    DcMotor.RunMode.RUN_USING_ENCODER,
+//                    new PIDFCoefficients(BASE_P, BASE_I, BASE_D, scaledF)
+//            );
+//            lastVoltage = voltage;
+//        }
         robot.odo.update();
 
-
+        double shootPower;
         double powerDiff = robot.getBatteryVoltage() - 13.0;
 
-        tripleShoot(lift, shootMotor, intakeMotor,0.80 - powerDiff * 0.05,3600);
+        if (battery.getVoltage() > 13) {
+            shootPower = 0.79;
+        } else {
+            shootPower = 0.81;
+        }
+
+        tripleShoot(lift, shootMotor, intakeMotor,shootPower - powerDiff * 0.05,3600);
 
 
         DriveToTarget(makeTarget(680,0,0), 0.5, 0.2, 0.7, 1, 2);
-        DriveToTarget(makeTarget(680,0,90), 0.5, 0.2, 0.7, 1, 2);
+        DriveToTarget(makeTarget(680,0,-90), 0.5, 0.2, 0.7, 1, 2);
 
         turretMotor.setPower(-0.35);
 
         // first intake
         intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(680,250,90), 0.5, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(680,-250,-90), 0.5, 0.2, 0.7, 1, 1);
         intakeMotor.setPower(0);
         intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(680,470,90), 0.4, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(680,-470,-90), 0.4, 0.2, 0.7, 1, 1);
         intakeMotor.setPower(0);
+//        intakeMotor.setPower(-0.6);
+//        DriveToTarget(makeTarget(680,690,90), 0.4, 0.2, 0.7, 1, 1);
+//        intakeMotor.setPower(0);
 
-        DriveToTarget(makeTarget(680,470,-45), 0.6, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(680,-690,45), 0.6, 0.2, 0.7, 1, 1);
 
-        DriveToTarget(makeTarget(1800,-390,-45), 0.4, 0.2, 0.7, 1, 2);
-        DriveToTarget(makeTarget(1800,-390,45), 0.4, 0.2, 0.7, 1, 2);
+        DriveToTarget(makeTarget(1800,390,45), 0.4, 0.2, 0.7, 1, 2);
+        DriveToTarget(makeTarget(1800,390,-45), 0.4, 0.2, 0.7, 1, 2);
 
 //        shootMotor.setPower(0.85); // add auto aim later
         turretMotor.setPower(0);
         //  use 0.61 with high voltage
-        tripleShoot(lift, shootMotor, intakeMotor,0.60 - powerDiff * 0.05,2500);
+        if (battery.getVoltage() > 13) {
+            shootPower = 0.58;
+        } else {
+            shootPower = 0.61;
+        }
+//        robot.waitAim(100);
+        tripleShoot(lift, shootMotor, intakeMotor,shootPower - powerDiff * 0.05,2500);
 
-        DriveToTarget(makeTarget(1800,-390,90), 0.4, 0.2, 0.7, 1, 1);
-        DriveToTarget(makeTarget(1310,0,90), 0.5, 0.2, 0.7, 1, 2);
+        DriveToTarget(makeTarget(1800,390,-90), 0.4, 0.2, 0.7, 1, 2);
+        DriveToTarget(makeTarget(1310,0,-90), 0.5, 0.2, 0.7, 1, 2);
 
         //second intake
         intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(1310,250,90), 0.5, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(1310,-250,-90), 0.5, 0.2, 0.7, 1, 1);
         intakeMotor.setPower(0);
         intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(1310,470,90), 0.4, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(1310,-470,-90), 0.4, 0.2, 0.7, 1, 1);
         intakeMotor.setPower(0);
 
-        DriveToTarget(makeTarget(1800,-390,90), 0.4, 0.2, 0.7, 1, 1);
-        DriveToTarget(makeTarget(1800,-390,45), 0.4, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(1800,390,-90), 0.4, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(1800,390,-45), 0.4, 0.2, 0.7, 1, 1);
 
-        DriveToTarget(makeTarget(600,0,90), 0.8, 0.2, 0.7, 1, 5);
+        DriveToTarget(makeTarget(600,0,-90), 0.8, 0.2, 0.7, 1, 5);
 
     }
 }

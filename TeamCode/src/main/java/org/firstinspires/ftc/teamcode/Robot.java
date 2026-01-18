@@ -282,16 +282,22 @@ public class Robot {
                 magnitude-magnitude*sigmoid(dist+tolerance,k));
     }
 
+
     public void waitAim(double waitTime) throws InterruptedException {
         control.turretMotor.setMotorEnable();
         for(int i = 0; i<waitTime/10; i++) {
             limelight.loop();
             double degreeError = 0.0;
-            if(!limelight.detectRed){
+            if(!limelight.detectRed && !limelight.detectBlue){
                 Thread.sleep(10);
                 continue;
             }
-            degreeError = limelight.redGoal.getTargetXDegrees();
+            if(limelight.detectRed) {
+                degreeError = limelight.redGoal.getTargetXDegrees();
+            }
+            else if(limelight.detectBlue) {
+                degreeError = limelight.blueGoal.getTargetXDegrees();
+            }
             double aimSpeed = autoAimSpeed(degreeError, 12);
             control.turretMotor.setPower(aimSpeed);
             telemetry.update();
@@ -313,7 +319,8 @@ public class Robot {
         control.stopIntake();           // stop
 
         control.lift.setPosition(0.65); // trigger second ball launch - move up
-        Thread.sleep(500);        // wait to get there
+        //Thread.sleep(500);        // wait to get there
+        waitAim(250);
         control.lift.setPosition(0);    // move down
         Thread.sleep(500);        // wait to get there
 

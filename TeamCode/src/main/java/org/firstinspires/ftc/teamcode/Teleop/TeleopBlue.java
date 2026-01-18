@@ -72,6 +72,7 @@ public class TeleopBlue extends LinearOpMode {
 
         boolean shooterActive = false;
         boolean prevA = false;
+        double distToTarget = 150.0;
 
         while (opModeIsActive()) {
             // ===== Drive Only - Start =====
@@ -127,8 +128,7 @@ public class TeleopBlue extends LinearOpMode {
                 lastVoltage = voltage;
             }
 
-            // --- Distance-based flywheel velocity ---
-            double distToTarget = 0.0;
+            // --- Distance-based flywheel velocity --
             robot.limelight.loop(); // initialize robot.limelight.blueGoal
             if (robot.limelight.blueGoal != null && robot.limelight.detectBlue) {
                 distToTarget = robot.limelight.getDistanceFromTags(robot.limelight.blueGoal);

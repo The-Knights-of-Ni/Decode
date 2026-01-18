@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.Util.AllianceColor;
 import java.util.HashMap;
 import java.util.Locale;
 
-@Autonomous(name = "Auto2025RedFar")
+//@Autonomous(name = "Auto2025RedFar")
 public class Auto2025RedFar extends LinearOpMode {
     ElapsedTime timer;
     private Robot robot;
@@ -100,7 +100,7 @@ public class Auto2025RedFar extends LinearOpMode {
 
         robot.control.turretMotor.setPower(-0.2*shootPower);
 
-        robot.control.shootAll();
+        robot.shootAll2();
     }
 
     @Override

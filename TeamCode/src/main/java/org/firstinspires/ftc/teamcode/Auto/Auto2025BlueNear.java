@@ -112,7 +112,7 @@ public class Auto2025BlueNear extends LinearOpMode {
 
         robot.control.turretMotor.setPower(-0.1*shootPower);
 
-        robot.control.shootAll();
+        robot.shootAll2();
     }
 
     @Override
@@ -148,8 +148,9 @@ public class Auto2025BlueNear extends LinearOpMode {
         DriveToTarget(makeTarget(960,-450,-135), 0.5, 0.2, 0.7, 1, 1.5);
         DriveToTarget(makeTarget(960,-450,-225), 0.5, 0.2, 0.7, 1, 1.5);
 
+        robot.waitAim(100);
         tripleShoot(lift, shootMotor, intakeMotor, shotPower,100);
-        Thread.sleep(500);
+//        Thread.sleep(500);
 
         DriveToTarget(makeTarget(960,-700,180), 0.5, 0.2, 0.7, 1, 1.5);
         DriveToTarget(makeTarget(750,-700,180), 0.5, 0.2, 0.7, 1, 1.5);
@@ -161,11 +162,13 @@ public class Auto2025BlueNear extends LinearOpMode {
         DriveToTarget(makeTarget(220,-700,180), 0.4, 0.2, 0.7, 1, 1);
         intakeMotor.setPower(0);
 
-        DriveToTarget(makeTarget(960,-450,180), 0.5, 0.2, 0.7, 1, 1.5);
-        DriveToTarget(makeTarget(960,-450,135), 0.5, 0.2, 0.7, 1, 1.5);
+        DriveToTarget(makeTarget(1360,-450,180), 0.5, 0.2, 0.7, 1, 1.5);
+        DriveToTarget(makeTarget(1360,-450,135), 0.5, 0.2, 0.7, 1, 1.5);
+        robot.waitAim(100);
+        shotPower = 0.59;
         tripleShoot(lift, shootMotor, intakeMotor, shotPower,500);
         Thread.sleep(500);
-
+//        DriveToTarget(makeTarget(1060,-450,135), 0.5, 0.2, 0.7, 1, 1.5);
 
     }
 }
