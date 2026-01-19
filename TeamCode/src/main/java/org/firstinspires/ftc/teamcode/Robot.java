@@ -288,16 +288,25 @@ public class Robot {
         for(int i = 0; i<waitTime/10; i++) {
             limelight.loop();
             double degreeError = 0.0;
+//            double degreeErrorRed = 0.0;
+//            double degreeErrorBlue = 0.0;
             if(!limelight.detectRed && !limelight.detectBlue){
                 Thread.sleep(10);
                 continue;
             }
-            if(limelight.detectRed) {
-                degreeError = limelight.redGoal.getTargetXDegrees();
-            }
-            else if(limelight.detectBlue) {
+//            if(limelight.detectRed) {
+//                degreeError = limelight.redGoal.getTargetXDegrees();
+////                degreeErrorRed = degreeError;
+//            }
+            if(limelight.detectBlue) {
                 degreeError = limelight.blueGoal.getTargetXDegrees();
+//                degreeErrorBlue = degreeError;
             }
+//            if (degreeErrorBlue != 0.0 && degreeErrorRed != 0.0) {
+//                if(Math.abs(degreeErrorRed) < Math.abs(degreeErrorBlue)) {
+//                    degreeError = degreeErrorRed;
+//                }
+//            }
             double aimSpeed = autoAimSpeed(degreeError, 12);
             control.turretMotor.setPower(aimSpeed);
             telemetry.update();

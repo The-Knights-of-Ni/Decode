@@ -18,8 +18,8 @@ import org.firstinspires.ftc.teamcode.Util.AllianceColor;
 import java.util.HashMap;
 import java.util.Locale;
 
-//@Autonomous(name = "Auto2025RedFar2")
-public class Auto2025RedFar2 extends LinearOpMode {
+@Autonomous(name = "Auto2025RedFar2backup")
+public class Auto2025RedFar2backup extends LinearOpMode {
     ElapsedTime timer;
     private Robot robot;
     double timeCurrent;
@@ -157,60 +157,60 @@ public class Auto2025RedFar2 extends LinearOpMode {
             shootPower = 0.81;
         }
 
-//        tripleShoot(lift, shootMotor, intakeMotor,shootPower - powerDiff * 0.05,3600);
-//        Thread.sleep(1000);
-        DriveToTarget(makeTarget(0,-300,0), 0.5, 0.2, 0.7, 1, 1);
+        tripleShoot(lift, shootMotor, intakeMotor,shootPower - powerDiff * 0.05,3600);
+        Thread.sleep(1000);
+//        DriveToTarget(makeTarget(0,-300,0), 0.5, 0.2, 0.7, 1, 1);
 
 
 //        Thread.sleep(10000);
 //
-//        DriveToTarget(makeTarget(680,0,0), 0.5, 0.2, 0.7, 1, 2);
-//        DriveToTarget(makeTarget(680,0,-90), 0.5, 0.2, 0.7, 1, 2);
-//
-//        turretMotor.setPower(-0.35);
-//
-//        // first intake
-//        intakeMotor.setPower(-0.9);
-//        DriveToTarget(makeTarget(680,-250,-90), 0.5, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(680,0,0), 0.5, 0.2, 0.7, 1, 2);
+        DriveToTarget(makeTarget(680,0,-90), 0.5, 0.2, 0.7, 1, 2);
+
+        turretMotor.setPower(-0.35);
+
+        // first intake
+        intakeMotor.setPower(-0.9);
+        DriveToTarget(makeTarget(680,-250,-90), 0.5, 0.2, 0.7, 1, 1);
+        intakeMotor.setPower(0);
+        intakeMotor.setPower(-0.9);
+        DriveToTarget(makeTarget(680,-470,-90), 0.4, 0.2, 0.7, 1, 1);
+        intakeMotor.setPower(0);
+//        intakeMotor.setPower(-0.6);
+//        DriveToTarget(makeTarget(680,690,90), 0.4, 0.2, 0.7, 1, 1);
 //        intakeMotor.setPower(0);
-//        intakeMotor.setPower(-0.9);
-//        DriveToTarget(makeTarget(680,-470,-90), 0.4, 0.2, 0.7, 1, 1);
-//        intakeMotor.setPower(0);
-////        intakeMotor.setPower(-0.6);
-////        DriveToTarget(makeTarget(680,690,90), 0.4, 0.2, 0.7, 1, 1);
-////        intakeMotor.setPower(0);
-//
-//        DriveToTarget(makeTarget(680,-690,45), 0.6, 0.2, 0.7, 1, 1);
-//
-//        DriveToTarget(makeTarget(1800,350,45), 0.4, 0.2, 0.7, 1, 2);
-//        DriveToTarget(makeTarget(1800,350,-45), 0.4, 0.2, 0.7, 1, 2);
-//
-////        shootMotor.setPower(0.85); // add auto aim later
-//        turretMotor.setPower(0);
-//        //  use 0.61 with high voltage
-//        if (battery.getVoltage() > 13) {
-//            shootPower = 0.58;
-//        } else {
-//            shootPower = 0.61;
-//        }
-////        robot.waitAim(100);
-//        tripleShoot(lift, shootMotor, intakeMotor,shootPower - powerDiff * 0.05,2500);
-//
-//        DriveToTarget(makeTarget(1800,350,-90), 0.4, 0.2, 0.7, 1, 2);
-//        DriveToTarget(makeTarget(1310,0,-90), 0.5, 0.2, 0.7, 1, 2);
-//
-//        //second intake
-//        intakeMotor.setPower(-0.9);
-//        DriveToTarget(makeTarget(1310,-250,-90), 0.5, 0.2, 0.7, 1, 1);
-//        intakeMotor.setPower(0);
-//        intakeMotor.setPower(-0.9);
-//        DriveToTarget(makeTarget(1310,-470,-90), 0.4, 0.2, 0.7, 1, 1);
-//        intakeMotor.setPower(0);
-//
-//        DriveToTarget(makeTarget(1800,350,-90), 0.4, 0.2, 0.7, 1, 1);
-//        DriveToTarget(makeTarget(1800,350,-45), 0.4, 0.2, 0.7, 1, 1);
-//
-//        DriveToTarget(makeTarget(600,0,-90), 0.8, 0.2, 0.7, 1, 5);
+
+        DriveToTarget(makeTarget(680,-690,45), 0.6, 0.2, 0.7, 1, 1);
+
+        DriveToTarget(makeTarget(1800,350,45), 0.4, 0.2, 0.7, 1, 2);
+        DriveToTarget(makeTarget(1800,350,-45), 0.4, 0.2, 0.7, 1, 2);
+
+//        shootMotor.setPower(0.85); // add auto aim later
+        turretMotor.setPower(0);
+        //  use 0.61 with high voltage
+        if (battery.getVoltage() > 13) {
+            shootPower = 0.58;
+        } else {
+            shootPower = 0.61;
+        }
+//        robot.waitAim(100);
+        tripleShoot(lift, shootMotor, intakeMotor,shootPower - powerDiff * 0.05,2500);
+
+        DriveToTarget(makeTarget(1800,350,-90), 0.4, 0.2, 0.7, 1, 2);
+        DriveToTarget(makeTarget(1310,0,-90), 0.5, 0.2, 0.7, 1, 2);
+
+        //second intake
+        intakeMotor.setPower(-0.9);
+        DriveToTarget(makeTarget(1310,-250,-90), 0.5, 0.2, 0.7, 1, 1);
+        intakeMotor.setPower(0);
+        intakeMotor.setPower(-0.9);
+        DriveToTarget(makeTarget(1310,-470,-90), 0.4, 0.2, 0.7, 1, 1);
+        intakeMotor.setPower(0);
+
+        DriveToTarget(makeTarget(1800,350,-90), 0.4, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(1800,350,-45), 0.4, 0.2, 0.7, 1, 1);
+
+        DriveToTarget(makeTarget(600,0,-90), 0.8, 0.2, 0.7, 1, 5);
 
     }
 }
