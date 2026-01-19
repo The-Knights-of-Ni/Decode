@@ -98,14 +98,14 @@ public class Auto2025RedFar2 extends LinearOpMode {
     }
 
 
-    public void tripleShoot(Servo lift, DcMotor shootMotor, DcMotor intakeMotor, double shootPower, long waitTime, AllianceColor color) throws InterruptedException {
+    public void tripleShoot(Servo lift, DcMotor shootMotor, DcMotor intakeMotor, double shootPower, long waitTime) throws InterruptedException {
         robot.control.turretMotor.setMotorEnable();
-        robot.waitAim(50, color);
+        robot.waitAim(50);
         robot.control.turretMotor.setPower(0);
         shootMotor.setPower(-shootPower);
         Thread.sleep(waitTime);
-        robot.waitAim(50, color);
-        robot.shootAll2(color);
+        robot.waitAim(50);
+        robot.shootAll2();
     }
 
     @Override

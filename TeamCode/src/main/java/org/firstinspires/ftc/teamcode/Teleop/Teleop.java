@@ -206,10 +206,12 @@ public class Teleop extends LinearOpMode {
                 if(Robot.gamepad1.bButton.isPressed()){
                     // red alliance
                     color = 1;
+                    robot.allianceColor = AllianceColor.RED;
                 }
                 else if(Robot.gamepad1.xButton.isPressed()){
                     // blue alliance
                     color = 2;
+                    robot.allianceColor = AllianceColor.BLUE;
                 }
                 else{
                     telemetry.addLine("Alliance color not yet selected.");
@@ -259,16 +261,6 @@ public class Teleop extends LinearOpMode {
                 shootMotorConstant = 0.03;
             }
 
-//            // Improved continuous voltage compensation for shooter
-//            double targetVoltage = 12.8; // ideal voltage
-//            double kVoltage = 0.02; // change as needed
-//            double voltage = robot.getBatteryVoltage();
-//            if (voltage < targetVoltage) {
-//                shootMotorConstant = kVoltage * (targetVoltage - voltage);
-//                telemetry.addData("ShootmotorConstant: ", shootMotorConstant);
-//            }
-
-            //            if(distToTarget != 0 && shootMotorActive){
             // Continuously update shoot motor power if active
             if (shootMotorActive) {
                 double sm_power = robot.control.shootMotorVelocity(distToTarget) + shootMotorConstant;
@@ -280,33 +272,6 @@ public class Teleop extends LinearOpMode {
 
             // un-deprecate later
             if (twoGamepads) {
-
-                // Starting the shooting motor (Trigger Left)
-//                if (Robot.gamepad2.triggerLeft > 0.05) {
-//                    robot.control.startShoot(ShootMotorPower);
-//                    // put limelight tests for teleop here for now?
-//                    telemetry.log().add("Starting the shoot motor");
-//                    robot.limelight.loop();
-//                }
-//
-//                // Stopping the shooting motor (Bumper Left)
-//                if (Robot.gamepad2.bumperLeft.isPressed()) {
-//                    robot.control.stopShoot();
-//                    telemetry.log().add("Stopping the shoot motor");
-//                }
-//
-//                // Starting and stopping the intake motor
-//                if (Robot.gamepad2.yButton.isPressed()) {
-//                    if (intakeOn){
-//                        robot.control.stopIntake();
-//                        telemetry.log().add("Stopping the intake");
-//                    }
-//                    else {
-//                        robot.control.startIntake();
-//                        telemetry.log().add("Starting the intake");
-//                    }
-//                    intakeOn = !intakeOn;
-//                }
 
                 if(gamepad1.dpad_down && (robot.limelight.detectBlue || robot.limelight.detectRed)){
                     double degreeError = 0.0;

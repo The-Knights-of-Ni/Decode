@@ -98,14 +98,14 @@ public class Auto2025RedFar2backup extends LinearOpMode {
     }
 
 
-    public void tripleShoot(Servo lift, DcMotor shootMotor, DcMotor intakeMotor, double shootPower, long waitTime, AllianceColor color) throws InterruptedException {
+    public void tripleShoot(Servo lift, DcMotor shootMotor, DcMotor intakeMotor, double shootPower, long waitTime) throws InterruptedException {
         robot.control.turretMotor.setMotorEnable();
-        robot.waitAim(50, color);
+        robot.waitAim(50);
         robot.control.turretMotor.setPower(0);
         shootMotor.setPower(-shootPower);
         Thread.sleep(waitTime);
-        robot.waitAim(50, color);
-        robot.shootAll2(color);
+        robot.waitAim(50);
+        robot.shootAll2();
     }
 
     @Override
@@ -155,7 +155,7 @@ public class Auto2025RedFar2backup extends LinearOpMode {
             shootPower = 0.81;
         }
 
-        tripleShoot(lift, shootMotor, intakeMotor,shootPower - powerDiff * 0.05,3600, AllianceColor.RED);
+        tripleShoot(lift, shootMotor, intakeMotor,shootPower - powerDiff * 0.05,3600);
         Thread.sleep(1000);
 //        DriveToTarget(makeTarget(0,-300,0), 0.5, 0.2, 0.7, 1, 1);
 
@@ -192,7 +192,7 @@ public class Auto2025RedFar2backup extends LinearOpMode {
             shootPower = 0.61;
         }
 //        robot.waitAim(100);
-        tripleShoot(lift, shootMotor, intakeMotor,shootPower - powerDiff * 0.05,2500, AllianceColor.RED);
+        tripleShoot(lift, shootMotor, intakeMotor,shootPower - powerDiff * 0.05,2500);
 
         DriveToTarget(makeTarget(1800,350,-90), 0.4, 0.2, 0.7, 1, 2);
         DriveToTarget(makeTarget(1310,0,-90), 0.5, 0.2, 0.7, 1, 2);

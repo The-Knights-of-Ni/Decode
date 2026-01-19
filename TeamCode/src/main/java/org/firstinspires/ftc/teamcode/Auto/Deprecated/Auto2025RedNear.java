@@ -87,14 +87,14 @@ public class Auto2025RedNear extends LinearOpMode {
     }
 
 
-    public void tripleShoot(Servo lift, DcMotor shootMotor, DcMotor intakeMotor, double shootPower, long waitTime, AllianceColor color) throws InterruptedException {
+    public void tripleShoot(Servo lift, DcMotor shootMotor, DcMotor intakeMotor, double shootPower, long waitTime) throws InterruptedException {
         robot.control.turretMotor.setMotorEnable();
-        robot.waitAim(50, color);
+        robot.waitAim(50);
         lift.setPosition(0);
         shootMotor.setPower(-shootPower);
-        robot.waitAim(waitTime, color);
+        robot.waitAim(waitTime);
         robot.control.turretMotor.setPower(-0.1*shootPower);
-        robot.shootAll2(color);
+        robot.shootAll2();
     }
 
     @Override
@@ -130,8 +130,8 @@ public class Auto2025RedNear extends LinearOpMode {
         DriveToTarget(makeTarget(960,450,135), 0.5, 0.2, 0.7, 1, 1.5);
         DriveToTarget(makeTarget(960,450,225), 0.5, 0.2, 0.7, 1, 1.5);
 
-        robot.waitAim(100, AllianceColor.RED);
-        tripleShoot(lift, shootMotor, intakeMotor, shotPower,100, AllianceColor.RED);
+        robot.waitAim(100);
+        tripleShoot(lift, shootMotor, intakeMotor, shotPower,100);
         Thread.sleep(500);
 
         DriveToTarget(makeTarget(960,700,-180), 0.5, 0.2, 0.7, 1, 1.5);
@@ -147,8 +147,8 @@ public class Auto2025RedNear extends LinearOpMode {
         DriveToTarget(makeTarget(1360,450,-180), 0.5, 0.2, 0.7, 1, 1.5);
         DriveToTarget(makeTarget(1360,450,-135), 0.5, 0.2, 0.7, 1, 1.5);
         shotPower = 0.59;
-        robot.waitAim(100, AllianceColor.RED);
-        tripleShoot(lift, shootMotor, intakeMotor, shotPower,500, AllianceColor.RED);
+        robot.waitAim(100);
+        tripleShoot(lift, shootMotor, intakeMotor, shotPower,500);
         Thread.sleep(500);
 
 

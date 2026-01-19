@@ -89,14 +89,14 @@ public class Auto2025RedFar extends LinearOpMode {
 
 
 
-    public void tripleShoot(Servo lift, DcMotor shootMotor, DcMotor intakeMotor, double shootPower, long waitTime, AllianceColor color) throws InterruptedException {
+    public void tripleShoot(Servo lift, DcMotor shootMotor, DcMotor intakeMotor, double shootPower, long waitTime) throws InterruptedException {
         robot.control.turretMotor.setMotorEnable();
-        robot.waitAim(100, AllianceColor.RED);
+        robot.waitAim(100);
         lift.setPosition(0);
         shootMotor.setPower(-shootPower);
-        robot.waitAim(waitTime, color);
+        robot.waitAim(waitTime);
         robot.control.turretMotor.setPower(-0.2*shootPower);
-        robot.shootAll2(color);
+        robot.shootAll2();
     }
 
     @Override
@@ -121,7 +121,7 @@ public class Auto2025RedFar extends LinearOpMode {
         double powerDiff = robot.getBatteryVoltage() - 13.0;
         // 13.7: 0.8 too strong
         //
-        tripleShoot(lift, shootMotor, intakeMotor,0.80 - powerDiff * 0.05,3600, AllianceColor.RED);
+        tripleShoot(lift, shootMotor, intakeMotor,0.80 - powerDiff * 0.05,3600);
 
         DriveToTarget(makeTarget(680,0,0), 0.5, 0.5, 0.7, 1, 2);
         DriveToTarget(makeTarget(680,0,-90), 0.5, 0.5, 0.7, 1, 2);
@@ -144,7 +144,7 @@ public class Auto2025RedFar extends LinearOpMode {
 //        shootMotor.setPower(0.85); // add auto aim later
         turretMotor.setPower(0);
         //  use 0.61 with high voltage
-        tripleShoot(lift, shootMotor, intakeMotor,0.60 - powerDiff * 0.05,2500, AllianceColor.RED);
+        tripleShoot(lift, shootMotor, intakeMotor,0.60 - powerDiff * 0.05,2500);
 
         DriveToTarget(makeTarget(1800,390,-90), 0.4, 0.5, 0.7, 1, 1);
         DriveToTarget(makeTarget(1310,0,-90), 0.5, 0.5, 0.7, 1, 2);

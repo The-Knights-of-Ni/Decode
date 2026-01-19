@@ -205,10 +205,12 @@ public class brownieTeleop extends LinearOpMode {
                 if(Robot.gamepad1.bButton.isPressed()){
                     // red alliance
                     color = 1;
+                    robot.allianceColor = AllianceColor.RED;
                 }
                 else if(Robot.gamepad1.xButton.isPressed()){
                     // blue alliance
                     color = 2;
+                    robot.allianceColor = AllianceColor.BLUE;
                 }
                 else{
                     telemetry.addLine("Alliance color not yet selected.");

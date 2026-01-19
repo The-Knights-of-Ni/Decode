@@ -108,14 +108,14 @@ public class AutoFolsomBlueFar extends LinearOpMode {
 
 
     // Remove shootPower and powerDiff, use only battery.getVoltage()
-    public void tripleShoot(Servo lift, DcMotorEx flywheel, DcMotor intakeMotor, double targetVelocity, long waitTime, AllianceColor color) throws InterruptedException {
+    public void tripleShoot(Servo lift, DcMotorEx flywheel, DcMotor intakeMotor, double targetVelocity, long waitTime) throws InterruptedException {
         robot.control.turretMotor.setMotorEnable();
-        robot.waitAim(50, color);
+        robot.waitAim(50);
         robot.control.turretMotor.setPower(0);
         flywheel.setVelocity(targetVelocity);
         Thread.sleep(waitTime);
-        robot.waitAim(50, color);
-        robot.shootAll2(color);
+        robot.waitAim(50);
+        robot.shootAll2();
     }
 
     @Override
@@ -148,7 +148,7 @@ public class AutoFolsomBlueFar extends LinearOpMode {
             DcMotor.RunMode.RUN_USING_ENCODER,
             new PIDFCoefficients(BASE_P, BASE_I, BASE_D, scaledF)
         );
-        tripleShoot(lift, flywheel, intakeMotor, targetVelocity, 3600, AllianceColor.BLUE);
+        tripleShoot(lift, flywheel, intakeMotor, targetVelocity, 3600);
         Thread.sleep(1000);
 
         DriveToTarget(makeTarget(680,0,0), 0.5, 0.2, 0.7, 1, 2);
@@ -182,7 +182,7 @@ public class AutoFolsomBlueFar extends LinearOpMode {
             DcMotor.RunMode.RUN_USING_ENCODER,
             new PIDFCoefficients(BASE_P, BASE_I, BASE_D, scaledF)
         );
-        tripleShoot(lift, flywheel, intakeMotor, targetVelocity, 2500, AllianceColor.BLUE);
+        tripleShoot(lift, flywheel, intakeMotor, targetVelocity, 2500);
 
         DriveToTarget(makeTarget(1800,-350,90), 0.4, 0.2, 0.7, 1, 2);
         DriveToTarget(makeTarget(1310,0,90), 0.5, 0.2, 0.7, 1, 2);
