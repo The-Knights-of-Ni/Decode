@@ -1,13 +1,9 @@
-package org.firstinspires.ftc.teamcode.Auto;
+package org.firstinspires.ftc.teamcode.Auto.Deprecated;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -20,8 +16,8 @@ import org.firstinspires.ftc.teamcode.Util.AllianceColor;
 import java.util.HashMap;
 import java.util.Locale;
 
-@Autonomous(name = "Auto2025BlueFar2")
-public class Auto2025BlueFar2 extends LinearOpMode {
+//@Autonomous(name = "Auto2025RedNear")
+public class Auto2025RedNear extends LinearOpMode {
     ElapsedTime timer;
     private Robot robot;
     double timeCurrent;
@@ -30,32 +26,19 @@ public class Auto2025BlueFar2 extends LinearOpMode {
     DcMotor backLeftMotor;
     DcMotor frontRightMotor;
     DcMotor backRightMotor;
-//    private DcMotorEx flywheel;
-    private VoltageSensor battery;
-//    // Base PIDF (tuned at REFERENCE_VOLTAGE)
-//    private static final double BASE_P = 20.0;
-//    private static final double BASE_I = 0.0;
-//    private static final double BASE_D = 2.0;
-//    private static final double BASE_F = 11.7;
 
     private void initOpMode() {
         // Initialize DC motor objects
         timer = new ElapsedTime();
         HashMap<String, Boolean> flags = new HashMap<>();
-//        flywheel = hardwareMap.get(DcMotorEx.class, "shootMotor");
         flags.put("web", true);
         flags.put("vision", false);
         DriveToPoint nav = new DriveToPoint(this);
-        this.robot = new Robot(hardwareMap, telemetry, timer, nav, AllianceColor.BLUE, gamepad1, gamepad2, flags);
+        this.robot = new Robot(hardwareMap, telemetry, timer, nav, AllianceColor.RED, gamepad1, gamepad2, flags);
         timeCurrent = timer.nanoseconds();
         timePre = timeCurrent;
 
-        battery = hardwareMap.voltageSensor.iterator().next();
         telemetry.addData("Waiting for start", "...");
-
-//        flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-//        flywheel.setDirection(DcMotor.Direction.REVERSE);
     }
 
     void DriveToTarget(Pose2D TARGET, double power, double holdTime, double powerMultiplier, double patience, double timeOut){
@@ -64,6 +47,9 @@ public class Auto2025BlueFar2 extends LinearOpMode {
             robot.odo.update();
             if (robot.nav.driveTo(robot.odo.getPosition(), TARGET, power, holdTime)){
                 telemetry.addLine("at position #1!");
+                // Sleep to give the reset position time, as it takes 0.25s
+                //                        odo.resetPosAndIMU();
+                //                        sleep(300);
                 powerMultiplier = 0.85;
                 break;
             }
@@ -101,15 +87,14 @@ public class Auto2025BlueFar2 extends LinearOpMode {
     }
 
 
-    public void tripleShoot(Servo lift, DcMotor shootMotor, DcMotor intakeMotor, double shootPower, long waitTime) throws InterruptedException {
+    public void tripleShoot(Servo lift, DcMotor shootMotor, DcMotor intakeMotor, double shootPower, long waitTime, AllianceColor color) throws InterruptedException {
         robot.control.turretMotor.setMotorEnable();
-        robot.waitAim(50);
-
-        robot.control.turretMotor.setPower(0);
+        robot.waitAim(50, color);
+        lift.setPosition(0);
         shootMotor.setPower(-shootPower);
-        Thread.sleep(waitTime);
-        robot.waitAim(50);
-        robot.shootAll2();
+        robot.waitAim(waitTime, color);
+        robot.control.turretMotor.setPower(-0.1*shootPower);
+        robot.shootAll2(color);
     }
 
     @Override
@@ -129,86 +114,43 @@ public class Auto2025BlueFar2 extends LinearOpMode {
 
         waitForStart();
 
-//        // PIDF for flywheel
-//        double lastVoltage = 0;
-//        lastVoltage = battery.getVoltage();
-//        double voltage = battery.getVoltage();
-//        double REFERENCE_VOLTAGE = 13.0;
-//
-//        // update PIDF when voltage meaningfully changes
-//        // PID stands for Proportional, Integral, Derivative. These three terms control how the motor responds
-//        // to error (difference between target and actual value).
-//        // PIDF adds a Feedforward ("F") term. The F term predicts the needed output based on the target value,
-//        // helping the motor reach the target faster and more accurately, especially for velocity control.
-//        if (Math.abs(voltage - lastVoltage) > 0.1) {
-//            double scaledF = BASE_F * (REFERENCE_VOLTAGE / voltage);
-//            flywheel.setPIDFCoefficients(
-//                    DcMotor.RunMode.RUN_USING_ENCODER,
-//                    new PIDFCoefficients(BASE_P, BASE_I, BASE_D, scaledF)
-//            );
-//            lastVoltage = voltage;
-//        }
         robot.odo.update();
 
-        double shootPower;
-        double powerDiff = robot.getBatteryVoltage() - 13.0;
+        //add two shoot commands here
 
-        if (battery.getVoltage() > 13) {
-            shootPower = 0.79;
-        } else {
-            shootPower = 0.81;
-        }
+//        Thread.sleep(1000);
 
-        tripleShoot(lift, shootMotor, intakeMotor,shootPower - powerDiff * 0.05,3600);
-        Thread.sleep(1000);
+        double shotPower = 0.58;
+        // for warming up the motor to prevent sleep
+        shootMotor.setPower(-shotPower);
+        DriveToTarget(makeTarget(100,0,0), 0.5, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(100,0,45), 0.5, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(960,0,45), 0.5, 0.2, 0.7, 1, 1.5);
+        DriveToTarget(makeTarget(960,450,45), 0.5, 0.2, 0.7, 1, 1.5);
+        DriveToTarget(makeTarget(960,450,135), 0.5, 0.2, 0.7, 1, 1.5);
+        DriveToTarget(makeTarget(960,450,225), 0.5, 0.2, 0.7, 1, 1.5);
 
-        DriveToTarget(makeTarget(680,0,0), 0.5, 0.2, 0.7, 1, 2);
-        DriveToTarget(makeTarget(680,0,90), 0.5, 0.2, 0.7, 1, 2);
+        robot.waitAim(100, AllianceColor.RED);
+        tripleShoot(lift, shootMotor, intakeMotor, shotPower,100, AllianceColor.RED);
+        Thread.sleep(500);
 
-        turretMotor.setPower(-0.35);
+        DriveToTarget(makeTarget(960,700,-180), 0.5, 0.2, 0.7, 1, 1.5);
+        DriveToTarget(makeTarget(750,700,-180), 0.5, 0.2, 0.7, 1, 1.5);
 
-        // first intake
         intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(680,250,90), 0.5, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(440,700,-180), 0.5, 0.2, 0.7, 1, 1);
         intakeMotor.setPower(0);
         intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(680,470,90), 0.4, 0.2, 0.7, 1, 1);
-        intakeMotor.setPower(0);
-//        intakeMotor.setPower(-0.6);
-//        DriveToTarget(makeTarget(680,690,90), 0.4, 0.2, 0.7, 1, 1);
-//        intakeMotor.setPower(0);
-
-        DriveToTarget(makeTarget(680,690,-45), 0.6, 0.2, 0.7, 1, 1);
-
-        DriveToTarget(makeTarget(1800,-350,-45), 0.4, 0.2, 0.7, 1, 2);
-        DriveToTarget(makeTarget(1800,-350,45), 0.4, 0.2, 0.7, 1, 2);
-
-//        shootMotor.setPower(0.85); // add auto aim later
-        turretMotor.setPower(0);
-        //  use 0.61 with high voltage
-        if (battery.getVoltage() > 13) {
-            shootPower = 0.58;
-        } else {
-            shootPower = 0.61;
-        }
-//        robot.waitAim(100);
-        tripleShoot(lift, shootMotor, intakeMotor,shootPower - powerDiff * 0.05,2500);
-
-        DriveToTarget(makeTarget(1800,-350,90), 0.4, 0.2, 0.7, 1, 2);
-        DriveToTarget(makeTarget(1310,0,90), 0.5, 0.2, 0.7, 1, 2);
-
-        //second intake
-        intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(1310,250,90), 0.5, 0.2, 0.7, 1, 1);
-        intakeMotor.setPower(0);
-        intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(1310,470,90), 0.4, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(220,700,-180), 0.4, 0.2, 0.7, 1, 1);
         intakeMotor.setPower(0);
 
-        DriveToTarget(makeTarget(1800,-350,90), 0.4, 0.2, 0.7, 1, 1);
-        DriveToTarget(makeTarget(1800,-350,45), 0.4, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(1360,450,-180), 0.5, 0.2, 0.7, 1, 1.5);
+        DriveToTarget(makeTarget(1360,450,-135), 0.5, 0.2, 0.7, 1, 1.5);
+        shotPower = 0.59;
+        robot.waitAim(100, AllianceColor.RED);
+        tripleShoot(lift, shootMotor, intakeMotor, shotPower,500, AllianceColor.RED);
+        Thread.sleep(500);
 
-        DriveToTarget(makeTarget(600,0,90), 0.8, 0.2, 0.7, 1, 5);
 
     }
 }

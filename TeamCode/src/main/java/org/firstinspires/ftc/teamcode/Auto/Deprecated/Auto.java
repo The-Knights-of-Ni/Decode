@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Auto;
+package org.firstinspires.ftc.teamcode.Auto.Deprecated;
 
 import android.util.Log;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;

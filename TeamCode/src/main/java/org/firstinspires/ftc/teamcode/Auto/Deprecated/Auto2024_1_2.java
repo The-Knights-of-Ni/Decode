@@ -1,8 +1,7 @@
-package org.firstinspires.ftc.teamcode.Auto;
+package org.firstinspires.ftc.teamcode.Auto.Deprecated;
 
 import android.util.Log;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -10,9 +9,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
+import org.firstinspires.ftc.teamcode.Auto.PID;
 
-//@Autonomous(name = "Auto2024_2")
-public class Auto2024_2 extends LinearOpMode {
+//@Autonomous(name = "Auto2024_1_2")
+public class Auto2024_1_2 extends LinearOpMode {
     private static final double mmPerInch = 25.4;
     private static final double MOTOR_TICK_PER_REV_YELLOW_JACKET_312 = 537.6;
     private static final double DRIVE_GEAR_REDUCTION = 1.0; // This is < 1.0 if geared UP
@@ -78,8 +78,7 @@ public class Auto2024_2 extends LinearOpMode {
         PICKUP(0.86),   // Position to pick up sample
         LARGE1(0.7),   // Intermediate position to slow down when putting to LARGE
         CARRY(0.55),     // Position for carrying to bucket
-        HIGHBAR(0.575),
-        SUBMERGE(0.72); // Position for Submerge
+        SUBMERGE(0.77); // Position for Submerge
 
 
         private double swing;
@@ -130,27 +129,69 @@ public class Auto2024_2 extends LinearOpMode {
         // reset the timeout time and start motion.
         timer.reset();
 
-        // SCORE FIRST SPECIMEN
-        clawClose(c); // close claw
-        setPosition(al, ar, Auto2024_2.Pivot.START); // pivot to starting position
-        move(new Vector2D(0, 11.25*mmPerInch), 0); // move forward
-        setPosition(al, ar, Auto2024_2.Pivot.HIGHBAR); // move to carry position
-        Thread.sleep(2000);
-        move(new Vector2D(0, 2*mmPerInch), 0); // move forward
-        moveSlidersWithEncoder(sl, sr, Auto2024_2.Bucket.LOW); // move slide up
-        Thread.sleep(2000);
-        clawOpen(c); // open claw
+        // ===== SCORE PRELOADED =====
+        clawClose(c);
+        setPosition(al, ar, Pivot.START);
+        move(new Vector2D(0, 16.8 *mmPerInch), 0); // move backward
+        move(new Vector2D(0,0),-62); // turn to bucket - tuning left from front wheel
+        move(new Vector2D(0, 10.5*mmPerInch), 0); // adjust/scoot towards bucket - move back
+        moveSlidersWithEncoder(sl, sr, Bucket.HIGH); // move linear slide up
+        Thread.sleep(1500);
+        setPosition(al, ar, Pivot.CARRY); // move arm up
         Thread.sleep(1000);
-        resetMotor(); // move slide down
-        setPosition(al, ar, Auto2024_2.Pivot.START); // move pivot back to starting
+        clawOpen(c);
+        Thread.sleep(500);
+        clawClose(c);
+        setPosition(al, ar, Pivot.START);
+        resetMotor();
+        Thread.sleep(1500);
 
-        // PARK
-        move(new Vector2D(30*mmPerInch, 0), -15); // move right
-        move(new Vector2D(0, -19.5*mmPerInch), -6); // move back
+        // ===== SCORE SECOND SAMPLE =====
+        move(new Vector2D(0,0),71); // turn to sample - turning right from front wheel
+        setPosition(al, ar, Pivot.SUBMERGE); // move pivot to pick up sample
+        setPosition(al, ar, Pivot.PICKUP); // move pivot to pick up sample
+        clawOpen(c); // open claw
+        // --To Sample
+        move(new Vector2D(-5.8*mmPerInch,8.3*mmPerInch),0); // move to sample
+        clawClose(c); // close claw
+        Thread.sleep(500); // wait
+        setPosition(al, ar, Pivot.CARRY); // move arm up
+        // --To Bucket
+        move(new Vector2D(0, 0), -73); // turn to bucket
+        move(new Vector2D(0, 4.5*mmPerInch), 0); //scoot towards bucket
+        moveSlidersWithEncoder(sl, sr, Bucket.HIGH); // move linear slide up
+        Thread.sleep(2000);
+        clawOpen(c);
+        Thread.sleep(250);
+        setPosition(al, ar, Pivot.START);
+        Thread.sleep(250);
+        resetMotor();
+        Thread.sleep(1500);
 
-        Thread.sleep(5000);
-
-        stop();
+        // ===== SCORE THIRD SAMPLE =====
+        // --To Sample
+        move(new Vector2D(0,0),70); // turn to sample
+        setPosition(al, ar, Pivot.SUBMERGE); // move pivot to pick up sample
+        setPosition(al, ar, Pivot.PICKUP); // move pivot to pick up sample
+        clawOpen(c); // open claw
+        move(new Vector2D(-11*mmPerInch,3.0*mmPerInch),0); // move to sample
+//        move(new Vector2D(0,2.5*mmPerInch),0); // move closer
+        clawClose(c); // close claw
+        Thread.sleep(500); // wait
+//        // --To Bucket
+//        setPosition(al, ar, Pivot.CARRY); // move arm up
+//        move(new Vector2D(0, -5.5*mmPerInch), 0); // back up
+//        move(new Vector2D(0, 0), -70); // turn to bucket
+//        move(new Vector2D(-4.5*mmPerInch, -3*mmPerInch), 0); //move right
+//        moveSlidersWithEncoder(sl, sr, Bucket.HIGH); // move linear slide up
+//        Thread.sleep(1000);
+//        clawOpen(c);
+//        clawClose(c);
+//        Thread.sleep(500);
+//        resetMotor();
+//        Thread.sleep(250);
+//        setPosition(al, ar, Pivot.START);
+//        Thread.sleep(250);
     }
 
     public void move(Vector2D v, double turnAngle) {
@@ -356,7 +397,7 @@ public class Auto2024_2 extends LinearOpMode {
     }
 
     public void clawClose(Servo c){
-        c.setPosition(0.05);     //0.09=.5" gap
+        c.setPosition(0.075);     //0.09=.5" gap
     }
 
     public void setPosition(Servo al, Servo ar, Pivot p){

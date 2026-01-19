@@ -156,24 +156,24 @@ public class hanTeleop extends LinearOpMode {
         robot.control.shootMotor.setVelocity(tps);
     }
 
-    void shootAll() throws InterruptedException{
+    void shootAll(AllianceColor color) throws InterruptedException{
         robot.control.lift.setPosition(0.65); // trigger first ball launch - move up
-        robot.waitAim(500);        // wait to get there
+        robot.waitAim(500, color);        // wait to get there
         robot.control.lift.setPosition(0);    // move down
-        robot.waitAim(500);        // wait to get there
+        robot.waitAim(500, color);        // wait to get there
 
         robot.control.startIntake();          // run intake to move 2 balls up
-        robot.waitAim(250);       // run enough to have enough power to move balls up
+        robot.waitAim(250, color);       // run enough to have enough power to move balls up
         robot.control.lift.setPosition(0.65); // trigger second ball launch - move up
-        robot.waitAim(500);
+        robot.waitAim(500, color);
         robot.control.stopIntake();           // stop
 
-        robot.waitAim(800);        // wait for flywheel to get back to speed after first ball is shot
+        robot.waitAim(800, color);        // wait for flywheel to get back to speed after first ball is shot
         robot.control.push.setPosition(0.0);  // push third ball up - 0.0
-        // robot.waitAim(500);        // wait to get there; i suspect that we don't need this since they both move realy slowly
+        // robot.waitAim(500, color);        // wait to get there; i suspect that we don't need this since they both move realy slowly
 
         robot.control.lift.setPosition(0.65); // trigger third ball launch - move up
-        robot.waitAim(500);        // wait to get there
+        robot.waitAim(500, color);        // wait to get there
         robot.control.lift.setPosition(0);    // move down
 
         robot.control.push.setPosition(0.55);  // put back push 0.6
@@ -384,7 +384,12 @@ public class hanTeleop extends LinearOpMode {
                 }
 
                 if (gamepad1.right_trigger > 0.05){         // To shoot 3 balls
-                    robot.shootAll2();
+                    // Use alliance color to call shootAll2
+                    if (color == 2) {
+                        robot.shootAll2(AllianceColor.BLUE);
+                    } else if (color == 1) {
+                        robot.shootAll2(AllianceColor.RED);
+                    }
                     telemetry.addLine("All Balls Shot");
                 }
 

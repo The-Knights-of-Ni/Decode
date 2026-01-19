@@ -283,30 +283,24 @@ public class Robot {
     }
 
 
-    public void waitAim(double waitTime) throws InterruptedException {
+    public void waitAim(double waitTime, AllianceColor detectedColor) throws InterruptedException {
         control.turretMotor.setMotorEnable();
         for(int i = 0; i<waitTime/10; i++) {
             limelight.loop();
             double degreeError = 0.0;
-//            double degreeErrorRed = 0.0;
-//            double degreeErrorBlue = 0.0;
-            if(!limelight.detectRed && !limelight.detectBlue){
-                Thread.sleep(10);
-                continue;
-            }
-//            if(limelight.detectRed) {
-//                degreeError = limelight.redGoal.getTargetXDegrees();
-////                degreeErrorRed = degreeError;
-//            }
-            if(limelight.detectBlue) {
+            if (detectedColor == AllianceColor.RED) {
+                if (!limelight.detectRed) {
+                    Thread.sleep(10);
+                    continue;
+                }
+                degreeError = limelight.redGoal.getTargetXDegrees();
+            } else if (detectedColor == AllianceColor.BLUE) {
+                if (!limelight.detectBlue) {
+                    Thread.sleep(10);
+                    continue;
+                }
                 degreeError = limelight.blueGoal.getTargetXDegrees();
-//                degreeErrorBlue = degreeError;
             }
-//            if (degreeErrorBlue != 0.0 && degreeErrorRed != 0.0) {
-//                if(Math.abs(degreeErrorRed) < Math.abs(degreeErrorBlue)) {
-//                    degreeError = degreeErrorRed;
-//                }
-//            }
             double aimSpeed = autoAimSpeed(degreeError, 12);
             control.turretMotor.setPower(aimSpeed);
             telemetry.update();
@@ -330,6 +324,36 @@ public class Robot {
         control.lift.setPosition(0.65); // trigger second ball launch - move up
         //Thread.sleep(500);        // wait to get there
         waitAim(250);
+        control.lift.setPosition(0);    // move down
+        Thread.sleep(500);        // wait to get there
+
+        Thread.sleep(800);        // wait for flywheel to get back to speed after first ball is shot
+        control.push.setPosition(0.0);  // push third ball up - 0.0
+        Thread.sleep(500);        // wait to get there
+
+        control.lift.setPosition(0.65); // trigger third ball launch - move up
+        Thread.sleep(500);        // wait to get there
+        control.lift.setPosition(0);    // move down
+
+        control.push.setPosition(0.55);  // put back push 0.6
+    }
+
+    public void shootAll2(AllianceColor color) throws InterruptedException{
+        /*
+        DO NOT CHANGE NUMBERS OR SEQUENCES - WORKING VERSION
+         */
+        control.lift.setPosition(0.65); // trigger first ball launch - move up
+        Thread.sleep(500);        // wait to get there
+        control.lift.setPosition(0);    // move down
+        Thread.sleep(500);        // wait to get there
+
+        control.startIntake();          // run intake to move 2 balls up
+        Thread.sleep(1000);       // run enough to have enough power to move balls up
+        control.stopIntake();           // stop
+
+        control.lift.setPosition(0.65); // trigger second ball launch - move up
+        //Thread.sleep(500);        // wait to get there
+        waitAim(250, color);
         control.lift.setPosition(0);    // move down
         Thread.sleep(500);        // wait to get there
 

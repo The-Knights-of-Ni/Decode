@@ -1,6 +1,5 @@
-package org.firstinspires.ftc.teamcode.Auto;
+package org.firstinspires.ftc.teamcode.Auto.Deprecated;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -9,7 +8,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.DriveToPoint;
 import org.firstinspires.ftc.teamcode.Util.AllianceColor;
@@ -17,8 +15,10 @@ import org.firstinspires.ftc.teamcode.Util.AllianceColor;
 import java.util.HashMap;
 import java.util.Locale;
 
-//@Autonomous(name = "Auto2025BlueFar")
-public class Auto2025BlueFar extends LinearOpMode {
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+
+//@Autonomous(name = "Auto2025BlueNear")
+public class Auto2025BlueNear extends LinearOpMode {
     ElapsedTime timer;
     private Robot robot;
     double timeCurrent;
@@ -87,19 +87,26 @@ public class Auto2025BlueFar extends LinearOpMode {
         return new Pose2D(DistanceUnit.MM,xpos,ypos, AngleUnit.DEGREES,hpos);
     }
 
+    public double sigmoid(double x, double k){
+        return 1/(1+Math.exp(-k*x));
+    }
 
-    public void tripleShoot(Servo lift, DcMotor shootMotor, DcMotor intakeMotor, double shootPower, long waitTime) throws InterruptedException {
+    public double autoAimSpeed(double dist, double k){
+        double magnitude = 0.5, tolerance = 2.0;
+        return (-magnitude*sigmoid(dist-tolerance,k) +
+                magnitude-magnitude*sigmoid(dist+tolerance,k));
+    }
+
+
+
+    public void tripleShoot(Servo lift, DcMotor shootMotor, DcMotor intakeMotor, double shootPower, long waitTime, AllianceColor color) throws InterruptedException {
         robot.control.turretMotor.setMotorEnable();
-        robot.waitAim(100);
-//        robot.control.turretMotor.setPower(-0.1*shootPower);
-
+        robot.waitAim(50, color);
         lift.setPosition(0);
         shootMotor.setPower(-shootPower);
-        robot.waitAim(waitTime);
-
+        robot.waitAim(waitTime, color);
         robot.control.turretMotor.setPower(-0.1*shootPower);
-
-        robot.control.shootAll();
+        robot.shootAll2(color);
     }
 
     @Override
@@ -121,50 +128,41 @@ public class Auto2025BlueFar extends LinearOpMode {
 
         robot.odo.update();
 
+        //add two shoot commands here
 
-        double powerDiff = robot.getBatteryVoltage() - 13.0;
+//        Thread.sleep(1000);
 
-        tripleShoot(lift, shootMotor, intakeMotor,0.80 - powerDiff * 0.05,3600);
+        double shotPower = 0.58;
+        // for warming up the motor to prevent sleep
+        shootMotor.setPower(-shotPower);
+        DriveToTarget(makeTarget(100,0,0), 0.5, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(100,0,-45), 0.5, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(960,0,-45), 0.5, 0.2, 0.7, 1, 1.5);
+        DriveToTarget(makeTarget(960,-450,-45), 0.5, 0.2, 0.7, 1, 1.5);
+        DriveToTarget(makeTarget(960,-450,-135), 0.5, 0.2, 0.7, 1, 1.5);
+        DriveToTarget(makeTarget(960,-450,-225), 0.5, 0.2, 0.7, 1, 1.5);
 
+        robot.waitAim(100, AllianceColor.BLUE);
+        tripleShoot(lift, shootMotor, intakeMotor, shotPower,100, AllianceColor.BLUE);
+//        Thread.sleep(500);
 
-        DriveToTarget(makeTarget(680,0,0), 0.5, 0.2, 0.7, 1, 2);
-        DriveToTarget(makeTarget(680,0,90), 0.5, 0.2, 0.7, 1, 2);
+        DriveToTarget(makeTarget(960,-700,180), 0.5, 0.2, 0.7, 1, 1.5);
+        DriveToTarget(makeTarget(750,-700,180), 0.5, 0.2, 0.7, 1, 1.5);
 
-        turretMotor.setPower(-0.35);
-
-        // first intake
         intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(680,250,90), 0.5, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(440,-700,180), 0.5, 0.2, 0.7, 1, 1);
         intakeMotor.setPower(0);
         intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(680,470,90), 0.4, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(220,-700,180), 0.4, 0.2, 0.7, 1, 1);
         intakeMotor.setPower(0);
 
-        DriveToTarget(makeTarget(680,470,-45), 0.6, 0.2, 0.7, 1, 1);
-
-        DriveToTarget(makeTarget(1800,-390,-45), 0.4, 0.2, 0.7, 1, 2);
-        DriveToTarget(makeTarget(1800,-390,45), 0.4, 0.2, 0.7, 1, 2);
-
-//        shootMotor.setPower(0.85); // add auto aim later
-        turretMotor.setPower(0);
-        //  use 0.61 with high voltage
-        tripleShoot(lift, shootMotor, intakeMotor,0.60 - powerDiff * 0.05,2500);
-
-        DriveToTarget(makeTarget(1800,-390,90), 0.4, 0.2, 0.7, 1, 1);
-        DriveToTarget(makeTarget(1310,0,90), 0.5, 0.2, 0.7, 1, 2);
-
-        //second intake
-        intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(1310,250,90), 0.5, 0.2, 0.7, 1, 1);
-        intakeMotor.setPower(0);
-        intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(1310,470,90), 0.4, 0.2, 0.7, 1, 1);
-        intakeMotor.setPower(0);
-
-        DriveToTarget(makeTarget(1800,-390,90), 0.4, 0.2, 0.7, 1, 1);
-        DriveToTarget(makeTarget(1800,-390,45), 0.4, 0.2, 0.7, 1, 1);
-
-        DriveToTarget(makeTarget(600,0,90), 0.8, 0.2, 0.7, 1, 5);
+        DriveToTarget(makeTarget(1360,-450,180), 0.5, 0.2, 0.7, 1, 1.5);
+        DriveToTarget(makeTarget(1360,-450,135), 0.5, 0.2, 0.7, 1, 1.5);
+        robot.waitAim(100, AllianceColor.BLUE);
+        shotPower = 0.59;
+        tripleShoot(lift, shootMotor, intakeMotor, shotPower,500, AllianceColor.BLUE);
+        Thread.sleep(500);
+//        DriveToTarget(makeTarget(1060,-450,135), 0.5, 0.2, 0.7, 1, 1.5);
 
     }
 }

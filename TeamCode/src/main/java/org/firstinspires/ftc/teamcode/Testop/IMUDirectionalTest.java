@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Testop;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import org.firstinspires.ftc.teamcode.Auto.Auto;
+import org.firstinspires.ftc.teamcode.Auto.Deprecated.Auto;
 import org.firstinspires.ftc.teamcode.Util.AllianceColor;
 
 //@Autonomous(name = "IMU Test", group = "Concept")
