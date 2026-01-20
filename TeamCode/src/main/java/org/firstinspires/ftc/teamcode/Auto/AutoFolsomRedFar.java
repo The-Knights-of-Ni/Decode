@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode.Auto;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -18,11 +20,8 @@ import org.firstinspires.ftc.teamcode.Util.AllianceColor;
 import java.util.HashMap;
 import java.util.Locale;
 
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-
-@Autonomous(name = "AutoFolsomBlueFar")
-public class AutoFolsomBlueFar extends LinearOpMode {
+@Autonomous(name = "AutoFolsomRedFar")
+public class AutoFolsomRedFar extends LinearOpMode {
     ElapsedTime timer;
     private Robot robot;
     double timeCurrent;
@@ -44,7 +43,6 @@ public class AutoFolsomBlueFar extends LinearOpMode {
     private static final double BASE_I = 0.0;
     private static final double BASE_D = 2.0;
     private static final double BASE_F = 11.7;
-
     private void initOpMode() {
         // Initialize DC motor objects
         timer = new ElapsedTime();
@@ -52,7 +50,7 @@ public class AutoFolsomBlueFar extends LinearOpMode {
         flags.put("web", true);
         flags.put("vision", false);
         DriveToPoint nav = new DriveToPoint(this);
-        this.robot = new Robot(hardwareMap, telemetry, timer, nav, AllianceColor.BLUE, gamepad1, gamepad2, flags);
+        this.robot = new Robot(hardwareMap, telemetry, timer, nav, AllianceColor.RED, gamepad1, gamepad2, flags);
         timeCurrent = timer.nanoseconds();
         timePre = timeCurrent;
 
@@ -171,30 +169,30 @@ public class AutoFolsomBlueFar extends LinearOpMode {
         tripleShoot(lift, flywheel, intakeMotor, targetVelocity, firstShotWaitTime);
 
         turretMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        turretMotor.setPower(-0.5); // turn right on the Red side
 
         DriveToTarget(makeTarget(680,0,0), 0.5, 0.2, 0.7, 1, 2);
-        DriveToTarget(makeTarget(680,0,90), 0.5, 0.2, 0.7, 1, 2);
+        DriveToTarget(makeTarget(680,0,-90), 0.5, 0.2, 0.7, 1, 2);
 
         // first intake
         intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(680,250,90), 0.5, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(680,-250,-90), 0.5, 0.2, 0.7, 1, 1);
         intakeMotor.setPower(0);
         telemetry.addLine("First ball taken");
 
         intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(680,470,90), 0.4, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(680,-470,-90), 0.4, 0.2, 0.7, 1, 1);
         intakeMotor.setPower(0);
         telemetry.addLine("Second ball taken");
 
         intakeMotor.setPower(-0.80);
-        DriveToTarget(makeTarget(680,580,90), 0.4, 0.2, 0.7, 1, 1);
+        DriveToTarget(makeTarget(680,-580,-90), 0.4, 0.2, 0.7, 1, 1);
         intakeMotor.setPower(0);
         telemetry.addLine("Third ball taken");
 
         turretMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
         // back to origin
-        DriveToTarget(makeTarget(680,0,90), 0.5, 0.2, 0.7, 1, 2);
+        DriveToTarget(makeTarget(680,0,-90), 0.5, 0.2, 0.7, 1, 2);
         DriveToTarget(makeTarget(680,0,0), 0.5, 0.2, 0.7, 1, 2);
         DriveToTarget(makeTarget(30,0,0), 0.5, 0.2, 0.7, 1, 2);
 
@@ -212,22 +210,5 @@ public class AutoFolsomBlueFar extends LinearOpMode {
 
         robot.control.lift.setPosition(0);    // move down
         robot.control.push.setPosition(0.55);  // put back push 0.6
-
-        //second intake
-//        intakeMotor.setPower(-0.9);
-//        DriveToTarget(makeTarget(1310,250,90), 0.5, 0.2, 0.7, 1, 1);
-//        intakeMotor.setPower(0);
-//
-//        intakeMotor.setPower(-0.9);
-//        DriveToTarget(makeTarget(1310,470,90), 0.4, 0.2, 0.7, 1, 1);
-//        intakeMotor.setPower(0);
-//
-//        DriveToTarget(makeTarget(1800,-350,90), 0.4, 0.2, 0.7, 1, 1);
-//        DriveToTarget(makeTarget(1800,-350,45), 0.4, 0.2, 0.7, 1, 1);
-//
-//        DriveToTarget(makeTarget(600,0,90), 0.8, 0.2, 0.7, 1, 5);
-        telemetry.update();
-
-
     }
 }

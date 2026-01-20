@@ -373,6 +373,10 @@ public class Teleop extends LinearOpMode {
                     telemetry.addLine("All Balls Shot");
                 }
 
+                if (gamepad1.left_trigger > 0.05){         // To shoot the remaining middle ball
+                    robot.shootRemainingMiddleBall();
+                }
+
                 if (gamepad2.left_trigger > 0.05){
                     tempx = robot.odo.getPosX();
                     tempy = robot.odo.getPosY();
