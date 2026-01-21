@@ -119,9 +119,6 @@ public class AutoFolsomRedFar extends LinearOpMode {
     }
 
     public void tripleShoot(Servo lift, DcMotorEx flywheel, DcMotor intakeMotor, double targetVelocity, long waitTime) throws InterruptedException {
-        robot.control.turretMotor.setMotorEnable();
-        robot.waitAim(50);
-        robot.control.turretMotor.setPower(0);
         flywheel.setVelocity(targetVelocity);
         Thread.sleep(waitTime);
         robot.shootAll2();
@@ -153,12 +150,10 @@ public class AutoFolsomRedFar extends LinearOpMode {
 
         robot.odo.update();
 
-        turretMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
         // Shooting with velocity control
         // First shot
         // Set flywheel for far shot with fixed RPM, PIDF still compensates for voltage
-        double targetRPM = 3700;
+        double targetRPM = 3700;        // works for far
         double targetVelocity = targetRPM * TICKS_PER_REV / 60.0;
         double voltage = battery.getVoltage();
 
@@ -166,10 +161,12 @@ public class AutoFolsomRedFar extends LinearOpMode {
 
         // first shot - needs to wait for flywheel to get up to speed
         long firstShotWaitTime = 3000;
+
+        robot.control.turretMotor.setPower(-0.2);     // turn right on the Red side to hold turret while shooting
+
         tripleShoot(lift, flywheel, intakeMotor, targetVelocity, firstShotWaitTime);
 
-        turretMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        turretMotor.setPower(-0.5); // turn right on the Red side
+        robot.control.turretMotor.setPower(0);      // stop turret
 
         DriveToTarget(makeTarget(680,0,0), 0.5, 0.2, 0.7, 1, 2);
         DriveToTarget(makeTarget(680,0,-90), 0.5, 0.2, 0.7, 1, 2);
@@ -190,13 +187,10 @@ public class AutoFolsomRedFar extends LinearOpMode {
         intakeMotor.setPower(0);
         telemetry.addLine("Third ball taken");
 
-        turretMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // back to origin
         DriveToTarget(makeTarget(680,0,-90), 0.5, 0.2, 0.7, 1, 2);
         DriveToTarget(makeTarget(680,0,0), 0.5, 0.2, 0.7, 1, 2);
         DriveToTarget(makeTarget(30,0,0), 0.5, 0.2, 0.7, 1, 2);
-
-        turretMotor.setPower(0);
 
         // Second shot
         targetRPM = 3700;
@@ -206,7 +200,12 @@ public class AutoFolsomRedFar extends LinearOpMode {
         setFlywheelPIDF(flywheel, BASE_P, BASE_I, BASE_D, BASE_F, REFERENCE_VOLTAGE, voltage);
 
         long secondShotWaitTime = 500;
+
+        robot.control.turretMotor.setPower(-0.2);     // turn right on the Red side to hold turret while shooting
+
         tripleShoot(lift, flywheel, intakeMotor, targetVelocity, secondShotWaitTime);
+
+        robot.control.turretMotor.setPower(0);     // stop turret
 
         robot.control.lift.setPosition(0);    // move down
         robot.control.push.setPosition(0.55);  // put back push 0.6
