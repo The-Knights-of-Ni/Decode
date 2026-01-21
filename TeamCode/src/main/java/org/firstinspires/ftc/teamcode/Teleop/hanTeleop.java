@@ -139,13 +139,13 @@ public class hanTeleop extends LinearOpMode {
         telemetry.addData("Degree difference:",dist);
         String data = String.format(Locale.US, "%f, %f", pos.getHeading(AngleUnit.DEGREES), dist);
         Log.println(Log.DEBUG, "ROBOT", data);
-        DriveToTarget(TARGET, 0.8, 0.5, 1, 1, 5); // original powerMutliplier = 0.7
+        DriveToTarget(TARGET, 1, 0.5, 1, 1, 5); // original powerMutliplier = 0.7 // original power = 0.8
     }
 
     private double getTargetRPM(double distance){
         if (distance < 160){
             telemetry.addLine("Too Close!");
-            return 2800;
+            return 2400;
         }
         double targetRPM = 5.7298 * distance + 1844.68582; // with the data from racgael's branch, r^2 greater than 0.95.
         return targetRPM;
@@ -158,22 +158,26 @@ public class hanTeleop extends LinearOpMode {
 
     void shootAll() throws InterruptedException{
         robot.control.lift.setPosition(0.65); // trigger first ball launch - move up
-        robot.waitAim(500);        // wait to get there
+        Thread.sleep(500);        // wait to get there
         robot.control.lift.setPosition(0);    // move down
-        robot.waitAim(500);        // wait to get there
+        Thread.sleep(500);        // wait to get there
 
         robot.control.startIntake();          // run intake to move 2 balls up
-        robot.waitAim(250);       // run enough to have enough power to move balls up
-        robot.control.lift.setPosition(0.65); // trigger second ball launch - move up
-        robot.waitAim(500);
+        Thread.sleep(1000);       // run enough to have enough power to move balls up
         robot.control.stopIntake();           // stop
 
-        robot.waitAim(800);        // wait for flywheel to get back to speed after first ball is shot
+        robot.control.lift.setPosition(0.65); // trigger second ball launch - move up
+        //Thread.sleep(500);        // wait to get there
+        robot.waitAim(250);
+        robot.control.lift.setPosition(0);    // move down
+//        Thread.sleep(500);        // removed, probably redundant.
+
+        Thread.sleep(800);        // wait for flywheel to get back to speed after first ball is shot
         robot.control.push.setPosition(0.0);  // push third ball up - 0.0
-        // robot.waitAim(500, color);        // wait to get there; i suspect that we don't need this since they both move realy slowly
+//        Thread.sleep(500);        // wait to get there - redundant also, since they both move rather slowly
 
         robot.control.lift.setPosition(0.65); // trigger third ball launch - move up
-        robot.waitAim(500);        // wait to get there
+        Thread.sleep(500);        // wait to get there
         robot.control.lift.setPosition(0);    // move down
 
         robot.control.push.setPosition(0.55);  // put back push 0.6
@@ -404,7 +408,7 @@ public class hanTeleop extends LinearOpMode {
                 double x = 0;
                 double y = 0;
                 double rx = 0;
-                double sensitivity = 0.70;
+                double sensitivity = 1; // prev 0.7
 
                 if (reversedDrive){
                     telemetry.addLine("Drive is reversed");
@@ -469,8 +473,8 @@ public class hanTeleop extends LinearOpMode {
 
                 if (gamepad2.a){ // move instead of .setPower on gamepad1 if works.
                     shootMotorActive = true;
-                    runShootMotor(3920);
-                    intendedShootVelocity = 3920;
+                    runShootMotor(3700);
+                    intendedShootVelocity = 3700;
                 }
 
                 if (gamepad2.b){
