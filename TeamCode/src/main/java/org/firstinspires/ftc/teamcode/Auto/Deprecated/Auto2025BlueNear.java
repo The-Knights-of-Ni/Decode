@@ -163,6 +163,8 @@ public class Auto2025BlueNear extends LinearOpMode {
         tripleShoot(lift, shootMotor, intakeMotor, shotPower,500);
         Thread.sleep(500);
 
-
+        while(opModeIsActive()){
+            Thread.sleep(100);
+        }
     }
 }

@@ -209,5 +209,9 @@ public class AutoFolsomRedFar extends LinearOpMode {
 
         robot.control.lift.setPosition(0);    // move down
         robot.control.push.setPosition(0.55);  // put back push 0.6
+
+        while(opModeIsActive()){
+            Thread.sleep(100);
+        }
     }
 }

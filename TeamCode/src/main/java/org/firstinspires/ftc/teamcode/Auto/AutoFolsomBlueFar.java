@@ -230,6 +230,8 @@ public class AutoFolsomBlueFar extends LinearOpMode {
 //        DriveToTarget(makeTarget(600,0,90), 0.8, 0.2, 0.7, 1, 5);
         telemetry.update();
 
-
+        while(opModeIsActive()){
+            Thread.sleep(100);
+        }
     }
 }
