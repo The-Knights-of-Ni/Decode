@@ -136,7 +136,6 @@ public class TeleopBlue extends LinearOpMode {
                 distToTarget = 150.0;
                 telemetry.addLine("Warning: Limelight tag not detected");
             }
-            // ToDO for redGoal
 
             if (gamepad1.a) {        // Intake on/off
                 robot.control.startIntake();
@@ -174,7 +173,7 @@ public class TeleopBlue extends LinearOpMode {
             }
             // Set flywheel for far shot when dpad_left is pressed
             if (gamepad1.dpad_left && shooterActive) {
-                targetRPM = 3920;
+                targetRPM = 3700;
                 targetVelocity = targetRPM * TICKS_PER_REV / 60.0;
                 flywheel.setVelocity(targetVelocity);
                 telemetry.addLine("Target velocity for Far - ");

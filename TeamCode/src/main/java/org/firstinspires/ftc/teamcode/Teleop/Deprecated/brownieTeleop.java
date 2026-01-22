@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-@TeleOp(name = "brownieTeleOp")
+//@TeleOp(name = "brownieTeleOp")
 public class brownieTeleop extends LinearOpMode {
     double deltaT;
     double timeCurrent;

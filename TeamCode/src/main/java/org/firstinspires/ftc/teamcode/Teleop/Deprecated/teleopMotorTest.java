@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-@TeleOp(name = "teleopMotorTest")
+//@TeleOp(name = "teleopMotorTest")
 public class teleopMotorTest extends LinearOpMode {
     double deltaT;
     double timeCurrent;
