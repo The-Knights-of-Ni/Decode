@@ -19,9 +19,14 @@ import java.util.HashMap;
 @TeleOp(name = "TeleOp Red", group = "Test")
 public class TeleopRed extends LinearOpMode {
     private Robot robot;
-    // Hardware
-    private DcMotorEx flywheel;
-    private Servo lift;
+    DcMotor frontLeftMotor;
+    DcMotor backLeftMotor;
+    DcMotor frontRightMotor;
+    DcMotor backRightMotor;
+    DcMotor turretMotor;
+    DcMotor intakeMotor;
+    Servo  lift;
+    DcMotorEx flywheel;
     private VoltageSensor battery;
     private ElapsedTime timer;
 
@@ -42,8 +47,14 @@ public class TeleopRed extends LinearOpMode {
 
     // Runtime
     private void initOpMode() {
-        lift = hardwareMap.get(Servo.class, "lift");
-        flywheel = hardwareMap.get(DcMotorEx.class, "shootMotor");
+        frontLeftMotor = hardwareMap.dcMotor.get("fl"); //1 port
+        backLeftMotor = hardwareMap.dcMotor.get("rl");  //0
+        frontRightMotor = hardwareMap.dcMotor.get("fr");    //3
+        backRightMotor = hardwareMap.dcMotor.get("rr"); //2
+        turretMotor = hardwareMap.dcMotor.get("turretMotor"); // ext 1
+        intakeMotor = hardwareMap.dcMotor.get("intakeMotor"); // ext 3
+        lift = hardwareMap.get(Servo.class, "lift"); // ext 0 servo
+        flywheel = hardwareMap.get(DcMotorEx.class, "shootMotor");  // ext 0
         battery = hardwareMap.voltageSensor.iterator().next();
 
         // to create robot
@@ -184,9 +195,9 @@ public class TeleopRed extends LinearOpMode {
             boolean shooterReady = error < 50 && targetVelocity > 0;    // Todo: use this
             if (gamepad1.y && shooterActive) {
                 telemetry.log().add("Starting the lift");
-                robot.control.lift.setPosition(0.7);
+                lift.setPosition(0.7);
                 Thread.sleep(500);
-                robot.control.lift.setPosition(0);
+                lift.setPosition(0);
             }
 
             if (Robot.gamepad1.bumperRight.isPressed()){     // Push servo starts and stops

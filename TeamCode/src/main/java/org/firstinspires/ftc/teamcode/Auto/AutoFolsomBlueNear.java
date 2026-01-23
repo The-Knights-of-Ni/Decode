@@ -159,6 +159,7 @@ public class AutoFolsomBlueNear extends LinearOpMode {
         double voltage = battery.getVoltage();
 
         setFlywheelPIDF(flywheel, BASE_P, BASE_I, BASE_D, BASE_F, REFERENCE_VOLTAGE, voltage);
+        flywheel.setVelocity(targetVelocity);
 
         DriveToTarget(makeTarget(100,0,0), 0.5, 0.2, 0.7, 1, 1);
         DriveToTarget(makeTarget(100,0,-45), 0.5, 0.2, 0.7, 1, 1);
@@ -174,16 +175,25 @@ public class AutoFolsomBlueNear extends LinearOpMode {
         DriveToTarget(makeTarget(750,-700,180), 0.5, 0.2, 0.7, 1, 1.5);
 
         intakeMotor.setPower(-0.9);
+
         DriveToTarget(makeTarget(440,-700,180), 0.5, 0.2, 0.7, 1, 1);
         intakeMotor.setPower(0);
 
-        intakeMotor.setPower(-0.9);
+        intakeMotor.setPower(-0.69);
         DriveToTarget(makeTarget(220,-700,180), 0.4, 0.2, 0.7, 1, 1);
         intakeMotor.setPower(0);
 
-        DriveToTarget(makeTarget(1360,-450,180), 0.5, 0.2, 0.7, 1, 1.5);
-        DriveToTarget(makeTarget(1360,-450,135), 0.5, 0.2, 0.7, 1, 1.5);
+//        DriveToTarget(makeTarget(1060,-450,180), 0.5, 0.2, 0.7, 1, 1.5);
+//        DriveToTarget(makeTarget(1060,-400,135), 0.5, 0.2, 0.7, 1, 1.5);
 
-//        DriveToTarget(makeTarget(1060,-450,135), 0.5, 0.2, 0.7, 1, 1.5);
+        long secondShotWaitTime = 0;
+        tripleShoot(lift, flywheel, intakeMotor, targetVelocity, secondShotWaitTime);
+
+        // move out of shooting zone
+        DriveToTarget(makeTarget(860,-300,135), 0.5, 0.2, 0.7, 1, 1.5);
+
+        while(opModeIsActive()){
+            Thread.sleep(100);
+        }
     }
 }

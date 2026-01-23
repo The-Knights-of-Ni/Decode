@@ -20,8 +20,14 @@ import java.util.HashMap;
 public class TeleopBlue extends LinearOpMode {
     private Robot robot;
     // Hardware
-    private DcMotorEx flywheel;
-    private Servo lift;
+    DcMotor frontLeftMotor;
+    DcMotor backLeftMotor;
+    DcMotor frontRightMotor;
+    DcMotor backRightMotor;
+    DcMotor turretMotor;
+    DcMotor intakeMotor;
+    Servo  lift;
+    DcMotorEx flywheel;
     private VoltageSensor battery;
     private ElapsedTime timer;
 
@@ -42,8 +48,14 @@ public class TeleopBlue extends LinearOpMode {
 
     // Runtime
     private void initOpMode() {
-        lift = hardwareMap.get(Servo.class, "lift");
-        flywheel = hardwareMap.get(DcMotorEx.class, "shootMotor");
+        frontLeftMotor = hardwareMap.dcMotor.get("fl"); //1 port
+        backLeftMotor = hardwareMap.dcMotor.get("rl");  //0
+        frontRightMotor = hardwareMap.dcMotor.get("fr");    //3
+        backRightMotor = hardwareMap.dcMotor.get("rr"); //2
+        turretMotor = hardwareMap.dcMotor.get("turretMotor"); // ext 1
+        intakeMotor = hardwareMap.dcMotor.get("intakeMotor"); // ext 3
+        lift = hardwareMap.get(Servo.class, "lift"); // ext 0 servo
+        flywheel = hardwareMap.get(DcMotorEx.class, "shootMotor");  // ext 0
         battery = hardwareMap.voltageSensor.iterator().next();
 
         // to create robot
@@ -66,9 +78,6 @@ public class TeleopBlue extends LinearOpMode {
 
         double lastVoltage = 0;
         lastVoltage = battery.getVoltage();
-        
-        long liftStartTime = 0;
-        boolean lifting = false;
 
         boolean shooterActive = false;
         boolean prevA = false;
@@ -76,15 +85,6 @@ public class TeleopBlue extends LinearOpMode {
 
         while (opModeIsActive()) {
             // ===== Drive Only - Start =====
-            DcMotor frontLeftMotor = hardwareMap.dcMotor.get("fl"); //1 port
-            DcMotor backLeftMotor = hardwareMap.dcMotor.get("rl");  //0
-            DcMotor frontRightMotor = hardwareMap.dcMotor.get("fr");    //3
-            DcMotor backRightMotor = hardwareMap.dcMotor.get("rr"); //2
-            DcMotor turretMotor = hardwareMap.dcMotor.get("turretMotor"); // ext 1
-            DcMotor shootMotor = hardwareMap.dcMotor.get("shootMotor"); // ext 0
-            DcMotor intakeMotor = hardwareMap.dcMotor.get("intakeMotor"); // ext 3
-            Servo  lift = hardwareMap.get(Servo.class, "lift"); // ext 0 servo
-
             // Reverse the right side motors. This may be wrong for your setup.
             // If your robot moves backwards when commanded to go forwards,
             // reverse the left side instead.
@@ -184,9 +184,9 @@ public class TeleopBlue extends LinearOpMode {
             boolean shooterReady = error < 50 && targetVelocity > 0;    // Todo: use this
             if (gamepad1.y && shooterActive) {
                 telemetry.log().add("Starting the lift");
-                robot.control.lift.setPosition(0.7);
+                lift.setPosition(0.7);
                 Thread.sleep(500);
-                robot.control.lift.setPosition(0);
+                lift.setPosition(0);
             }
 
             if (Robot.gamepad1.bumperRight.isPressed()){     // Push servo starts and stops

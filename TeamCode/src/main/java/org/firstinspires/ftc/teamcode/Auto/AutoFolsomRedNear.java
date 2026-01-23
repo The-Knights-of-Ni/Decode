@@ -186,7 +186,12 @@ public class AutoFolsomRedNear extends LinearOpMode {
         DriveToTarget(makeTarget(1360,450,-180), 0.5, 0.2, 0.7, 1, 1.5);
         DriveToTarget(makeTarget(1360,450,-135), 0.5, 0.2, 0.7, 1, 1.5);
 
+        long secondShotWaitTime = 0;
+        tripleShoot(lift, flywheel, intakeMotor, targetVelocity, secondShotWaitTime);
 
+        while(opModeIsActive()){
+            Thread.sleep(100);
+        }
 
     }
 }

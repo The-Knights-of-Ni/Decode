@@ -153,7 +153,7 @@ public class AutoFolsomRedFar extends LinearOpMode {
         // Shooting with velocity control
         // First shot
         // Set flywheel for far shot with fixed RPM, PIDF still compensates for voltage
-        double targetRPM = 3700;        // works for far
+        double targetRPM = 3650;        // works for far
         double targetVelocity = targetRPM * TICKS_PER_REV / 60.0;
         double voltage = battery.getVoltage();
 
@@ -162,7 +162,7 @@ public class AutoFolsomRedFar extends LinearOpMode {
         // first shot - needs to wait for flywheel to get up to speed
         long firstShotWaitTime = 3000;
 
-        robot.control.turretMotor.setPower(-0.2);     // turn right on the Red side to hold turret while shooting
+        robot.control.turretMotor.setPower(-0.27);     // turn right on the Red side to hold turret while shooting
 
         tripleShoot(lift, flywheel, intakeMotor, targetVelocity, firstShotWaitTime);
 
@@ -182,18 +182,19 @@ public class AutoFolsomRedFar extends LinearOpMode {
         intakeMotor.setPower(0);
         telemetry.addLine("Second ball taken");
 
-        intakeMotor.setPower(-0.80);
+        intakeMotor.setPower(-0.69);
         DriveToTarget(makeTarget(680,-580,-90), 0.4, 0.2, 0.7, 1, 1);
         intakeMotor.setPower(0);
         telemetry.addLine("Third ball taken");
 
         // back to origin
+        robot.control.turretMotor.setPower(-0.34);
+
         DriveToTarget(makeTarget(680,0,-90), 0.5, 0.2, 0.7, 1, 2);
         DriveToTarget(makeTarget(680,0,0), 0.5, 0.2, 0.7, 1, 2);
         DriveToTarget(makeTarget(30,0,0), 0.5, 0.2, 0.7, 1, 2);
 
         // Second shot
-        targetRPM = 3700;
         targetVelocity = targetRPM * TICKS_PER_REV / 60.0;
         voltage = battery.getVoltage();
 
@@ -201,14 +202,15 @@ public class AutoFolsomRedFar extends LinearOpMode {
 
         long secondShotWaitTime = 500;
 
-        robot.control.turretMotor.setPower(-0.2);     // turn right on the Red side to hold turret while shooting
-
         tripleShoot(lift, flywheel, intakeMotor, targetVelocity, secondShotWaitTime);
 
         robot.control.turretMotor.setPower(0);     // stop turret
 
         robot.control.lift.setPosition(0);    // move down
         robot.control.push.setPosition(0.55);  // put back push 0.6
+
+        // move forward to move out of shooting zone
+        DriveToTarget(makeTarget(680,0,0), 0.5, 0.2, 0.7, 1, 2);
 
         while(opModeIsActive()){
             Thread.sleep(100);
