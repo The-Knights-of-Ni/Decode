@@ -524,39 +524,39 @@ public class hanTeleopFC extends LinearOpMode {
                 }
 
                 // === shooting control ===
-                if (wantToShoot && !liftUp){
+                if (wantToShoot && !liftUp && System.currentTimeMillis() < shooterTriggerMS + 500){
                     robot.control.lift.setPosition(0.65);
                     liftUp = true; // first ball launch
                 } // the intention of the below wait is for lift to reach the position. so the first ball is actually
                 // launched 500 ms after setPosition(0.65).
-                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 500 && liftUp){
+                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 500 && liftUp && System.currentTimeMillis() < shooterTriggerMS + 1000){
                     robot.control.lift.setPosition(0);
                     liftUp = false;
                 }
 
-                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 1000 && !intakeOn){
+                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 1000 && !intakeOn && System.currentTimeMillis() < shooterTriggerMS + 2000){
                     robot.control.startIntake();
                     intakeOn = true;
                 }
 
-                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 2000 && intakeOn){
+                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 2000 && intakeOn && System.currentTimeMillis() < shooterTriggerMS + 2500){
                     robot.control.stopIntake();
                     intakeOn = false;
                     robot.control.lift.setPosition(0.65); // second ball launch
                     liftUp = true;
                 }
 
-                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 2500 && liftUp){
+                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 2500 && liftUp && System.currentTimeMillis() < shooterTriggerMS + 3000){
                     robot.control.lift.setPosition(0);
                     liftUp = false;
                 }
 
-                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 3000 && !pushUp){
+                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 3000 && !pushUp && System.currentTimeMillis() < shooterTriggerMS + 3250){
                     robot.control.push.setPosition(0);
                     pushUp = true;
                 }
 
-                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 3250 && !liftUp){
+                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 3250 && !liftUp && System.currentTimeMillis() < shooterTriggerMS + 3750){
                     robot.control.lift.setPosition(0.65);
                     liftUp = true;
                 }
