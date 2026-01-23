@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-@TeleOp(name = "hanTeleop")
+//@TeleOp(name = "hanTeleop")
 public class hanTeleop extends LinearOpMode {
     double deltaT;
     double timeCurrent;

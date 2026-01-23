@@ -413,8 +413,9 @@ public class hanTeleopFC extends LinearOpMode {
                 }
 
                 if (gamepad1.right_trigger > 0.05){         // To shoot 3 balls
-                    shooterTriggerMS = System.currentTimeMillis();
-                    wantToShoot = true;
+                    robot.shootAll2();
+//                    shooterTriggerMS = System.currentTimeMillis();
+//                    wantToShoot = true;
                 }
 
                 if (gamepad1.dpad_left){
@@ -523,10 +524,14 @@ public class hanTeleopFC extends LinearOpMode {
                     intendedShootVelocity = 2900;
                 }
 
+                telemetry.addData("time since launch: ", System.currentTimeMillis() - shooterTriggerMS);
+                telemetry.addData("want to shoot?", wantToShoot);
+
                 // === shooting control ===
                 if (wantToShoot && !liftUp && System.currentTimeMillis() < shooterTriggerMS + 500){
                     robot.control.lift.setPosition(0.65);
                     liftUp = true; // first ball launch
+                    telemetry.addLine("first ball");
                 } // the intention of the below wait is for lift to reach the position. so the first ball is actually
                 // launched 500 ms after setPosition(0.65).
                 if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 500 && liftUp && System.currentTimeMillis() < shooterTriggerMS + 1000){
@@ -534,9 +539,10 @@ public class hanTeleopFC extends LinearOpMode {
                     liftUp = false;
                 }
 
-                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 1000 && !intakeOn && System.currentTimeMillis() < shooterTriggerMS + 2000){
+                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 1000 && System.currentTimeMillis() < shooterTriggerMS + 2000){
                     robot.control.startIntake();
                     intakeOn = true;
+                    telemetry.addLine("intake on");
                 }
 
                 if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 2000 && intakeOn && System.currentTimeMillis() < shooterTriggerMS + 2500){
@@ -544,6 +550,7 @@ public class hanTeleopFC extends LinearOpMode {
                     intakeOn = false;
                     robot.control.lift.setPosition(0.65); // second ball launch
                     liftUp = true;
+                    telemetry.addLine("intake off");
                 }
 
                 if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 2500 && liftUp && System.currentTimeMillis() < shooterTriggerMS + 3000){
@@ -561,13 +568,13 @@ public class hanTeleopFC extends LinearOpMode {
                     liftUp = true;
                 }
 
-                if (wantToShoot && System.currentTimeMillis() >= 3750 && liftUp && pushUp){
+                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 3750 && liftUp && pushUp){
                     robot.control.lift.setPosition(0);
                     robot.control.push.setPosition(0.55);
                     wantToShoot = false;
                 }
 
-                if (wantToShoot && System.currentTimeMillis() >= 4000){
+                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 4000){
                     wantToShoot = false;
                     telemetry.addLine("Shootall took too long");
                 }

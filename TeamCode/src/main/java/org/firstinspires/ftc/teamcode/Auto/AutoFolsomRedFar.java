@@ -150,70 +150,75 @@ public class AutoFolsomRedFar extends LinearOpMode {
 
         robot.odo.update();
 
-        // Shooting with velocity control
-        // First shot
-        // Set flywheel for far shot with fixed RPM, PIDF still compensates for voltage
-        double targetRPM = 3650;        // works for far
-        double targetVelocity = targetRPM * TICKS_PER_REV / 60.0;
-        double voltage = battery.getVoltage();
+        while(opModeIsActive()) {
+            // Shooting with velocity control
+            // First shot
+            // Set flywheel for far shot with fixed RPM, PIDF still compensates for voltage
+            double targetRPM = 3650;        // works for far
+            double targetVelocity = targetRPM * TICKS_PER_REV / 60.0;
+            double voltage = battery.getVoltage();
 
-        setFlywheelPIDF(flywheel, BASE_P, BASE_I, BASE_D, BASE_F, REFERENCE_VOLTAGE, voltage);
+            setFlywheelPIDF(flywheel, BASE_P, BASE_I, BASE_D, BASE_F, REFERENCE_VOLTAGE, voltage);
 
-        // first shot - needs to wait for flywheel to get up to speed
-        long firstShotWaitTime = 3000;
+            // first shot - needs to wait for flywheel to get up to speed
+            long firstShotWaitTime = 3000;
 
-        robot.control.turretMotor.setPower(-0.27);     // turn right on the Red side to hold turret while shooting
+            robot.control.turretMotor.setPower(-0.28);     // turn right on the Red side to hold turret while shooting CHANGED FROM 0.27 TO 0.35
 
-        tripleShoot(lift, flywheel, intakeMotor, targetVelocity, firstShotWaitTime);
+            tripleShoot(lift, flywheel, intakeMotor, targetVelocity, firstShotWaitTime);
 
-        robot.control.turretMotor.setPower(0);      // stop turret
+            robot.control.turretMotor.setPower(0);      // stop turret
 
-        DriveToTarget(makeTarget(680,0,0), 0.5, 0.2, 0.7, 1, 2);
-        DriveToTarget(makeTarget(680,0,-90), 0.5, 0.2, 0.7, 1, 2);
+            DriveToTarget(makeTarget(680, 0, 0), 0.5, 0.2, 0.7, 1, 2);
+            DriveToTarget(makeTarget(680, 0, -90), 0.5, 0.2, 0.7, 1, 2);
 
-        // first intake
-        intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(680,-250,-90), 0.5, 0.2, 0.7, 1, 1);
-        intakeMotor.setPower(0);
-        telemetry.addLine("First ball taken");
+            // first intake
+            intakeMotor.setPower(-0.9);
+            DriveToTarget(makeTarget(680, -250, -90), 0.5, 0.2, 0.7, 1, 1);
+            intakeMotor.setPower(0);
+            telemetry.addLine("First ball taken");
 
-        intakeMotor.setPower(-0.9);
-        DriveToTarget(makeTarget(680,-470,-90), 0.4, 0.2, 0.7, 1, 1);
-        intakeMotor.setPower(0);
-        telemetry.addLine("Second ball taken");
+            intakeMotor.setPower(-0.9);
+            DriveToTarget(makeTarget(680, -470, -90), 0.4, 0.2, 0.7, 1, 1);
+            intakeMotor.setPower(0);
+            telemetry.addLine("Second ball taken");
 
-        intakeMotor.setPower(-0.69);
-        DriveToTarget(makeTarget(680,-580,-90), 0.4, 0.2, 0.7, 1, 1);
-        intakeMotor.setPower(0);
-        telemetry.addLine("Third ball taken");
+            intakeMotor.setPower(-0.69);
+            DriveToTarget(makeTarget(680, -580, -90), 0.4, 0.2, 0.7, 1, 1);
+            intakeMotor.setPower(0);
+            telemetry.addLine("Third ball taken");
 
-        // back to origin
-        robot.control.turretMotor.setPower(-0.34);
+            // back to origin
+//            robot.control.turretMotor.setPower(-0.45);
 
-        DriveToTarget(makeTarget(680,0,-90), 0.5, 0.2, 0.7, 1, 2);
-        DriveToTarget(makeTarget(680,0,0), 0.5, 0.2, 0.7, 1, 2);
-        DriveToTarget(makeTarget(30,0,0), 0.5, 0.2, 0.7, 1, 2);
+            DriveToTarget(makeTarget(680, 0, -90), 0.5, 0.2, 0.7, 1, 2);
+            DriveToTarget(makeTarget(680, 0, 0), 0.5, 0.2, 0.7, 1, 2);
 
-        // Second shot
-        targetVelocity = targetRPM * TICKS_PER_REV / 60.0;
-        voltage = battery.getVoltage();
+            robot.control.turretMotor.setPower(-0.38);
 
-        setFlywheelPIDF(flywheel, BASE_P, BASE_I, BASE_D, BASE_F, REFERENCE_VOLTAGE, voltage);
+            DriveToTarget(makeTarget(30, 0, 0), 0.5, 0.2, 0.7, 1, 2);
 
-        long secondShotWaitTime = 500;
+            // Second shot
+            targetVelocity = targetRPM * TICKS_PER_REV / 60.0;
+            voltage = battery.getVoltage();
 
-        tripleShoot(lift, flywheel, intakeMotor, targetVelocity, secondShotWaitTime);
+            setFlywheelPIDF(flywheel, BASE_P, BASE_I, BASE_D, BASE_F, REFERENCE_VOLTAGE, voltage);
 
-        robot.control.turretMotor.setPower(0);     // stop turret
+            long secondShotWaitTime = 500;
 
-        robot.control.lift.setPosition(0);    // move down
-        robot.control.push.setPosition(0.55);  // put back push 0.6
+            tripleShoot(lift, flywheel, intakeMotor, targetVelocity, secondShotWaitTime);
 
-        // move forward to move out of shooting zone
-        DriveToTarget(makeTarget(680,0,0), 0.5, 0.2, 0.7, 1, 2);
+            robot.control.turretMotor.setPower(0);     // stop turret
 
-        while(opModeIsActive()){
-            Thread.sleep(100);
+            robot.control.lift.setPosition(0);    // move down
+            robot.control.push.setPosition(0.55);  // put back push 0.6
+
+            // move forward to move out of shooting zone
+            DriveToTarget(makeTarget(680, 0, 0), 0.5, 0.2, 0.7, 1, 2);
+            Thread.sleep(30000);
         }
+//        while(opModeIsActive()){
+//            Thread.sleep(100);
+//        }
     }
 }

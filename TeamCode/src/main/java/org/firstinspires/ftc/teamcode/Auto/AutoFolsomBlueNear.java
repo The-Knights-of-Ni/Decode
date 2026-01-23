@@ -151,49 +151,54 @@ public class AutoFolsomBlueNear extends LinearOpMode {
 
         robot.odo.update();
 
-        // Shooting with velocity control
-        // First shot
-        // Set flywheel for far shot with fixed RPM, PIDF still compensates for voltage
-        double targetRPM = 2800;
-        double targetVelocity = targetRPM * TICKS_PER_REV / 60.0;
-        double voltage = battery.getVoltage();
+        while(opModeIsActive()) {
+            // Shooting with velocity control
+            // First shot
+            // Set flywheel for far shot with fixed RPM, PIDF still compensates for voltage
+            double targetRPM = 2800;
+            double targetVelocity = targetRPM * TICKS_PER_REV / 60.0;
+            double voltage = battery.getVoltage();
 
-        setFlywheelPIDF(flywheel, BASE_P, BASE_I, BASE_D, BASE_F, REFERENCE_VOLTAGE, voltage);
-        flywheel.setVelocity(targetVelocity);
+            setFlywheelPIDF(flywheel, BASE_P, BASE_I, BASE_D, BASE_F, REFERENCE_VOLTAGE, voltage);
+            flywheel.setVelocity(targetVelocity);
 
-        DriveToTarget(makeTarget(100,0,0), 0.5, 0.2, 0.7, 1, 1);
-        DriveToTarget(makeTarget(100,0,-45), 0.5, 0.2, 0.7, 1, 1);
-        DriveToTarget(makeTarget(960,0,-45), 0.5, 0.2, 0.7, 1, 1.5);
-        DriveToTarget(makeTarget(960,-450,-45), 0.5, 0.2, 0.7, 1, 1.5);
-        DriveToTarget(makeTarget(960,-450,-135), 0.5, 0.2, 0.7, 1, 1.5);
-        DriveToTarget(makeTarget(960,-450,-225), 0.5, 0.2, 0.7, 1, 1.5);
+            DriveToTarget(makeTarget(100, 0, 0), 0.5, 0.2, 0.7, 1, 1);
+            DriveToTarget(makeTarget(100, 0, -45), 0.5, 0.2, 0.7, 1, 1);
+            DriveToTarget(makeTarget(960, 0, -45), 0.5, 0.2, 0.7, 1, 1.5);
+            DriveToTarget(makeTarget(960, -450, -45), 0.5, 0.2, 0.7, 1, 1.5);
+            DriveToTarget(makeTarget(960, -450, -135), 0.5, 0.2, 0.7, 1, 1.5);
+            DriveToTarget(makeTarget(960, -450, -225), 0.5, 0.2, 0.7, 1, 1.5);
 
-        long firstShotWaitTime = 0;
-        tripleShoot(lift, flywheel, intakeMotor, targetVelocity, firstShotWaitTime);
+            long firstShotWaitTime = 0;
+            tripleShoot(lift, flywheel, intakeMotor, targetVelocity, firstShotWaitTime);
 
-        DriveToTarget(makeTarget(960,-700,180), 0.5, 0.2, 0.7, 1, 1.5);
-        DriveToTarget(makeTarget(750,-700,180), 0.5, 0.2, 0.7, 1, 1.5);
+            DriveToTarget(makeTarget(960, -700, 180), 0.5, 0.2, 0.7, 1, 1.5);
+            DriveToTarget(makeTarget(750, -700, 180), 0.5, 0.2, 0.7, 1, 1.5);
 
-        intakeMotor.setPower(-0.9);
+            intakeMotor.setPower(-0.9);
 
-        DriveToTarget(makeTarget(440,-700,180), 0.5, 0.2, 0.7, 1, 1);
-        intakeMotor.setPower(0);
+            DriveToTarget(makeTarget(440, -700, 180), 0.5, 0.2, 0.7, 1, 1);
+            intakeMotor.setPower(0);
 
-        intakeMotor.setPower(-0.69);
-        DriveToTarget(makeTarget(220,-700,180), 0.4, 0.2, 0.7, 1, 1);
-        intakeMotor.setPower(0);
+            intakeMotor.setPower(-0.69);
+            DriveToTarget(makeTarget(220, -700, 180), 0.4, 0.2, 0.7, 1, 1);
+            intakeMotor.setPower(0);
 
 //        DriveToTarget(makeTarget(1060,-450,180), 0.5, 0.2, 0.7, 1, 1.5);
-//        DriveToTarget(makeTarget(1060,-400,135), 0.5, 0.2, 0.7, 1, 1.5);
+            DriveToTarget(makeTarget(960, -450, 180), 0.5, 0.2, 0.7, 1, 1.5);
+            DriveToTarget(makeTarget(960, -450, -225), 0.5, 0.2, 0.7, 1, 1.5);
 
-        long secondShotWaitTime = 0;
-        tripleShoot(lift, flywheel, intakeMotor, targetVelocity, secondShotWaitTime);
+            long secondShotWaitTime = 0;
+            tripleShoot(lift, flywheel, intakeMotor, targetVelocity, secondShotWaitTime);
 
-        // move out of shooting zone
-        DriveToTarget(makeTarget(860,-300,135), 0.5, 0.2, 0.7, 1, 1.5);
-
-        while(opModeIsActive()){
-            Thread.sleep(100);
+            // move out of shooting zone
+            DriveToTarget(makeTarget(960, 0, 135), 0.5, 0.2, 0.7, 1, 1.5);
+            DriveToTarget(makeTarget(960, 0, 180), 0.5, 0.2, 0.7, 1, 1.5);
+            Thread.sleep(30000);
         }
+
+//        while(opModeIsActive()){
+//            Thread.sleep(100);
+//        }
     }
 }
