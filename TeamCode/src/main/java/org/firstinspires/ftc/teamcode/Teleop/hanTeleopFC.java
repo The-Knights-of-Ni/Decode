@@ -273,6 +273,7 @@ public class hanTeleopFC extends LinearOpMode {
         boolean liftUp = false;
         boolean pushUp = false;
         boolean intakeOn = false;
+        int checkpoint = 0;
 
         // ==== TELEOP ====
         while (opModeIsActive()) {
@@ -284,48 +285,44 @@ public class hanTeleopFC extends LinearOpMode {
             // update data from gamepads
             Robot.updateGamepads();
 
-            if(color == 0){
-                if(Robot.gamepad1.bButton.isPressed()){
+            if (color == 0) {
+                if (Robot.gamepad1.bButton.isPressed()) {
                     // red alliance
                     color = 1;
                     robot.allianceColor = AllianceColor.RED;
-                }
-                else if(Robot.gamepad1.xButton.isPressed()){
+                } else if (Robot.gamepad1.xButton.isPressed()) {
                     // blue alliance
                     color = 2;
                     robot.allianceColor = AllianceColor.BLUE;
-                }
-                else{
+                } else {
                     telemetry.addLine("Alliance color not yet selected.");
                     telemetry.update();
                 }
                 continue;
             }
 
-            if(color == 2){
+            if (color == 2) {
                 telemetry.addLine("Color is blue");
-            }
-            else if(color == 1){
+            } else if (color == 1) {
                 telemetry.addLine("Color is red");
             }
 
-            double actualVelocity = -(shootMotor.getVelocity()*60)/28 + 450;
+            double actualVelocity = -(shootMotor.getVelocity() * 60) / 28 + 450;
             telemetry.addData("Intended Shootmotor Velocity is ", intendedShootVelocity);
             telemetry.addData("Shootmotor Velocity is (reading +450):", actualVelocity);
             shootMotorGood = actualVelocity >= intendedShootVelocity - 50 && actualVelocity <= intendedShootVelocity + 50;
-            if (shootMotorGood){
+            if (shootMotorGood) {
                 telemetry.addLine("Shoot Motor is GOOD");
-            } else{
+            } else {
                 telemetry.addLine("Shoot Motor is BAD");
             }
 
             robot.limelight.loop();
 
 
-
             if (robot.limelight.detectBlue && color == 2) {
                 distToTarget = robot.limelight.getDistanceFromTags(robot.limelight.blueGoal);
-            } else if (robot.limelight.detectRed && color == 1){
+            } else if (robot.limelight.detectRed && color == 1) {
                 distToTarget = robot.limelight.getDistanceFromTags(robot.limelight.redGoal);
             }
 
@@ -352,7 +349,7 @@ public class hanTeleopFC extends LinearOpMode {
 //            double voltage = robot.getBatteryVoltage();
 
             // Continuously update shoot motor power if active
-            if (shootMotorActive && !gamepad2.a && !gamepad2.b && (robot.limelight.detectBlue || robot.limelight.detectRed)){
+            if (shootMotorActive && !gamepad2.a && !gamepad2.b && (robot.limelight.detectBlue || robot.limelight.detectRed)) {
                 intendedShootVelocity = getTargetRPM(distToTarget);
                 runShootMotor(intendedShootVelocity);
                 telemetry.addData("Auto Speed Active, at ", intendedShootVelocity);
@@ -368,224 +365,243 @@ public class hanTeleopFC extends LinearOpMode {
                 if (gamepad1.a) {        // Intake on/off
                     robot.control.startIntake();
                 } else {
-                    robot.control.stopIntake();
-                }
+                    if (!wantToShoot) {
+                        robot.control.stopIntake();
 
-                if (gamepad1.y) {       // Lift starts and stops
-                    telemetry.log().add("Starting the lift");
-                    robot.control.lift.setPosition(0.7);
-                    Thread.sleep(500);
-                    robot.control.lift.setPosition(0);
-                }
-
-                if(gamepad1.dpad_down && (robot.limelight.detectBlue || robot.limelight.detectRed)){
-                    double degreeError = 0.0;
-
-                    if(color == 2 && robot.limelight.detectBlue){
-                        degreeError = robot.limelight.blueGoal.getTargetXDegrees();
-                    }
-                    else if(color == 1 && robot.limelight.detectRed){
-                        degreeError = robot.limelight.redGoal.getTargetXDegrees();
                     }
 
-                    if(Math.abs(degreeError) > 15){
-                        adjustAngle(degreeError);
+                    if (gamepad1.y) {       // Lift starts and stops
+                        telemetry.log().add("Starting the lift");
+                        robot.control.lift.setPosition(0.7);
+                        Thread.sleep(500);
+                        robot.control.lift.setPosition(0);
                     }
-                    else {
-                        double aimSpeed = autoAimSpeed(degreeError , 12);
-                        robot.control.turretMotor.setMotorEnable();
-                        robot.control.turretMotor.setPower(aimSpeed);
+
+                    if (gamepad1.dpad_down && (robot.limelight.detectBlue || robot.limelight.detectRed)) {
+                        double degreeError = 0.0;
+
+                        if (color == 2 && robot.limelight.detectBlue) {
+                            degreeError = robot.limelight.blueGoal.getTargetXDegrees();
+                        } else if (color == 1 && robot.limelight.detectRed) {
+                            degreeError = robot.limelight.redGoal.getTargetXDegrees();
+                        }
+
+                        if (Math.abs(degreeError) > 15) {
+                            adjustAngle(degreeError);
+                        } else {
+                            double aimSpeed = autoAimSpeed(degreeError, 12);
+                            robot.control.turretMotor.setMotorEnable();
+                            robot.control.turretMotor.setPower(aimSpeed);
+                        }
+                    } else {
+                        robot.control.turretMotor.setPower(0);
                     }
-                }
-                else{
-                    robot.control.turretMotor.setPower(0);
-                }
 
-                if (Robot.gamepad1.bumperRight.isPressed()){     // Push servo starts and stops
-                    telemetry.log().add("Starting the push");
-                    robot.control.push.setPosition(0);    // to push 0
-                    Thread.sleep(1000);
-                    robot.control.push.setPosition(0.5);    // back to origin 0.5
-                }
+                    if (Robot.gamepad1.bumperRight.isPressed()) {     // Push servo starts and stops
+                        telemetry.log().add("Starting the push");
+                        robot.control.push.setPosition(0);    // to push 0
+                        Thread.sleep(1000);
+                        robot.control.push.setPosition(0.5);    // back to origin 0.5
+                    }
 
-                if (Robot.gamepad1.bumperLeft.isPressed()){     // Push servo back to origin if stuck
-                    robot.control.push.setPosition(0.5);    // back to origin 0.5
-                }
+                    if (Robot.gamepad1.bumperLeft.isPressed()) {     // Push servo back to origin if stuck
+                        robot.control.push.setPosition(0.5);    // back to origin 0.5
+                    }
 
-                if (gamepad1.right_trigger > 0.05){         // To shoot 3 balls
+                    if (gamepad1.right_trigger > 0.05 && System.currentTimeMillis() > shooterTriggerMS + 500) {         // To shoot 3 balls
 //                    robot.shootAll2();
-                    shooterTriggerMS = System.currentTimeMillis();
-                    wantToShoot = true;
+                        shooterTriggerMS = System.currentTimeMillis();
+                        wantToShoot = true;
+                        checkpoint = 0;
+                    }
+
+//                if (gamepad1.dpad_left){
+//                    robot.control.lift.setPosition(0.3); // to stop the balls from intake.
+//                } else {robot.control.lift.setPosition(0);}
+
+                    if (gamepad1.left_trigger > 0.05) {
+                        robot.shootRemainingMiddleBall();
+                    }
+
+                    // ===== Gamepad 2 - Drive Only =====
+
+                    double x = 0;
+                    double y = 0;
+                    double rx = 0;
+                    double sensitivity = 1; // prev 0.7
+
+                    if (reversedDrive) {
+                        telemetry.addLine("Drive is reversed");
+                        y = -gamepad2.left_stick_y * sensitivity;
+                        x = gamepad2.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
+                        rx = gamepad2.right_stick_x * sensitivity;
+                    } else {
+                        telemetry.addLine("Drive is not reversed");
+                        y = gamepad2.left_stick_y * sensitivity;
+                        x = -gamepad2.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
+                        rx = gamepad2.right_stick_x * sensitivity;
+                    }
+
+                    // == START FC DRIVE ==
+
+                    // Denominator is the largest motor power (absolute value) or 1
+                    // This ensures all the powers maintain the same ratio,
+                    // but only if at least one is out of the range [-1, 1]
+                    if (gamepad2.start) {
+                        imu.resetYaw();
+                    }
+
+                    double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+                    // Rotate the movement direction counter to the bot's rotation
+                    double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
+                    double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
+
+                    rotX = rotX * 1.1;  // Counteract imperfect strafing
+
+                    // Denominator is the largest motor power (absolute value) or 1
+                    // This ensures all the powers maintain the same ratio,
+                    // but only if at least one is out of the range [-1, 1]
+                    double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
+                    double frontLeftPower = (rotY + rotX + rx) / denominator;
+                    double backLeftPower = (rotY - rotX + rx) / denominator;
+                    double frontRightPower = (rotY - rotX - rx) / denominator;
+                    double backRightPower = (rotY + rotX - rx) / denominator;
+
+                    frontLeftMotor.setPower(frontLeftPower);
+                    backLeftMotor.setPower(backLeftPower);
+                    frontRightMotor.setPower(frontRightPower);
+                    backRightMotor.setPower(backRightPower);
+
+                    // == END FC DRIVE
+
+                    if (gamepad2.dpad_down && System.currentTimeMillis() - lastReversed > 500) {
+                        lastReversed = System.currentTimeMillis();
+                        reversedDrive = !reversedDrive;
+                    }
+
+                    if (reversedDrive) { // different rotations if reversed (as intuitive). may have to switch signs
+                        if (gamepad2.left_trigger > 0.05) {
+                            adjustAngle(-45);
+                        }
+                        if (gamepad2.right_trigger > 0.05) {
+                            adjustAngle(45);
+                        }
+                        if (gamepad2.left_bumper) {
+                            adjustAngle(-62);
+                        }
+                        if (gamepad2.right_bumper) {
+                            adjustAngle(62);
+                        }
+                    } else {
+                        if (gamepad2.left_trigger > 0.05) {
+                            adjustAngle(135);
+                        } // for near shooting
+                        if (gamepad2.right_trigger > 0.05) {
+                            adjustAngle(-135);
+                        }
+                        if (gamepad2.left_bumper) {
+                            adjustAngle(118);
+                        } // for far shooting.
+                        if (gamepad2.right_bumper) {
+                            adjustAngle(-118);
+                        }
+                    }
+
+                    if (gamepad2.x) {        // Shootmotor starts with default power
+                        robot.control.shootMotor.setPower(-0.6); // why was this positive before :(
+                        shootMotorActive = true;
+                    }
+                    if (gamepad2.y) {
+                        robot.control.shootMotor.setPower(0.0);
+                        shootMotorActive = false;
+                    }
+
+                    if (gamepad2.a) { // move instead of .setPower on gamepad1 if works.
+                        shootMotorActive = true;
+                        runShootMotor(3700);
+                        intendedShootVelocity = 3700;
+                    }
+
+                    if (gamepad2.b) {
+                        shootMotorActive = true;
+                        runShootMotor(2900);
+                        intendedShootVelocity = 2900;
+                    }
+
+                    telemetry.addData("time since launch: ", System.currentTimeMillis() - shooterTriggerMS);
+                    telemetry.addData("want to shoot?", wantToShoot);
+                    telemetry.addData("lift up?", liftUp);
+                    telemetry.addData("push up?", pushUp);
+                    telemetry.addData("intake on?", intakeOn);
+                    telemetry.addData("checkpoint", checkpoint);
+
+                    // === shooting control ===
+                    if (wantToShoot && System.currentTimeMillis() < shooterTriggerMS + 350 && checkpoint == 0) {
+                        robot.control.lift.setPosition(0.65);
+                        liftUp = true; // first ball launch
+                        telemetry.addLine("first ball");
+                        checkpoint = 1;
+                    } // the intention of the below wait is for lift to reach the position. so the first ball is actually
+                    // launched 500 ms after setPosition(0.65).
+                    if (checkpoint == 1 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 350 && liftUp && System.currentTimeMillis() < shooterTriggerMS + 700) {
+                        robot.control.lift.setPosition(0);
+                        liftUp = false;
+                        checkpoint = 2;
+                    }
+
+                    if (checkpoint == 2 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 700 && System.currentTimeMillis() < shooterTriggerMS + 1200) {
+                        robot.control.startIntake();
+                        intakeOn = true;
+                        telemetry.addLine("intake on");
+                        checkpoint = 3;
+                    }
+
+                    if (checkpoint == 3 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 1200 && System.currentTimeMillis() < shooterTriggerMS + 1750) {
+                        robot.control.stopIntake();
+                        intakeOn = false;
+                        robot.control.lift.setPosition(0.65); // second ball launch
+                        liftUp = true;
+                        telemetry.addLine("intake off");
+                        checkpoint = 4;
+                    }
+
+                    if (checkpoint == 4 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 1750 && System.currentTimeMillis() < shooterTriggerMS + 2200) {
+                        robot.control.lift.setPosition(0);
+                        liftUp = false;
+                        checkpoint = 5;
+                    }
+
+                    if (checkpoint == 5 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 2200 && System.currentTimeMillis() < shooterTriggerMS + 2300) {
+                        robot.control.push.setPosition(0);
+                        pushUp = true;
+                        checkpoint = 6;
+                    }
+
+                    if (checkpoint == 6 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 2300 && System.currentTimeMillis() < shooterTriggerMS + 2750) {
+                        robot.control.lift.setPosition(0.65);
+                        liftUp = true;
+                        checkpoint = 7;
+                    }
+
+                    if (checkpoint == 7 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 3000) { // change from 5500 to 6000
+                        robot.control.lift.setPosition(0);
+                        robot.control.push.setPosition(0.55);
+                        liftUp = false;
+                        pushUp = false;
+                        wantToShoot = false;
+                        checkpoint = 0;
+                    }
+
+                    if (checkpoint == 7 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 6000) {
+                        wantToShoot = false;
+                        telemetry.addLine("Shootall took too long");
+                        checkpoint = 0;
+                    }
                 }
 
-                if (gamepad1.dpad_left){
-                    robot.control.lift.setPosition(0.3); // to stop the balls from intake.
-                } else {robot.control.lift.setPosition(0);}
-
-                if (gamepad1.left_trigger > 0.05){
-                    robot.shootRemainingMiddleBall();
-                }
-
-                // ===== Gamepad 2 - Drive Only =====
-
-                double x = 0;
-                double y = 0;
-                double rx = 0;
-                double sensitivity = 1; // prev 0.7
-
-                if (reversedDrive){
-                    telemetry.addLine("Drive is reversed");
-                    y = -gamepad2.left_stick_y * sensitivity;
-                    x = gamepad2.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
-                    rx = gamepad2.right_stick_x * sensitivity;
-                } else{
-                    telemetry.addLine("Drive is not reversed");
-                    y = gamepad2.left_stick_y * sensitivity;
-                    x = -gamepad2.left_stick_x * 1.1 * sensitivity;   // Counteract imperfect strafing
-                    rx = gamepad2.right_stick_x * sensitivity;
-                }
-
-                // == START FC DRIVE ==
-
-                // Denominator is the largest motor power (absolute value) or 1
-                // This ensures all the powers maintain the same ratio,
-                // but only if at least one is out of the range [-1, 1]
-                if (gamepad2.start) {
-                    imu.resetYaw();
-                }
-
-                double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-
-                // Rotate the movement direction counter to the bot's rotation
-                double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
-                double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
-
-                rotX = rotX * 1.1;  // Counteract imperfect strafing
-
-                // Denominator is the largest motor power (absolute value) or 1
-                // This ensures all the powers maintain the same ratio,
-                // but only if at least one is out of the range [-1, 1]
-                double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
-                double frontLeftPower = (rotY + rotX + rx) / denominator;
-                double backLeftPower = (rotY - rotX + rx) / denominator;
-                double frontRightPower = (rotY - rotX - rx) / denominator;
-                double backRightPower = (rotY + rotX - rx) / denominator;
-
-                frontLeftMotor.setPower(frontLeftPower);
-                backLeftMotor.setPower(backLeftPower);
-                frontRightMotor.setPower(frontRightPower);
-                backRightMotor.setPower(backRightPower);
-
-                // == END FC DRIVE
-
-                if (gamepad2.dpad_down && System.currentTimeMillis() - lastReversed > 500){
-                    lastReversed = System.currentTimeMillis();
-                    reversedDrive = !reversedDrive;
-                }
-
-                if (reversedDrive){ // different rotations if reversed (as intuitive). may have to switch signs
-                    if (gamepad2.left_trigger > 0.05){
-                        adjustAngle(-45);}
-                    if (gamepad2.right_trigger > 0.05){
-                        adjustAngle(45);}
-                    if (gamepad2.left_bumper){
-                        adjustAngle(-62);}
-                    if (gamepad2.right_bumper){
-                        adjustAngle(62);}
-                } else{
-                    if (gamepad2.left_trigger > 0.05){
-                        adjustAngle(135);} // for near shooting
-                    if (gamepad2.right_trigger > 0.05){
-                        adjustAngle(-135);}
-                    if (gamepad2.left_bumper){
-                        adjustAngle(118);} // for far shooting.
-                    if (gamepad2.right_bumper){
-                        adjustAngle(-118);}
-                }
-
-                if (gamepad2.x) {        // Shootmotor starts with default power
-                    robot.control.shootMotor.setPower(-0.6); // why was this positive before :(
-                    shootMotorActive = true;
-                }
-                if (gamepad2.y){
-                    robot.control.shootMotor.setPower(0.0);
-                    shootMotorActive = false;
-                }
-
-                if (gamepad2.a){ // move instead of .setPower on gamepad1 if works.
-                    shootMotorActive = true;
-                    runShootMotor(3700);
-                    intendedShootVelocity = 3700;
-                }
-
-                if (gamepad2.b){
-                    shootMotorActive = true;
-                    runShootMotor(2900);
-                    intendedShootVelocity = 2900;
-                }
-
-                telemetry.addData("time since launch: ", System.currentTimeMillis() - shooterTriggerMS);
-                telemetry.addData("want to shoot?", wantToShoot);
-                telemetry.addData("lift up?", liftUp);
-                telemetry.addData("push up?", pushUp);
-                telemetry.addData("intake on?", intakeOn);
-
-                // === shooting control ===
-                if (wantToShoot && !liftUp && System.currentTimeMillis() < shooterTriggerMS + 500){
-                    robot.control.lift.setPosition(0.65);
-                    liftUp = true; // first ball launch
-                    telemetry.addLine("first ball");
-                } // the intention of the below wait is for lift to reach the position. so the first ball is actually
-                // launched 500 ms after setPosition(0.65).
-                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 500 && liftUp && System.currentTimeMillis() < shooterTriggerMS + 1000){
-                    robot.control.lift.setPosition(0);
-                    liftUp = false;
-                }
-
-                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 1000 && System.currentTimeMillis() < shooterTriggerMS + 2000){
-                    robot.control.startIntake();
-                    intakeOn = true;
-                    telemetry.addLine("intake on");
-                }
-
-                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 2000 && System.currentTimeMillis() < shooterTriggerMS + 2500){
-                    robot.control.stopIntake();
-                    intakeOn = false;
-                    robot.control.lift.setPosition(0.65); // second ball launch
-                    liftUp = true;
-                    telemetry.addLine("intake off");
-                }
-
-                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 2500 && System.currentTimeMillis() < shooterTriggerMS + 3000){
-                    robot.control.lift.setPosition(0);
-                    liftUp = false;
-                }
-
-                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 3000 && System.currentTimeMillis() < shooterTriggerMS + 3250){
-                    robot.control.push.setPosition(0);
-                    pushUp = true;
-                }
-
-                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 3250 && System.currentTimeMillis() < shooterTriggerMS + 3750){
-                    robot.control.lift.setPosition(0.65);
-                    liftUp = true;
-                }
-
-                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 3750){
-                    robot.control.lift.setPosition(0);
-                    robot.control.push.setPosition(0.55);
-                    wantToShoot = false;
-                }
-
-                if (wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 4000){
-                    wantToShoot = false;
-                    telemetry.addLine("Shootall took too long");
-                }
-
-            } else {
+                telemetry.update();
             }
-
-            telemetry.update();
         }
     }
 }
