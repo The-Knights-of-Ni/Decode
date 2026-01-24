@@ -537,27 +537,27 @@ public class hanTeleopFC extends LinearOpMode {
                     telemetry.addData("checkpoint", checkpoint);
 
                     // === shooting control ===
-                    if (wantToShoot && System.currentTimeMillis() < shooterTriggerMS + 350 && checkpoint == 0) {
+                    if (wantToShoot && System.currentTimeMillis() < shooterTriggerMS + 500 && checkpoint == 0) {
                         robot.control.lift.setPosition(0.65);
                         liftUp = true; // first ball launch
                         telemetry.addLine("first ball");
                         checkpoint = 1;
                     } // the intention of the below wait is for lift to reach the position. so the first ball is actually
                     // launched 500 ms after setPosition(0.65).
-                    if (checkpoint == 1 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 350 && liftUp && System.currentTimeMillis() < shooterTriggerMS + 700) {
+                    if (checkpoint == 1 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 500 && liftUp && System.currentTimeMillis() < shooterTriggerMS + 800) {
                         robot.control.lift.setPosition(0);
                         liftUp = false;
                         checkpoint = 2;
                     }
 
-                    if (checkpoint == 2 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 700 && System.currentTimeMillis() < shooterTriggerMS + 1200) {
+                    if (checkpoint == 2 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 800 && System.currentTimeMillis() < shooterTriggerMS + 1300) {
                         robot.control.startIntake();
                         intakeOn = true;
                         telemetry.addLine("intake on");
                         checkpoint = 3;
                     }
 
-                    if (checkpoint == 3 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 1200 && System.currentTimeMillis() < shooterTriggerMS + 1750) {
+                    if (checkpoint == 3 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 1300 && System.currentTimeMillis() < shooterTriggerMS + 1850) {
                         robot.control.stopIntake();
                         intakeOn = false;
                         robot.control.lift.setPosition(0.65); // second ball launch
@@ -566,19 +566,19 @@ public class hanTeleopFC extends LinearOpMode {
                         checkpoint = 4;
                     }
 
-                    if (checkpoint == 4 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 1750 && System.currentTimeMillis() < shooterTriggerMS + 2200) {
+                    if (checkpoint == 4 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 1850 && System.currentTimeMillis() < shooterTriggerMS + 2300) {
                         robot.control.lift.setPosition(0);
                         liftUp = false;
                         checkpoint = 5;
                     }
 
-                    if (checkpoint == 5 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 2200 && System.currentTimeMillis() < shooterTriggerMS + 2300) {
+                    if (checkpoint == 5 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 2300 && System.currentTimeMillis() < shooterTriggerMS + 2400) {
                         robot.control.push.setPosition(0);
                         pushUp = true;
                         checkpoint = 6;
                     }
 
-                    if (checkpoint == 6 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 2300 && System.currentTimeMillis() < shooterTriggerMS + 2750) {
+                    if (checkpoint == 6 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 2400 && System.currentTimeMillis() < shooterTriggerMS + 2850) {
                         robot.control.lift.setPosition(0.65);
                         liftUp = true;
                         checkpoint = 7;
