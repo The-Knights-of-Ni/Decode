@@ -228,6 +228,16 @@ public class hanTeleopFC extends LinearOpMode {
         frontRightMotor = hardwareMap.dcMotor.get("fr");    //3
         backRightMotor = hardwareMap.dcMotor.get("rr"); //2
 
+        frontLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        frontLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         DcMotor turretMotor = hardwareMap.dcMotor.get("turretMotor"); // ext 1
         DcMotorEx shootMotor = hardwareMap.get(DcMotorEx.class, "shootMotor"); // ext 0
         DcMotor intakeMotor = hardwareMap.dcMotor.get("intakeMotor"); // ext 3
