@@ -1,10 +1,9 @@
 package org.firstinspires.ftc.teamcode.Testop.Drive;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import org.firstinspires.ftc.teamcode.Auto.Auto;
+import org.firstinspires.ftc.teamcode.Auto.Deprecated.Auto;
 import org.firstinspires.ftc.teamcode.Util.AllianceColor;
 import org.firstinspires.ftc.teamcode.Util.Pose;
-import org.firstinspires.ftc.teamcode.Util.Vector;
 
 @Autonomous(name = "Curved Strafe Test", group = "Concept")
 public class CurvedStrafeDriveTest extends Auto {

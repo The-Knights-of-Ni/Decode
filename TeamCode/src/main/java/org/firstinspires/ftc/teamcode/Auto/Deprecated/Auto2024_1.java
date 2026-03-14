@@ -1,14 +1,14 @@
-package org.firstinspires.ftc.teamcode.Auto;
+package org.firstinspires.ftc.teamcode.Auto.Deprecated;
 
 import android.util.Log;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
+import org.firstinspires.ftc.teamcode.Auto.PID;
 
 //@Autonomous(name = "Auto2024_1")
 public class Auto2024_1 extends LinearOpMode {

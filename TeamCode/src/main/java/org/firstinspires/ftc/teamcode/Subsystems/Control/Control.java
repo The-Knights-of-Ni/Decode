@@ -97,24 +97,30 @@ public class Control extends Subsystem {
         shootMotor.setVelocity(variable);
     }
 
+    // turret will drift during the sleeps, move this to robot so auto aiming can be used.
     public void shootAll() throws InterruptedException{
+        lift.setPosition(0.65); // trigger first ball launch
+        Thread.sleep(500);
+        // wait for a set time before stopping, magic number.
+        lift.setPosition(0);
+        Thread.sleep(500);
 
-            lift.setPosition(0.65); // trigger first ball launch
-            Thread.sleep(500); // wait for a set time before stopping, magic number.
-            lift.setPosition(0);
+        startIntake();
+        Thread.sleep(1500);
+        stopIntake();
 
-            startIntake();
-            Thread.sleep(1500);
-            stopIntake();
+        Thread.sleep(800);
+        push.setPosition(0.3);
+        Thread.sleep(500);
+        push.setPosition(0.0);
+        Thread.sleep(500);
 
-            push.setPosition(0);
-            Thread.sleep(500);
+        lift.setPosition(0.65); // trigger third ball launch
+        Thread.sleep(500); // wait for a set time before stopping, magic number.
+        lift.setPosition(0);
 
-            lift.setPosition(0.65); // trigger first ball launch
-            Thread.sleep(500); // wait for a set time before stopping, magic number.
-            lift.setPosition(0);
-
-            push.setPosition(0.6);  //back to origin
+        push.setPosition(0.6);  //back to origin
+        Thread.sleep(500);
     }
 
     public double shootMotorVelocity(double distance){

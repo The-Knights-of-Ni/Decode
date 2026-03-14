@@ -36,7 +36,7 @@ public class Robot {
     public final String initLogTag = "init";
     public final ElapsedTime timer;
     public final boolean visionEnabled;
-    private final AllianceColor allianceColor;
+    public AllianceColor allianceColor;
     private final boolean webEnabled;
     private final boolean odometryEnabled;
     private final boolean limelightEnabled;
@@ -271,4 +271,140 @@ public class Robot {
         }
         Log.i(caption, value);
     }
+
+    public double sigmoid(double x, double k){
+        return 1/(1+Math.exp(-k*x));
+    }
+
+    public double autoAimSpeed(double dist, double k){
+        double magnitude = 0.55, tolerance = 2.0;
+        return (-magnitude*sigmoid(dist-tolerance,k) +
+                magnitude-magnitude*sigmoid(dist+tolerance,k));
+    }
+
+
+    public void waitAim(double waitTime) throws InterruptedException {
+        control.turretMotor.setMotorEnable();
+        for(int i = 0; i<waitTime/10; i++) {
+            limelight.loop();
+            double degreeError = 0.0;
+
+            if (this.allianceColor == AllianceColor.RED) {
+                if (!limelight.detectRed) {
+                    Thread.sleep(10);
+                    continue;
+                }
+                degreeError = limelight.redGoal.getTargetXDegrees();
+            } else if (this.allianceColor == AllianceColor.BLUE) {
+                if (!limelight.detectBlue) {
+                    Thread.sleep(10);
+                    continue;
+                }
+                degreeError = limelight.blueGoal.getTargetXDegrees();
+            }
+            double aimSpeed = autoAimSpeed(degreeError, 12);
+            control.turretMotor.setPower(aimSpeed);
+            telemetry.update();
+            Thread.sleep(10);
+        }
+    }
+
+
+    public void shootAll2() throws InterruptedException{
+        /*
+        DO NOT CHANGE NUMBERS OR SEQUENCES - WORKING VERSION
+         */
+        control.lift.setPosition(0.65); // trigger first ball launch - move up
+        Thread.sleep(500);        // wait to get there
+        control.lift.setPosition(0);    // move down
+        Thread.sleep(500);        // wait to get there
+
+        control.startIntake();          // run intake to move 2 balls up
+        Thread.sleep(1000);       // run enough to have enough power to move balls up
+        control.stopIntake();           // stop
+
+        control.lift.setPosition(0.65); // trigger second ball launch - move up
+        //Thread.sleep(500);        // wait to get there
+        waitAim(250);
+        control.lift.setPosition(0);    // move down
+        Thread.sleep(500);        // wait to get there
+
+        Thread.sleep(800);        // wait for flywheel to get back to speed after first ball is shot
+        control.push.setPosition(0.0);  // push third ball up - 0.0
+        Thread.sleep(500);        // wait to get there
+
+        control.lift.setPosition(0.65); // trigger third ball launch - move up
+        Thread.sleep(500);        // wait to get there
+        control.lift.setPosition(0);    // move down
+
+        control.push.setPosition(0.55);  // put back push 0.6
+    }
+
+    public void shootRemainingMiddleBall() throws InterruptedException {
+        control.push.setPosition(0.0);  // push remaining ball up - 0.0
+        Thread.sleep(500);        // wait to get there
+
+        control.lift.setPosition(0.65); // trigger third ball launch - move up
+        Thread.sleep(500);        // wait to get there
+        control.lift.setPosition(0);    // move down
+
+        control.push.setPosition(0.55);  // put back push 0.6
+    }
+
+    public int newShoot(boolean wantToShoot, double shooterTriggerMS, int checkpoint){
+        if (wantToShoot && System.currentTimeMillis() < shooterTriggerMS + 500 && checkpoint == 0) {
+            control.lift.setPosition(0.65);
+            telemetry.addLine("first ball");
+            checkpoint = 1;
+        } // the intention of the below wait is for lift to reach the position. so the first ball is actually
+        // launched 500 ms after setPosition(0.65).
+        if (checkpoint == 1 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 500 && System.currentTimeMillis() < shooterTriggerMS + 800) {
+            control.lift.setPosition(0);
+            checkpoint = 2;
+        }
+
+        if (checkpoint == 2 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 800 && System.currentTimeMillis() < shooterTriggerMS + 1300) {
+            control.startIntake();
+            telemetry.addLine("intake on");
+            checkpoint = 3;
+        }
+
+        if (checkpoint == 3 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 1300 && System.currentTimeMillis() < shooterTriggerMS + 1850) {
+            control.stopIntake();
+            control.lift.setPosition(0.65); // second ball launch
+            telemetry.addLine("intake off");
+            checkpoint = 4;
+        }
+
+        if (checkpoint == 4 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 1850 && System.currentTimeMillis() < shooterTriggerMS + 2300) {
+            control.lift.setPosition(0);
+            checkpoint = 5;
+        }
+
+        if (checkpoint == 5 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 2300 && System.currentTimeMillis() < shooterTriggerMS + 2400) {
+            control.push.setPosition(0);
+            checkpoint = 6;
+        }
+
+        if (checkpoint == 6 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 2400 && System.currentTimeMillis() < shooterTriggerMS + 2850) {
+            control.lift.setPosition(0.65);
+            checkpoint = 7;
+        }
+
+        if (checkpoint == 7 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 3000) { // change from 5500 to 6000
+            control.lift.setPosition(0);
+            control.push.setPosition(0.55);
+            wantToShoot = false;
+            checkpoint = 0;
+        }
+
+        if (checkpoint == 7 && wantToShoot && System.currentTimeMillis() >= shooterTriggerMS + 6000) {
+            wantToShoot = false;
+            telemetry.addLine("Shootall took too long");
+            checkpoint = 0;
+        }
+
+        return checkpoint;
+    }
+
 }

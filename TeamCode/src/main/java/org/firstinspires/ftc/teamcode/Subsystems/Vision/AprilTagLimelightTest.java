@@ -82,8 +82,8 @@ public class AprilTagLimelightTest {
             botHeadingDeg = botPose.getOrientation().getYaw();
 
 
-            String data1 = String.format(Locale.US, "{Botpose: %s, X (mm): %.3f, Y (mm): %.3f, Heading (deg): %.3f}", botPose.toString(), botXmm, botYmm, botHeadingDeg);
-            telemetry.addData("", data1);
+            // String data1 = String.format(Locale.US, "{Botpose: %s, X (mm): %.3f, Y (mm): %.3f, Heading (deg): %.3f}", botPose.toString(), botXmm, botYmm, botHeadingDeg);
+            // telemetry.addData("", data1);
 
             for(int i = 0; i<res.size(); i++){
                 targetX = res.get(i).getTargetXDegrees();
@@ -91,8 +91,10 @@ public class AprilTagLimelightTest {
 
                 distance = getDistanceFromTags(res.get(i));
 
-                String data = String.format(Locale.US, "{ID: %d, Distance: %.3f, Target X: %.3f, Target Y: %.3f, Area: %.5f}",
-                        res.get(i).getFiducialId(), distance,  targetX, targetY, res.get(i).getTargetArea());
+                //String data = String.format(Locale.US, "{ID: %d, Distance: %.3f, Target X: %.3f, Target Y: %.3f, Area: %.5f}",
+                //        res.get(i).getFiducialId(), distance,  targetX, targetY, res.get(i).getTargetArea());
+                String data = String.format(Locale.US, "ID: %d, Distance: %.2f, Target X: %.2f",
+                        res.get(i).getFiducialId(), distance,  targetX);
                 telemetry.addData("", data);
 
                 if(res.get(i).getFiducialId() < 24 && res.get(i).getFiducialId() > 20){
