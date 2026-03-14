@@ -55,26 +55,26 @@ import java.util.Stack;
 @Disabled
 public class UtilityOctoQuadConfigMenu extends LinearOpMode
 {
-    TelemetryMenu.MenuElement rootMenu = new TelemetryMenu.MenuElement("OctoQuad Config Menu", true);
-    TelemetryMenu.MenuElement menuHwInfo = new TelemetryMenu.MenuElement("Hardware Information", false);
-    TelemetryMenu.EnumOption optionI2cResetMode;
-    TelemetryMenu.EnumOption optionChannelBankConfig;
+    telemetryAenu.MenuElement rootMenu = new telemetryAenu.MenuElement("OctoQuad Config Menu", true);
+    telemetryAenu.MenuElement menuHwInfo = new telemetryAenu.MenuElement("Hardware Information", false);
+    telemetryAenu.EnumOption optionI2cResetMode;
+    telemetryAenu.EnumOption optionChannelBankConfig;
 
-    TelemetryMenu.MenuElement menuEncoderDirections = new TelemetryMenu.MenuElement("Set Encoder Directions", false);
-    TelemetryMenu.BooleanOption[] optionsEncoderDirections = new TelemetryMenu.BooleanOption[OctoQuad.NUM_ENCODERS];
+    telemetryAenu.MenuElement menuEncoderDirections = new telemetryAenu.MenuElement("Set Encoder Directions", false);
+    telemetryAenu.BooleanOption[] optionsEncoderDirections = new telemetryAenu.BooleanOption[OctoQuad.NUM_ENCODERS];
 
-    TelemetryMenu.MenuElement menuVelocityIntervals = new TelemetryMenu.MenuElement("Velocity Measurement Intervals", false);
-    TelemetryMenu.IntegerOption[] optionsVelocityIntervals = new TelemetryMenu.IntegerOption[OctoQuad.NUM_ENCODERS];
+    telemetryAenu.MenuElement menuVelocityIntervals = new telemetryAenu.MenuElement("Velocity Measurement Intervals", false);
+    telemetryAenu.IntegerOption[] optionsVelocityIntervals = new telemetryAenu.IntegerOption[OctoQuad.NUM_ENCODERS];
 
-    TelemetryMenu.MenuElement menuAbsParams = new TelemetryMenu.MenuElement("Abs. Encoder Pulse Width Params", false);
-    TelemetryMenu.IntegerOption[] optionsAbsParamsMax = new TelemetryMenu.IntegerOption[OctoQuad.NUM_ENCODERS];
-    TelemetryMenu.IntegerOption[] optionsAbsParamsMin = new TelemetryMenu.IntegerOption[OctoQuad.NUM_ENCODERS];
-    TelemetryMenu.BooleanOption[] optionsAbsParamsWrapTracking = new TelemetryMenu.BooleanOption[OctoQuad.NUM_ENCODERS];
+    telemetryAenu.MenuElement menuAbsParams = new telemetryAenu.MenuElement("Abs. Encoder Pulse Width Params", false);
+    telemetryAenu.IntegerOption[] optionsAbsParamsMax = new telemetryAenu.IntegerOption[OctoQuad.NUM_ENCODERS];
+    telemetryAenu.IntegerOption[] optionsAbsParamsMin = new telemetryAenu.IntegerOption[OctoQuad.NUM_ENCODERS];
+    telemetryAenu.BooleanOption[] optionsAbsParamsWrapTracking = new telemetryAenu.BooleanOption[OctoQuad.NUM_ENCODERS];
 
-    TelemetryMenu.OptionElement optionProgramToFlash;
-    TelemetryMenu.OptionElement optionSendToRAM;
+    telemetryAenu.OptionElement optionProgramToFlash;
+    telemetryAenu.OptionElement optionSendToRAM;
 
-    TelemetryMenu.StaticClickableOption optionExit;
+    telemetryAenu.StaticClickableOption optionExit;
 
     OctoQuad octoquad;
 
@@ -112,7 +112,7 @@ public class UtilityOctoQuadConfigMenu extends LinearOpMode
         telemetry.addLine("Retrieving current configuration from OctoQuad");
         telemetry.update();
 
-        optionExit = new TelemetryMenu.StaticClickableOption("Exit configuration menu")
+        optionExit = new telemetryAenu.StaticClickableOption("Exit configuration menu")
         {
             @Override
             void onClick() // called on OpMode thread
@@ -121,15 +121,15 @@ public class UtilityOctoQuadConfigMenu extends LinearOpMode
             }
         };
 
-        optionI2cResetMode = new TelemetryMenu.EnumOption("I2C Reset Mode", OctoQuad.I2cRecoveryMode.values(), octoquad.getI2cRecoveryMode());
-        optionChannelBankConfig = new TelemetryMenu.EnumOption("Channel Bank Modes", OctoQuad.ChannelBankConfig.values(), octoquad.getChannelBankConfig());
+        optionI2cResetMode = new telemetryAenu.EnumOption("I2C Reset Mode", OctoQuad.I2cRecoveryMode.values(), octoquad.getI2cRecoveryMode());
+        optionChannelBankConfig = new telemetryAenu.EnumOption("Channel Bank Modes", OctoQuad.ChannelBankConfig.values(), octoquad.getChannelBankConfig());
 
-        menuHwInfo.addChild(new TelemetryMenu.StaticItem("Board Firmware: v" + octoquad.getFirmwareVersion()));
-        //menuHwInfo.addChild(new TelemetryMenu.StaticItem("Board unique ID: FIXME"));
+        menuHwInfo.addChild(new telemetryAenu.StaticItem("Board Firmware: v" + octoquad.getFirmwareVersion()));
+        //menuHwInfo.addChild(new telemetryAenu.StaticItem("Board unique ID: FIXME"));
 
         for(int i = 0; i < OctoQuad.NUM_ENCODERS; i++)
         {
-            optionsEncoderDirections[i] = new TelemetryMenu.BooleanOption(
+            optionsEncoderDirections[i] = new telemetryAenu.BooleanOption(
                     String.format("Encoder %d direction", i),
                     octoquad.getSingleEncoderDirection(i) == OctoQuad.EncoderDirection.REVERSE,
                     "-",
@@ -139,7 +139,7 @@ public class UtilityOctoQuadConfigMenu extends LinearOpMode
 
         for(int i = 0; i < OctoQuad.NUM_ENCODERS; i++)
         {
-            optionsVelocityIntervals[i] = new TelemetryMenu.IntegerOption(
+            optionsVelocityIntervals[i] = new telemetryAenu.IntegerOption(
                     String.format("Chan %d velocity intvl", i),
                     OctoQuad.MIN_VELOCITY_MEASUREMENT_INTERVAL_MS,
                     OctoQuad.MAX_VELOCITY_MEASUREMENT_INTERVAL_MS,
@@ -151,19 +151,19 @@ public class UtilityOctoQuadConfigMenu extends LinearOpMode
         {
             OctoQuad.ChannelPulseWidthParams params = octoquad.getSingleChannelPulseWidthParams(i);
 
-            optionsAbsParamsMax[i] = new TelemetryMenu.IntegerOption(
+            optionsAbsParamsMax[i] = new telemetryAenu.IntegerOption(
                     String.format("Chan %d max pulse length", i),
                     OctoQuad.MIN_PULSE_WIDTH_US,
                     OctoQuad.MAX_PULSE_WIDTH_US,
                     params.max_length_us);
 
-            optionsAbsParamsMin[i] = new TelemetryMenu.IntegerOption(
+            optionsAbsParamsMin[i] = new telemetryAenu.IntegerOption(
                     String.format("Chan %d min pulse length", i),
                     OctoQuad.MIN_PULSE_WIDTH_US,
                     OctoQuad.MAX_PULSE_WIDTH_US,
                     params.min_length_us);
 
-            optionsAbsParamsWrapTracking[i] = new TelemetryMenu.BooleanOption(
+            optionsAbsParamsWrapTracking[i] = new telemetryAenu.BooleanOption(
                     String.format("Chan %d wrap tracking enabled", i),
                     octoquad.getSingleChannelPulseWidthTracksWrap(i),
                     "yes",
@@ -173,7 +173,7 @@ public class UtilityOctoQuadConfigMenu extends LinearOpMode
         menuAbsParams.addChildren(optionsAbsParamsMax);
         menuAbsParams.addChildren(optionsAbsParamsWrapTracking);
 
-        optionProgramToFlash = new TelemetryMenu.OptionElement()
+        optionProgramToFlash = new telemetryAenu.OptionElement()
         {
             String name = "Program Settings to FLASH";
             long lastClickTime = 0;
@@ -208,7 +208,7 @@ public class UtilityOctoQuadConfigMenu extends LinearOpMode
             }
         };
 
-        optionSendToRAM = new TelemetryMenu.OptionElement()
+        optionSendToRAM = new telemetryAenu.OptionElement()
         {
             String name = "Send Settings to RAM";
             long lastClickTime = 0;
@@ -252,7 +252,7 @@ public class UtilityOctoQuadConfigMenu extends LinearOpMode
         rootMenu.addChild(optionSendToRAM);
         rootMenu.addChild(optionExit);
 
-        TelemetryMenu menu = new TelemetryMenu(telemetry, rootMenu);
+        telemetryAenu menu = new telemetryAenu(telemetry, rootMenu);
 
         while (!isStopRequested())
         {
@@ -302,7 +302,7 @@ public class UtilityOctoQuadConfigMenu extends LinearOpMode
      * SOFTWARE.
      */
 
-    public static class TelemetryMenu
+    public static class telemetryAenu
     {
         private final MenuElement root;
         private MenuElement currentLevel;
@@ -320,11 +320,11 @@ public class UtilityOctoQuadConfigMenu extends LinearOpMode
         private final Telemetry telemetry;
 
         /**
-         * TelemetryMenu constructor
+         * telemetryAenu constructor
          * @param telemetry pass in 'telemetry' from your OpMode
          * @param root the root menu element
          */
-        public TelemetryMenu(Telemetry telemetry, MenuElement root)
+        public telemetryAenu(Telemetry telemetry, MenuElement root)
         {
             this.root = root;
             this.currentLevel = root;
