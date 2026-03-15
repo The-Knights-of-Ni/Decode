@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Vision.AprilTagLimelightTest;
 
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -42,6 +43,7 @@ import java.util.Locale;
 
 
 @TeleOp(name = "FTCDashboardTelemetry Test")
+@Config
 public class FTCDashboardTelemetry extends LinearOpMode {
     double deltaT;
     double timeCurrent;
@@ -53,7 +55,7 @@ public class FTCDashboardTelemetry extends LinearOpMode {
     DcMotor backLeftMotor;
     DcMotor frontRightMotor;
     DcMotor backRightMotor;
-    double ShootMotorPower = 0.55;
+    public static double ShootMotorPower = 0.55;
 
     private VoltageSensor battery;
     private ElapsedTime timer2;
@@ -215,6 +217,9 @@ public class FTCDashboardTelemetry extends LinearOpMode {
         packet.fieldOverlay()
                 .setFill("blue")
                 .fillRect(-20, -20, 40, 40);
+        packet.fieldOverlay().drawImage("/dash/ftc.jpg", 24, 24, 48, 48, Math.toRadians(90), 24, 24, false);
+        packet.fieldOverlay().drawGrid(-24, 24, 48, 48, 4, 4, Math.toRadians(45), 24, 24, false);
+        packet.fieldOverlay().fillText("Origin", 0, 0, "8px Arial", -Math.toRadians(45), false);
         FtcDashboard dashboard = FtcDashboard.getInstance();
         dashboard.sendTelemetryPacket(packet);
         Telemetry dashboardTelemetry = dashboard.getTelemetry();
